@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bienvenue</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 90%;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .button-container {
+      margin-top: 20px;
+    }
+
+    .button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+      display: inline-block;
+    }
+
+    .logout {
+      background-color: #e53935;
+    }
+
+    .logout:hover {
+      background-color: #c62828;
+    }
+
+    .profile {
+      background-color: #4CAF50;
+      margin-right: 10px;
+    }
+
+    .profile:hover {
+      background-color: #388E3C;
+    }
+  </style>
+</head>
+<body>
+  @include('components/navbar')
+
+
+  <div class="container">
+    <h1>Bienvenue, {{ auth.user?.username || 'Utilisateur' }} !</h1>
+    <p>Vous êtes connecté(e) avec succès. Profitez de votre espace personnel.</p>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+@if (auth.isAuthenticated)
+    @include('components/ChatButton')
+    @include('components/LogoutButton')
+@else
+    @include('components/LoginButton')
+@endif

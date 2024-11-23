@@ -1,0 +1,88 @@
+@include('components/LogoutConfirmation')
+@include('components/Connexion')
+<script>
+// Afficher la confirmation de déconnexion
+function showLogoutConfirmation() {
+    const confirmationBox = document.querySelector('.logout-confirmation');
+    confirmationBox.style.display = 'flex';
+}
+
+// Afficher le formulaire de connexion
+function showConnexion() {
+    const connexionBox = document.querySelector('.loginForm-container');
+    connexionBox.style.display = 'flex';
+}
+</script>
+@if (auth.isAuthenticated)
+  <!-- Navbar with project name, profile icon, and logout button -->
+  <nav class="navbar">
+    <a href="/home" class="navbar-logo">ProjectPulse</a>
+    <div class="navbar-right">
+      <a href="/profile" class="profile-icon">
+        <img src="/resources/img/unknow.jpg" alt="Profile" />
+      </a>
+      <a href="#" class="logout-btn" onclick="showLogoutConfirmation()">Déconnexion</a>
+    </div>
+  </nav>
+@else
+  <!-- Navbar with project name and login button -->
+  <nav class="navbar">
+    <a href="/" class="navbar-logo">ProjectPulse</a>
+    <div class="navbar-right">
+      <a href="#" class="login-btn" onclick="showConnexion()">Connexion</a>
+    </div>
+  </nav>
+@endif
+
+<style>
+  /* Style pour la barre de navigation */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #5A45FF;
+    color: white;
+    padding: 15px 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+  .navbar-logo {
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+  }
+
+  .navbar-right {
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-right a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    margin-left: 20px;
+  }
+
+  .navbar-right .profile-icon img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+
+  .navbar-right .login-btn, .navbar-right .logout-btn {
+    background-color: #4a3ae0;
+    padding: 8px 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+
+  .navbar-right .login-btn:hover, .navbar-right .logout-btn:hover {
+    background-color: #3b29b3;
+  }
+</style>
