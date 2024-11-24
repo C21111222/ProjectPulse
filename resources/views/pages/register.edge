@@ -94,6 +94,27 @@
       font-size: 14px;
     }
 
+    /* Bouton retour */
+    .form-container .home-button {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .form-container .home-button a {
+      display: inline-block;
+      padding: 12px 20px;
+      background-color: #5A45FF;
+      color: #fff;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .form-container .home-button a:hover {
+      background-color: #4a3ae0;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .form-container h1 {
@@ -108,6 +129,11 @@
       .form-container button {
         font-size: 14px;
         padding: 10px;
+      }
+
+      .form-container .home-button a {
+        font-size: 14px;
+        padding: 10px 16px;
       }
     }
 
@@ -136,6 +162,9 @@
       </form>
       <div class="links">
         <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
+      </div>
+      <div class="home-button">
+        <a href="/home">Retour à l'accueil</a>
       </div>
     </div>
   </main>

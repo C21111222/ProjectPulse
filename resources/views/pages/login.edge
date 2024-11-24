@@ -82,6 +82,26 @@
     .form-container button:hover {
       background-color: #4a3ae0;
     }
+        /* Bouton retour */
+    .form-container .home-button {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .form-container .home-button a {
+      display: inline-block;
+      padding: 12px 20px;
+      background-color: #5A45FF;
+      color: #fff;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .form-container .home-button a:hover {
+      background-color: #4a3ae0;
+    }
 
     /* Liens */
     .form-container .links {
@@ -108,7 +128,12 @@
         font-size: 14px;
         padding: 10px;
       }
+      form-container .home-button a {
+        font-size: 14px;
+        padding: 10px 16px;
+      }
     }
+    
 
     @media (max-width: 480px) {
       .form-container {
@@ -136,6 +161,9 @@
       <div class="links">
         <p>Pas encore de compte ? <a href="/register">S'inscrire</a></p>
         <p><a href="/forgot-password">Mot de passe oublié ?</a></p>
+      </div>
+      <div class="home-button">
+        <a href="/home">Retour à l'accueil</a>
       </div>
     </div>
   </main>
