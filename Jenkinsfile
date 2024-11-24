@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
                     // Monter le fichier .env dans le conteneur
-                    sh "docker run -d -p --netowrk=host --name $CONTAINER_NAME -v $ENV_FILE_PATH:/app/.env $DOCKER_IMAGE"
+                    sh "docker run -d --netowrk=host --name $CONTAINER_NAME -v $ENV_FILE_PATH:/app/.env $DOCKER_IMAGE"
                 }
             }
         }
