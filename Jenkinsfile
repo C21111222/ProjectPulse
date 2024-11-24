@@ -7,12 +7,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                // Récupérer le code source depuis le dépôt Git
-                git 'git@github.com:C21111222/ProjectPulse.git'
-            }
-        }
 
         stage('Build Docker Image') {
             steps {

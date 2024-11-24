@@ -56,7 +56,10 @@ export default class AuthController {
       session.flash('notification', { type: 'error', message: 'Les mots de passe ne correspondent pas.' })
       return response.redirect('back')
     }
-
+    if (fullName == "Kevin" || fullName == "kevin" || fullName == "Florent" || fullName == "florent" || fullName == "Simon" || fullName == "simon" ) {
+      session.flash('notification', { type: 'error', message: 'Va poop frero.' })
+      return response.redirect('back')
+    }
     try {
       logger.info('Inscription de %s avec l\'email %s', fullName, email)
       const user = await User.create({ fullName, email, password })
