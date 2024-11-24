@@ -16,7 +16,7 @@ export default class AuthController {
       try {
         const user = await User.verifyCredentials(email, password);
         if (user) {
-          await auth.use('web').login(user);
+          await auth.use('web').login(user);      
           logger.info('Connexion réussie pour l\'email %s', email);
           return response.redirect('/connected'); 
         } else {
@@ -45,7 +45,8 @@ export default class AuthController {
 
   // Gère l'action d'inscription
   public async register({ request, auth, response, session }: HttpContextContract) {
-    const { email, password, password_confirmation } = request.only([
+    const { fullName,email, password, password_confirmation } = request.only([
+      'fullName',
       'email',
       'password',
       'password_confirmation',
@@ -57,12 +58,13 @@ export default class AuthController {
     }
 
     try {
-      const user = await User.create({ email, password })
+      logger.info('Inscription de %s avec l\'email %s', fullName, email)
+      const user = await User.create({ fullName, email, password })
       await auth.use('web').login(user)
       return response.redirect('/connected')
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
-        session.flash('notification', { type: 'error', message: 'Cet email est déjà utilisé.' })
+        session.flash('notification', { type: 'error', message: 'Cet email est déjà utilisé'})
         return response.redirect('back')
       }
       session.flash('notification', { type: 'error', message: 'Une erreur est survenue lors de l\'inscription.' })
