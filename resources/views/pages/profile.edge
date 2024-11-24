@@ -71,9 +71,9 @@
     <!-- Image de profil -->
     <img src="/resources/img/unknow.jpg" alt="Image de profil">
     <!-- Nom de l'utilisateur -->
-    <h1>{{ session.get('user.fullName') }}</h1>
+    <h1>{{ auth.user.getFullName() }}</h1>
     <!-- Adresse e-mail -->
-    <p>{{ session.get('user.email') }}</p>
+    <p>{{ auth.user.getMail() }}</p>
     <!-- Bouton Déconnexion -->
   </div>
 </body>

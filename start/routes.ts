@@ -9,11 +9,16 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
-const AuthController = () => import('#controllers/auth_controller')
+
+import transmit from '@adonisjs/transmit/services/main'
+
+transmit.registerRoutes()
+
 router.use([
-  // ...
   () => import('#middleware/silent_auth_middleware')
 ])
+const AuthController = () => import('#controllers/auth_controller')
+
 
 // Routes pour les utilisateurs non connectés (guest)
 router.group(() => {
@@ -41,8 +46,3 @@ router.on('/').render('pages/homePage')
 router.on('/profile').render('pages/profile').use(middleware.auth())
 router.on('/connected').render('pages/connected').use(middleware.auth())
 
-router
-  .get('dashboard', async ({ auth }) => {
-    await auth.user!.getAllMetrics()
-  })
-  .use(middleware.auth())

@@ -128,7 +128,7 @@
       <h1>Inscription</h1>
       <form action="/register" method="POST">
         {{ csrfField() }}
-        <input type="text" name="name" placeholder="Nom complet" required />
+        <input type="text" name="fullName" placeholder="Nom complet" required />
         <input type="email" name="email" placeholder="Adresse email" required />
         <input type="password" name="password" placeholder="Mot de passe" required />
         <input type="password" name="password_confirmation" placeholder="Confirmez le mot de passe" required />
