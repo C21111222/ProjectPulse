@@ -18,6 +18,7 @@ export default class AuthController {
         if (user) {
           await auth.use('web').login(user);      
           user.isActive = true;
+          await user.save();
           logger.info('Connexion réussie pour l\'email %s', email);
           return response.redirect('/connected'); 
         } else {
@@ -46,6 +47,7 @@ export default class AuthController {
         if (user) {
           await auth.use('web').login(user);
           user.isActive = true;
+          await user.save();
           logger.info('Connexion réussie pour l\'email %s', email);
           return response.redirect('/connected');
         } else {
@@ -92,6 +94,7 @@ export default class AuthController {
       const user = await User.create({ fullName, email, password })
       await auth.use('web').login(user)
       user.isActive = true
+      await user.save()
       return response.redirect('/connected')
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
@@ -107,6 +110,7 @@ export default class AuthController {
   public async logout({ auth, response }: HttpContextContract) {
     if (auth.user) {
       auth.user.isActive = false;
+      await auth.user.save();
     }
     await auth.use('web').logout()
     return response.redirect('/') 
