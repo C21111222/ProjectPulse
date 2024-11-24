@@ -1,5 +1,5 @@
 # ProjectPulse
-test
+
 How to run the project:
 1. Clone the repository
 2. cd into the project directory
