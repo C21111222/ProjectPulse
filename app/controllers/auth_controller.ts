@@ -47,18 +47,20 @@ export default class AuthController {
           await auth.use('web').login(user);
           user.isActive = true;
           logger.info('Connexion réussie pour l\'email %s', email);
-          return response.json({ success: true, redirectUrl: '/connected' });
+          return response.redirect('/connected');
         } else {
           logger.info('Connexion échouée pour l\'email %s', email);
-          return response.json({ success: false, message: 'Email ou mot de passe incorrect.' });
+          session.flash('notification', { type: 'error', message: 'Email ou mot de passe incorrect.' });
+          return response.redirect('/login');
         }
       } catch (error) {
         logger.info('Connexion échouée pour l\'email %s', email);
         if (error.code == 'E_INVALID_CREDENTIALS') {
-          return response.json({ success: false, message: 'Email ou mot de passe incorrect.' });
-        } else {
-          return response.json({ success: false, message: 'Une erreur est survenue lors de la connexion.' });
-        }
+          session.flash('notification', { type: 'error', message: 'Email ou mot de passe incorrect.' });
+          return response.redirect('/login');
+        } 
+        session.flash('notification', { type: 'error', message: 'Une erreur est survenue lors de la connexion.' });
+        return response.redirect('/login');
       }
     }
 
