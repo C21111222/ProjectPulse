@@ -24,7 +24,7 @@ const AuthController = () => import('#controllers/auth_controller')
 router.group(() => {
   // Route pour afficher la page de connexion
   router.get('/login', [AuthController , 'showLogin'])
-  router.get('/login_fast', [AuthController , 'login'])
+  router.post('/login_fast', [AuthController , 'loginFast'])
   // Route pour soumettre le formulaire de connexion
   router.post('/login', [AuthController , 'login'])
 

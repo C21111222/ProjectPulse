@@ -37,6 +37,33 @@ export default class AuthController {
 
     }
 
+    public async loginFast({ request, auth, response, session}: HttpContextContract) {
+      const { email, password } = request.all();
+      logger.info('Tentative de connexion avec l\'email %s', email);
+      try {
+        const user = await User.verifyCredentials(email, password);
+        if (user) {
+          await auth.use('web').login(user);      
+          logger.info('Connexion réussie pour l\'email %s', email);
+          return response.redirect('/connected'); 
+        } else {
+          logger.info('Connexion échouée pour l\'email %s', email);
+          session.flash('notification',{ type: 'error', message: 'Email ou mot de passe incorrect.' });
+          // on ne redirige pas etant donné que c'est un login rapide
+        }
+      } catch (error) {
+        logger.info('Connexion échouée pour l\'email %s', email);
+        if (error.code == 'E_INVALID_CREDENTIALS') {
+          session.flash('notification',{ type: 'error', message: 'Email ou mot de passe incorrect.' });
+          return response.redirect('back');
+        } else {
+          session.flash('notification',{ type: 'error', message: 'Une erreur est survenue lors de la connexion.' });
+        }
+      }
+
+
+    }
+
 
   // Affiche la page d'inscription
   public async showRegister({ view }: HttpContextContract) {
