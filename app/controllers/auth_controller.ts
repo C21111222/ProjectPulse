@@ -17,6 +17,7 @@ export default class AuthController {
         const user = await User.verifyCredentials(email, password);
         if (user) {
           await auth.use('web').login(user);      
+          user.isActive = true;
           logger.info('Connexion réussie pour l\'email %s', email);
           return response.redirect('/connected'); 
         } else {
@@ -37,31 +38,28 @@ export default class AuthController {
 
     }
 
-    public async loginFast({ request, auth, response, session}: HttpContextContract) {
+    public async loginFast({ request, auth, response, session }: HttpContextContract) {
       const { email, password } = request.all();
       logger.info('Tentative de connexion avec l\'email %s', email);
       try {
         const user = await User.verifyCredentials(email, password);
         if (user) {
-          await auth.use('web').login(user);      
+          await auth.use('web').login(user);
+          user.isActive = true;
           logger.info('Connexion réussie pour l\'email %s', email);
-          return response.redirect('/connected'); 
+          return response.json({ success: true, redirectUrl: '/connected' });
         } else {
           logger.info('Connexion échouée pour l\'email %s', email);
-          session.flash('notification',{ type: 'error', message: 'Email ou mot de passe incorrect.' });
-          // on ne redirige pas etant donné que c'est un login rapide
+          return response.json({ success: false, message: 'Email ou mot de passe incorrect.' });
         }
       } catch (error) {
         logger.info('Connexion échouée pour l\'email %s', email);
         if (error.code == 'E_INVALID_CREDENTIALS') {
-          session.flash('notification',{ type: 'error', message: 'Email ou mot de passe incorrect.' });
-          return response.redirect('back');
+          return response.json({ success: false, message: 'Email ou mot de passe incorrect.' });
         } else {
-          session.flash('notification',{ type: 'error', message: 'Une erreur est survenue lors de la connexion.' });
+          return response.json({ success: false, message: 'Une erreur est survenue lors de la connexion.' });
         }
       }
-
-
     }
 
 
@@ -91,6 +89,7 @@ export default class AuthController {
       logger.info('Inscription de %s avec l\'email %s', fullName, email)
       const user = await User.create({ fullName, email, password })
       await auth.use('web').login(user)
+      user.isActive = true
       return response.redirect('/connected')
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
@@ -104,6 +103,9 @@ export default class AuthController {
 
   // Gère la déconnexion
   public async logout({ auth, response }: HttpContextContract) {
+    if (auth.user) {
+      auth.user.isActive = false;
+    }
     await auth.use('web').logout()
     return response.redirect('/') 
   }

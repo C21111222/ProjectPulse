@@ -28,12 +28,20 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 
+  @column()
+  declare isActive: boolean
+
   public getFullName() {
     return this.fullName
   }
 
   public getMail() { 
     return this.email
+  }
+
+  // method pour recuperer tous les utilisateurs actifs
+  public static async getAllUsers() {
+    return await User.query().where('is_active', true).exec()
   }
   
 }
