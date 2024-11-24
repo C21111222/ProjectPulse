@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'adonisjs-project'
         CONTAINER_NAME = 'adonisjs-container'
+        ENV_FILE_PATH = '/var/secret/.env'  // Chemin du fichier .env sur le VPS
     }
 
     stages {
@@ -29,8 +30,8 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    // Lancer le nouveau conteneur Docker sur le port 3333
-                    sh "docker run -d -p 3333:3333 --name $CONTAINER_NAME $DOCKER_IMAGE"
+                    // Monter le fichier .env dans le conteneur
+                    sh "docker run -d -p 3333:3333 --name $CONTAINER_NAME -v $ENV_FILE_PATH:/app/.env $DOCKER_IMAGE"
                 }
             }
         }
