@@ -1,4 +1,4 @@
-
+@if (auth.isAuthenticated)
 <div id="chat-button" class="chat-button" onclick="toggleChat()">
   <span>Chat</span>
 </div>
@@ -11,6 +11,9 @@
   </div>
   <div class="chat-body">
     <p>Arrive prochainement...</p>
+    <div class="openChatButton">
+      <a href="/chat" class="button">Ouvrir le chat</a>
+    </div>
   </div>
 </div>
 
@@ -79,6 +82,34 @@
     justify-content: center;
     align-items: center;
   }
+  .chat-body {
+    padding: 10px;
+  }
+
+  .openChatButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 10px; /* Ajuster la distance par rapport au bas de la fenêtre de chat */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .openChatButton .button {
+    display: inline-block;
+    padding: 10px 20px; /* Ajuster le padding pour rendre le bouton plus grand */
+    background-color: #5A45FF; /* Couleur de fond */
+    color: white; /* Couleur du texte */
+    text-decoration: none; /* Supprimer la décoration de texte */
+    border-radius: 25px; /* Bordures arrondies */
+    font-size: 16px; /* Taille du texte */
+    transition: background-color 0.3s ease; /* Transition pour l'effet de survol */
+  }
+
+  .openChatButton .button:hover {
+    background-color: #4a3ae0; /* Couleur de fond au survol */
+  }
 </style>
 
 <script>
@@ -92,4 +123,4 @@
     }
   }
 </script>
-
+@endif

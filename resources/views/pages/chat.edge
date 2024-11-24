@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messagerie</title>
+  <style>
+    /* CSS pour la page de messagerie */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 60px); /* Ajuster la hauteur pour tenir compte de la navbar */
+      margin-top: 60px; /* Ajouter un espace pour la navbar */
+    }
+
+    .chat-sidebar {
+      width: 25%;
+      background-color: #2c3e50;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+    }
+
+    .search-bar {
+      margin-bottom: 20px;
+      width: 90%;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .user-list {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .user-item {
+      padding: 10px;
+      margin: 5px 0;
+      cursor: pointer;
+      border-radius: 5px;
+      background-color: #34495e;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.3s;
+    }
+
+    .user-item:hover {
+      background-color: #1abc9c;
+    }
+
+    .user-fullName {
+      font-size: 16px;
+      color: white;
+    }
+
+    .chat-window {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #ecf0f1;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      border-bottom: 1px solid #bdc3c7;
+    }
+
+    .message {
+      color: #7f8c8d;
+      font-style: italic;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 15px;
+      background-color: #bdc3c7;
+    }
+
+    .chat-input input[type="text"] {
+      flex-grow: 1;
+      padding: 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+
+    .chat-input button {
+      padding: 10px 20px;
+      font-size: 14px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .chat-input button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+
+    .chat-input button:hover:enabled {
+      background-color: #2980b9;
+    }
+
+    /* Scrollbar styling for user list and chat box */
+    .user-list::-webkit-scrollbar,
+    .chat-box::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .user-list::-webkit-scrollbar-thumb,
+    .chat-box::-webkit-scrollbar-thumb {
+      background-color: #34495e;
+      border-radius: 4px;
+    }
+
+    .user-list::-webkit-scrollbar-thumb:hover,
+    .chat-box::-webkit-scrollbar-thumb:hover {
+      background-color: #1abc9c;
+    }
+
+    /* Responsivité */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .chat-sidebar {
+        width: 100%;
+        height: 50vh;
+        order: 2;
+      }
+
+      .chat-window {
+        width: 100%;
+        height: 50vh;
+        order: 1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .chat-sidebar {
+        height: 60vh;
+      }
+
+      .chat-window {
+        height: 40vh;
+      }
+
+      .chat-input input[type="text"] {
+        font-size: 12px;
+        padding: 8px;
+      }
+
+      .chat-input button {
+        font-size: 12px;
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  @include('components/navbar') 
+  <div class="container">
+    <div class="chat-sidebar">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Rechercher un utilisateur..." />
+      </div>
+      <div class="user-list">
+        <ul id="userList">
+          @each(user in users)
+            <li class="user-item" data-user-id="{{ user.id }}">
+              <span class="user-fullName" onclick="openChat({{ user.id }})">{{ user.fullName }}</span>
+            </li>
+          @endeach
+        </ul>
+      </div>
+    </div>
+
+    <div class="chat-window">
+      <div id="chatBox" class="chat-box">
+        <p class="message">Sélectionnez un utilisateur pour démarrer une conversation</p>
+      </div>
+      <div id="chatInput" class="chat-input">
+        <input type="text" id="messageInput" placeholder="Tapez un message..." disabled />
+        <button id="sendButton" disabled>Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Injecter les utilisateurs dans une variable JavaScript
+    const users = [
+      @each(user in users)
+        { id: {{ user.id }}, fullName: '{{ user.fullName }}' },
+      @endeach
+    ];
+
+    // Fonction pour ouvrir un chat
+    function openChat(userId) {
+      const selectedUser = users.find(user => user.id === userId);
+      console.log(`Ouverture du chat avec ${selectedUser.fullName}`);
+      document.getElementById('chatBox').innerHTML = `<p><strong>Chat avec ${selectedUser.fullName}</strong></p>`;
+      document.getElementById('messageInput').disabled = false;
+      document.getElementById('sendButton').disabled = false;
+    }
+
+    // Attacher l'événement de clic aux éléments de la liste des utilisateurs
+    document.querySelectorAll('.user-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const userId = parseInt(item.getAttribute('data-user-id'));
+        openChat(userId);
+      });
+    });
+
+    // Fonction pour envoyer un message
+    function sendMessage() {
+      const message = document.getElementById('messageInput').value;
+      if (message.trim() !== '') {
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML += `<p>Vous : ${message}</p>`;
+        document.getElementById('messageInput').value = '';
+      }
+    }
+
+    // Envoyer le message lorsque le bouton est cliqué
+    document.getElementById('sendButton').addEventListener('click', sendMessage);
+
+    // Envoyer le message lorsque la touche "Entrée" est pressée
+    document.getElementById('messageInput').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Filtrage des utilisateurs par la barre de recherche
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const filteredUsers = users.filter(user => user.fullName.toLowerCase().includes(searchTerm));
+      const userList = document.getElementById('userList');
+      userList.innerHTML = '';
+      filteredUsers.forEach(user => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('user-item');
+        listItem.setAttribute('data-user-id', user.id);
+        listItem.textContent = user.fullName;
+
+        // Attacher l'événement de clic ici
+        listItem.addEventListener('click', () => openChat(user.id));
+
+        userList.appendChild(listItem);
+      });
+    });
+  </script>
+</body>
+</html>

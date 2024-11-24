@@ -18,6 +18,7 @@ router.use([
   () => import('#middleware/silent_auth_middleware')
 ])
 const AuthController = () => import('#controllers/auth_controller')
+const MessageriesController = () => import('#controllers/messageries_controller')
 
 
 // Routes pour les utilisateurs non connectés (guest)
@@ -35,6 +36,8 @@ router.group(() => {
   router.post('/register', [AuthController , 'register'])
 
 }).use(middleware.guest())
+
+router.get('/chat', [MessageriesController , 'index']).as('chat').use(middleware.auth())
 
 // Route pour se déconnecter
 router.get('/logout', [AuthController , 'logout'])

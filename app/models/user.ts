@@ -43,5 +43,17 @@ export default class User extends compose(BaseModel, AuthFinder) {
   public static async getAllUsers() {
     return await User.query().where('is_active', true).exec()
   }
+
+  // to json
+  public serialize() {
+    return {
+      id: this.id,
+      fullName: this.fullName,
+      email: this.email,
+      isActive: this.isActive,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    }
+  }
   
 }
