@@ -35,6 +35,17 @@ function showConnexion() {
   </nav>
 @endif
 
+@if(flashMessages.has('notification'))
+  <script>
+    Swal.fire({
+      icon: "{{ flashMessages.get('notification').type }}", // 'success', 'error', etc.
+      title: "{{ flashMessages.get('notification').message }}",
+      showConfirmButton: false,
+      timer: 3000
+    });
+  </script>
+@end
+
 <style>
   /* Style pour la barre de navigation */
   .navbar {
