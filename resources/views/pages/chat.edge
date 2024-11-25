@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Messagerie</title>
+  @if(flashMessages.has('notification'))
+    <script>
+      Swal.fire({
+        icon: "{{ flashMessages.get('notification').type }}", // 'success', 'error', etc.
+        title: "{{ flashMessages.get('notification').message }}",
+        showConfirmButton: false,
+        timer: 3000
+      });
+    </script>
+  @end
+
   <style>
     /* CSS pour la page de messagerie */
     body {

@@ -35,12 +35,16 @@ export default class MessageriesController {
       return response.json(messages)
     }
 
-    async sendMessage({ auth, request, response }) {
+    async sendMessage({ auth, request, response, session }) {
         const receiverId = request.input('receiver_id')
         const message = request.input('content')
         const receiver = await User.find(receiverId)
         if (!receiver) {
           return response.status(404).json({ message: 'Utilisateur non trouvé' })
+        }
+        if (message.length > 64) {
+          session.flash('notification', { type: 'error', message: 'Le message est trop long' })
+          return response.status(400).json({ message: 'Le message est trop long' })
         }
         const newMessage = new Message()
         newMessage.senderId = auth.user.id
