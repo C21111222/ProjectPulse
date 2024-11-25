@@ -293,7 +293,6 @@
 
       activeSubscription = transmit.subscription('chats/' + channel + '/messages');
       await activeSubscription.create();
-      activeSubscription.offMessage();
       activeSubscription.onMessage((data) => {
         console.log('Nouveau message reçu');
         console.log(data);
