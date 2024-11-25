@@ -273,6 +273,7 @@
           console.log(data)
         }); 
         stopListening();
+        activeSubscription.removeAllListeners();
         activeSubscription = null;
       }
       userIdsauv = userId;
@@ -310,6 +311,7 @@
           console.log(data)
         }); 
         stopListening();
+        activeSubscription.removeAllListeners();
         activeSubscription = null;
       }
     });
