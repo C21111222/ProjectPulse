@@ -324,6 +324,13 @@
       });
       console.log(`Envoi du message à l'utilisateur ${receiverId}`);
       console.log(response);
+              if (rep.status !== 200) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Une erreur est survenue lors de l\'envoi du message : ' + rep.message,
+          });
+      }
       return response;
     }
     
@@ -401,16 +408,9 @@
     function sendMessage() {
       const message = document.getElementById('messageInput').value;
       if (message.trim() !== '') {
-        const rep = sendMessageToServer(userIdsauv, message);
-        console.log(rep.status);
+        sendMessageToServer(userIdsauv, message);
         document.getElementById('messageInput').value = '';
-        if (rep.status !== 200) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erreur',
-            text: 'Une erreur est survenue lors de l\'envoi du message : ' + rep.value.message,
-          });
-        }
+
       }
     }
 
