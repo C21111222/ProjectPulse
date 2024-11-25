@@ -306,7 +306,9 @@
     window.addEventListener('beforeunload', () => {
       if (activeSubscription) {
         console.log('Fermeture de la souscription avant de quitter la page');
-        stopListening()
+        if (stopListening) {
+          stopListening();
+        }
       }
     });
 
