@@ -297,7 +297,7 @@
 
       activeSubscription = transmit.subscription('chats/' + channel + '/messages');
       await activeSubscription.create();
-      if (channel in knownChannels) {
+      if (knownChannels.includes(channel)) {
         console.log('Channel déjà connu');
       } else {
         console.log('Nouveau channel');
