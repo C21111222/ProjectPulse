@@ -324,7 +324,7 @@
       });
       console.log(`Envoi du message à l'utilisateur ${receiverId}`);
       console.log(response);
-      return response.json();
+      return response;
     }
     
     // Fonction pour ouvrir un chat
@@ -402,13 +402,13 @@
       const message = document.getElementById('messageInput').value;
       if (message.trim() !== '') {
         const rep = sendMessageToServer(userIdsauv, message);
-        console.log(rep);
+        console.log(rep.status);
         document.getElementById('messageInput').value = '';
         if (rep.status !== 200) {
           Swal.fire({
             icon: 'error',
             title: 'Erreur',
-            text: 'Une erreur est survenue lors de l\'envoi du message : ' + rep.message,
+            text: 'Une erreur est survenue lors de l\'envoi du message : ' + rep.value.message,
           });
         }
       }
