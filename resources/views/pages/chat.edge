@@ -270,8 +270,6 @@
       if (activeSubscription) {
         console.log('Fermeture de la souscription active');
         activeSubscription.delete()
-        activeSubscription = null;
-        let activeSubscription = null;
       }
       userIdsauv = userId;
       const selectedUser = users.find(user => user.id === userId);
@@ -305,7 +303,6 @@
       if (activeSubscription) {
         console.log('Fermeture de la souscription avant de quitter la page');
         activeSubscription.delete()
-        let activeSubscription = null;
       }
     });
 
