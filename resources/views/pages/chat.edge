@@ -269,12 +269,9 @@
       scrollToBottom();
       if (activeSubscription) {
         console.log('Fermeture de la souscription active');
-        const stopListening = activeSubscription.onMessage((data) => {
-          console.log(data)
-        }); 
-        stopListening();
         activeSubscription.delete()
         activeSubscription = null;
+        let activeSubscription = null;
       }
       userIdsauv = userId;
       const selectedUser = users.find(user => user.id === userId);
@@ -307,12 +304,8 @@
     window.addEventListener('beforeunload', () => {
       if (activeSubscription) {
         console.log('Fermeture de la souscription avant de quitter la page');
-        const stopListening = activeSubscription.onMessage((data) => {
-          console.log(data)
-        }); 
-        stopListening();
         activeSubscription.delete()
-        activeSubscription = null;
+        let activeSubscription = null;
       }
     });
 
