@@ -86,7 +86,7 @@ export default class AuthController {
       return response.redirect('back')
     }
     if (fullName == "Kevin" || fullName == "kevin" || fullName == "kévin" || fullName == "Kévin" ||fullName == "Florent" || fullName == "florent" || fullName == "Simon" || fullName == "simon" ) {
-      session.flash('notification', { type: 'error', message: 'Va poop frero.' })
+      session.flash('notification', { type: 'error', message: 'Va poop fdp.' })
       return response.redirect('back')
     }
     try {
