@@ -217,7 +217,6 @@
     baseUrl: window.location.origin
   })
   let activeSubscription = null;
-  let stopListening = null;
 
 
 
@@ -269,10 +268,10 @@
     async function openChat(userId) {
       if (activeSubscription) {
         console.log('Fermeture de la souscription active');
-        if (stopListening) {
-          stopListening();
-          stopListening = null;
-        }
+        const stopListening = activeSubscription.onMessage((data) => {
+          console.log(data)
+        }); 
+        stopListening();
         activeSubscription = null;
       }
       userIdsauv = userId;
@@ -293,9 +292,6 @@
 
       activeSubscription = transmit.subscription('chats/' + channel + '/messages');
       await activeSubscription.create();
-      const stopListening = activeSubscription.onMessage((data) => {
-        console.log(data)
-      }); 
       activeSubscription.onMessage((data) => {
         console.log('Nouveau message reçu');
         console.log(data);
@@ -309,9 +305,10 @@
     window.addEventListener('beforeunload', () => {
       if (activeSubscription) {
         console.log('Fermeture de la souscription avant de quitter la page');
-        if (stopListening) {
-          stopListening();
-        }
+        const stopListening = activeSubscription.onMessage((data) => {
+          console.log(data)
+        }); 
+        stopListening();
       }
     });
 
