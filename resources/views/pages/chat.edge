@@ -322,7 +322,7 @@
       },
       body: JSON.stringify({ receiver_id: receiverId, content }),
       });
-      if (response.status !== 200) {
+      if (response.status == 400) {
           Swal.fire({
             icon: 'error',
             title: 'Erreur',
