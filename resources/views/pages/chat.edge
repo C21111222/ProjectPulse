@@ -323,8 +323,8 @@
       body: JSON.stringify({ receiver_id: receiverId, content }),
       });
       console.log(`Envoi du message à l'utilisateur ${receiverId}`);
-      console.log(response);
-              if (response.status !== 200) {
+      console.log(response.status);
+      if (response.status !== 200) {
           Swal.fire({
             icon: 'error',
             title: 'Erreur',
