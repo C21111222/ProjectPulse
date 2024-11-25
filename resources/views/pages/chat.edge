@@ -141,13 +141,13 @@
       background-color: #1abc9c;
     }
 
-    .newmessage sent{
+    .newmessagesent{
       background-color: #3498db;
       color: white;
       align-self: flex-end;
     }
 
-    .newmessage received{
+    .newmessagereceived{
       background-color: #ecf0f1;
       color: #333;
       align-self: flex-start;
@@ -317,7 +317,7 @@
         console.log('Nouveau message reçu');
         console.log(data);
         const messageClass = data.sender === userId ? 'received' : 'sent';
-        document.getElementById('chatBox').innerHTML += `<p class="newmessage ${messageClass}">${data.sender === userId ? selectedUser.fullName : 'Vous'} : ${data.message}</p>`;
+        document.getElementById('chatBox').innerHTML += `<p class="newmessage${messageClass}">${data.sender === userId ? selectedUser.fullName : 'Vous'} : ${data.message}</p>`;
         scrollToBottom();
       });
         knownChannels.push(channel);
