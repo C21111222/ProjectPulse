@@ -293,8 +293,7 @@
 
       activeSubscription = transmit.subscription('chats/' + channel + '/messages');
       await activeSubscription.create();
-      // on enleve le listener pour eviter les doublons
-      activeSubscription.removeAllListeners();
+      activeSubscription.offMessage();
       activeSubscription.onMessage((data) => {
         console.log('Nouveau message reçu');
         console.log(data);
