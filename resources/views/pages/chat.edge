@@ -266,6 +266,7 @@
     
     // Fonction pour ouvrir un chat
     async function openChat(userId) {
+      scrollToBottom();
       if (activeSubscription) {
         console.log('Fermeture de la souscription active');
         const stopListening = activeSubscription.onMessage((data) => {
