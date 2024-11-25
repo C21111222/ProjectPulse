@@ -300,6 +300,7 @@
       if (channel in knownChannels) {
         console.log('Channel déjà connu');
       } else {
+        console.log('Nouveau channel');
         activeSubscription.onMessage((data) => {
         console.log('Nouveau message reçu');
         console.log(data);
