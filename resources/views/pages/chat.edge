@@ -232,6 +232,7 @@
     ];
     // variable pour stocker l'id de l'utilisateur à qui on envoie le message
     let userIdsauv = null;
+    let knownChannels = [];
     function scrollToBottom() {
       const chatBox = document.getElementById('chatBox');
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -296,13 +297,19 @@
 
       activeSubscription = transmit.subscription('chats/' + channel + '/messages');
       await activeSubscription.create();
-      activeSubscription.onMessage((data) => {
+      if (channel in knownChannels) {
+        console.log('Channel déjà connu');
+      } else {
+        activeSubscription.onMessage((data) => {
         console.log('Nouveau message reçu');
         console.log(data);
         const messageClass = data.senderId === userId ? 'received' : 'sent';
         document.getElementById('chatBox').innerHTML += `<p class="newmessage ${messageClass}">${data.sender === userId ? selectedUser.fullName : 'Vous'} : ${data.message}</p>`;
         scrollToBottom();
       });
+        knownChannels.push(channel);
+      }
+
       document.getElementById('messageInput').disabled = false;
       document.getElementById('sendButton').disabled = false;
     }
