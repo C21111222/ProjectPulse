@@ -322,13 +322,11 @@
       },
       body: JSON.stringify({ receiver_id: receiverId, content }),
       });
-      console.log(`Envoi du message à l'utilisateur ${receiverId}`);
-      console.log(response.status);
       if (response.status !== 200) {
           Swal.fire({
             icon: 'error',
             title: 'Erreur',
-            text: 'Une erreur est survenue lors de l\'envoi du message : ' + response.message,
+            text: 'Une erreur est survenue lors de l\'envoi du message, attention 64 caractères maximum',
           });
       }
       return response;
