@@ -141,16 +141,44 @@
       background-color: #1abc9c;
     }
 
-    .newmessagesent{
+    .messagesent {
       background-color: #3498db;
       color: white;
       align-self: flex-end;
+      margin-left: auto;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 60%;
     }
 
-    .newmessagereceived{
+    .messagereceived {
       background-color: #ecf0f1;
       color: #333;
       align-self: flex-start;
+      margin-right: auto;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 60%;
+    }
+
+    .newmessagesent {
+      background-color: #3498db;
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 60%;
+    }
+
+    .newmessagereceived {
+      background-color: #ecf0f1;
+      color: #333;
+      align-self: flex-start;
+      margin-right: auto;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 60%;
     }
 
     /* Responsivité */
@@ -298,7 +326,7 @@
       // on affiche les precedents messages
       messages.forEach(message => {
         const messageClass = message.senderId === userId ? 'received' : 'sent';
-        document.getElementById('chatBox').innerHTML += `<p class="message ${messageClass}">${message.senderId === userId ? selectedUser.fullName : 'Vous'} : ${message.content}</p>`;
+        document.getElementById('chatBox').innerHTML += `<p class="message${messageClass}">${message.senderId === userId ? selectedUser.fullName : 'Vous'} : ${message.content}</p>`;
       });
       scrollToBottom();
       // le nom du channel est le plus petit id de l'utilisateur connecté et de l'utilisateur avec qui on discute - le plus grand id
