@@ -402,6 +402,7 @@
       const message = document.getElementById('messageInput').value;
       if (message.trim() !== '') {
         const rep = sendMessageToServer(userIdsauv, message);
+        console.log(rep);
         document.getElementById('messageInput').value = '';
         if (rep.status !== 200) {
           Swal.fire({
