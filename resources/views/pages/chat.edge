@@ -141,7 +141,7 @@
       background-color: #1abc9c;
     }
 
-    .newmessage sent {
+    .newmessage sent{
       background-color: #3498db;
       color: white;
       align-self: flex-end;
@@ -316,7 +316,7 @@
         activeSubscription.onMessage((data) => {
         console.log('Nouveau message reçu');
         console.log(data);
-        const messageClass = data.senderId === userId ? 'received' : 'sent';
+        const messageClass = data.sender === userId ? 'received' : 'sent';
         document.getElementById('chatBox').innerHTML += `<p class="newmessage ${messageClass}">${data.sender === userId ? selectedUser.fullName : 'Vous'} : ${data.message}</p>`;
         scrollToBottom();
       });
