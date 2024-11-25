@@ -6,11 +6,15 @@ import logger from '@adonisjs/core/services/logger'
 import { log } from 'console'
 
 export default class MessageriesController {
-    async index({ view}) {
+    async index({auth, view}) {
         // Récupérer les utilisateurs actifs (ou tous les utilisateurs, selon vos critères)
         const users = await User.getAllUsers()
     
-        // Passer les utilisateurs à la vue Edge
+        // on enlève l'utilisateur connecté de la liste des utilisateurs
+        const authUser = users.find(user => user.id === auth.user.id)
+        if (authUser) {
+            users.splice(users.indexOf(authUser), 1)
+        }
         return view.render('pages/chat', { users: users.map(user => user.serialize()) })
     }
 
