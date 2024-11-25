@@ -269,7 +269,9 @@
     async function openChat(userId) {
       if (activeSubscription) {
         console.log('Fermeture de la souscription active');
-        stopListening()
+        if (stopListening){
+          stopListening();
+        }
         activeSubscription = null;
       }
       userIdsauv = userId;
