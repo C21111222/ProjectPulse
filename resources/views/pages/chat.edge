@@ -217,6 +217,7 @@
     baseUrl: window.location.origin
   })
   let activeSubscription = null;
+  let first = true;
 
 
 
@@ -266,10 +267,15 @@
     
     // Fonction pour ouvrir un chat
     async function openChat(userId) {
-      scrollToBottom();
+
       if (activeSubscription) {
         console.log('Fermeture de la souscription active');
-        activeSubscription.delete()
+        const unsubscribe = activeSubscription.onMessage(() => {
+            console.log('message received!')
+          })
+
+          // later
+          unsubscribe()
       }
       userIdsauv = userId;
       const selectedUser = users.find(user => user.id === userId);
@@ -281,6 +287,7 @@
         const messageClass = message.senderId === userId ? 'received' : 'sent';
         document.getElementById('chatBox').innerHTML += `<p class="message ${messageClass}">${message.senderId === userId ? selectedUser.fullName : 'Vous'} : ${message.content}</p>`;
       });
+      scrollToBottom();
       // le nom du channel est le plus petit id de l'utilisateur connecté et de l'utilisateur avec qui on discute - le plus grand id
       console.log({{ auth.user.id }});
       const channel = Math.min(userId, {{ auth.user.id }}) + '-' + Math.max(userId, {{ auth.user.id }});
@@ -302,7 +309,12 @@
     window.addEventListener('beforeunload', () => {
       if (activeSubscription) {
         console.log('Fermeture de la souscription avant de quitter la page');
-        activeSubscription.delete()
+                const unsubscribe = activeSubscription.onMessage(() => {
+            console.log('message received!')
+          })
+
+          // later
+          unsubscribe()
       }
     });
 
