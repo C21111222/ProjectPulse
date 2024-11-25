@@ -268,7 +268,9 @@
       </div>
     </div>
   </div>
- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script type="module">
     import { Transmit } from '/node_modules/@adonisjs/transmit-client'
 
@@ -401,6 +403,13 @@
       if (message.trim() !== '') {
         const rep = sendMessageToServer(userIdsauv, message);
         document.getElementById('messageInput').value = '';
+        if (rep.status !== 200) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Une erreur est survenue lors de l\'envoi du message : ' + rep.message,
+          });
+        }
       }
     }
 
