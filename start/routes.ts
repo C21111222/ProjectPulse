@@ -18,7 +18,7 @@ router.use([
   () => import('#middleware/silent_auth_middleware')
 ])
 const AuthController = () => import('#controllers/auth_controller')
-const MessageriesController = () => import('#controllers/messageries_controller')
+const MessagesController = () => import('#controllers/messages_controller')
 
 
 // Routes pour les utilisateurs non connectés (guest)
@@ -37,7 +37,7 @@ router.group(() => {
 
 }).use(middleware.guest())
 
-router.get('/chat', [MessageriesController , 'index']).as('chat').use(middleware.auth())
+router.get('/chat', [MessagesController , 'index']).as('chat').use(middleware.auth())
 
 // Route pour se déconnecter
 router.get('/logout', [AuthController , 'logout'])
@@ -48,4 +48,7 @@ router.on('/').render('pages/homePage')
 // Page connected, accessible seulement aux utilisateurs connectés
 router.on('/profile').render('pages/profile').use(middleware.auth())
 router.on('/connected').render('pages/connected').use(middleware.auth())
+
+router.get('/messages', [MessagesController , 'getHistory']).use(middleware.auth())
+router.post('/messages', [MessagesController , 'sendMessage']).use(middleware.auth())
 

@@ -28,9 +28,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 
-  @column()
-  declare isActive: boolean
-
   public getFullName() {
     return this.fullName
   }
@@ -41,7 +38,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   // method pour recuperer tous les utilisateurs actifs
   public static async getAllUsers() {
-    return await User.query().where('is_active', true).exec()
+    return await User.query().select('id', 'full_name', 'email')
   }
 
   // to json
@@ -50,7 +47,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
       id: this.id,
       fullName: this.fullName,
       email: this.email,
-      isActive: this.isActive,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     }

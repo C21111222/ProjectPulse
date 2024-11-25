@@ -17,8 +17,6 @@ export default class AuthController {
         const user = await User.verifyCredentials(email, password);
         if (user) {
           await auth.use('web').login(user);      
-          user.isActive = true;
-          await user.save();
           logger.info('Connexion réussie pour l\'email %s', email);
           return response.redirect('/connected'); 
         } else {
@@ -46,8 +44,6 @@ export default class AuthController {
         const user = await User.verifyCredentials(email, password);
         if (user) {
           await auth.use('web').login(user);
-          user.isActive = true;
-          await user.save();
           logger.info('Connexion réussie pour l\'email %s', email);
           return response.redirect('/connected');
         } else {
@@ -93,8 +89,6 @@ export default class AuthController {
       logger.info('Inscription de %s avec l\'email %s', fullName, email)
       const user = await User.create({ fullName, email, password })
       await auth.use('web').login(user)
-      user.isActive = true
-      await user.save()
       return response.redirect('/connected')
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
