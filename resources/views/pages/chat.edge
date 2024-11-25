@@ -268,7 +268,7 @@
       </div>
     </div>
   </div>
-
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="module">
     import { Transmit } from '/node_modules/@adonisjs/transmit-client'
 
@@ -399,7 +399,7 @@
     function sendMessage() {
       const message = document.getElementById('messageInput').value;
       if (message.trim() !== '') {
-        sendMessageToServer(userIdsauv, message);
+        const rep = sendMessageToServer(userIdsauv, message);
         document.getElementById('messageInput').value = '';
       }
     }
