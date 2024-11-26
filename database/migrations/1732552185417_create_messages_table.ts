@@ -10,6 +10,7 @@ export default class extends BaseSchema {
       table.string('sender_name')
       table.integer('receiver_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
       table.string('channel_id')
+      table.boolean('viewed').defaultTo(false)
       table.text('content')
       table.timestamps(true, true)
     })

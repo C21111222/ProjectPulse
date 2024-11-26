@@ -3,7 +3,6 @@ import User from '#models/user'
 import Message from '#models/message'
 import transmit from '@adonisjs/transmit/services/main'
 import logger from '@adonisjs/core/services/logger'
-import { send } from 'vite'
 
 export default class MessageriesController {
   /**
@@ -29,9 +28,91 @@ export default class MessageriesController {
     if (globalUser) {
       users.splice(users.indexOf(globalUser), 1)
     }
-    return view.render('pages/chat', { users: users.map((user) => user.serialize()) })
+    const resultat = []
+    // pour chaque utilisateur, on regarde le dernier message envoyé par celui ci, si il a été vu ou non, on crée un objet avec les infos de l'utilisateur et la variable messageViewed
+    for (const user of users) {
+      const lastMessage = await Message.query()
+        .where((query) => {
+          query.where('sender_id', user.id).andWhere('receiver_id', auth.user.id)
+        })
+        .orderBy('created_at', 'desc')
+        .first()
+      if (lastMessage) {
+        resultat.push({ user: user.serialize(), messageViewed: lastMessage.viewed })
+      } else {
+        resultat.push({ user: user.serialize(), messageViewed: true })
+      }
+    }
+
+    return view.render('pages/chat', { users: resultat })
   }
 
+  async unviewedChats({ auth, response }) {
+    const users = await User.getAllUsers()
+    const authUser = users.find((user) => user.id === auth.user.id)
+    const globalUser = users.find((user) => user.id === 999999)
+    if (authUser) {
+      users.splice(users.indexOf(authUser), 1)
+    }
+    if (globalUser) {
+      users.splice(users.indexOf(globalUser), 1)
+    }
+    const resultat = []
+    // pour chaque utilisateur, on regarde le dernier message envoyé par celui ci, si il a été vu ou non, on crée un objet avec les infos de l'utilisateur, on ne push que les utilisateurs qui ont envoyé un message non vu
+    for (const user of users) {
+      const lastMessage = await Message.query()
+        .where((query) => {
+          query.where('sender_id', user.id).andWhere('receiver_id', auth.user.id)
+        })
+        .orderBy('created_at', 'desc')
+        .first()
+      if (lastMessage && !lastMessage.viewed) {
+        resultat.push({ user: user.serialize(), messageViewed: lastMessage.viewed })
+      }
+    }
+    logger.info(resultat)
+    return response.json(resultat)
+  }
+
+  async haveView({ auth, request, response }) {
+    // on met tous les messages de la conversation en lu
+    const sendId = request.input('sender_id')
+    const receiver = await User.find(sendId)
+    if (!receiver) {
+      return response.status(404).json({ message: 'Utilisateur non trouvé' })
+    }
+    try {
+      await Message.query()
+        .where((query) => {
+          query.where('sender_id', sendId).andWhere('receiver_id', auth.user.id)
+        })
+        .update({ viewed: true })
+    } catch (error) {
+      return response.status(500).json({ message: 'Erreur lors de la lecture des messages' })
+    }
+
+    return response.ok({ message: 'Messages lus' })
+  }
+
+  async haveViewSingle({ auth, request, response }) {
+    // on met un message en lu
+    logger.info('haveViewSingle')
+    logger.info(request.all())
+    const messageId = request.input('message_id')
+    const message = await Message.find(messageId)
+    if (!message) {
+      return response.status(404).json({ message: 'Message non trouvé' })
+    }
+    if (message.receiverId != auth.user.id) {
+      return response.status(403).json({ message: "Vous n'êtes pas autorisé à lire ce message" })
+    }
+    try {
+      await message.merge({ viewed: true }).save()
+    } catch (error) {
+      return response.status(500).json({ message: 'Erreur lors de la lecture du message' })
+    }
+    return response.ok({ message: 'Message lu' })
+  }
   /**
    * Retrieves the message history between the authenticated user and a specified receiver.
    *
@@ -103,6 +184,7 @@ export default class MessageriesController {
           sender: auth.user.id,
           senderName: auth.user.fullName,
           createdAt: Date.now(),
+          messageId: newMessage.id,
         })
         await newMessage.save()
       } catch (error) {
@@ -124,9 +206,28 @@ export default class MessageriesController {
     newMessage.channelId = channel
     logger.info(channel)
     try {
-      transmit.broadcast(`chats/${channel}/messages`, { message: message, sender: auth.user.id, senderName: auth.user.fullName, createdAt: Date.now() })
-      transmit.broadcast(`notifications/${receiverId}`, { message: 'msg reçu', senderId : auth.user.id, senderName: auth.user.fullName, channelId: channel })
       await newMessage.save()
+      transmit.broadcast(`chats/${channel}/messages`, {
+        message: message,
+        sender: auth.user.id,
+        senderName: auth.user.fullName,
+        createdAt: Date.now(),
+        messageId: newMessage.id,
+      })
+      // on attend 0.5s pour être sûr que le message est bien enregistré puis on verifie si le message a été vu
+      setTimeout(async () => {
+        const message = await Message.find(newMessage.id)
+        if (message && !message.viewed) {
+          logger.info('message non vu')
+          transmit.broadcast(`notifications/${receiverId}`, {
+            message: 'msg reçu',
+            senderId: auth.user.id,
+            senderName: auth.user.fullName,
+            channelId: channel,
+            messageViewed: false,
+          })
+        }
+      }, 500)
     } catch (error) {
       return response.status(500).json({ message: "Erreur lors de l'envoi du message" })
     }

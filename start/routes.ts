@@ -37,6 +37,8 @@ router
 
 router.get('/chat', [MessagesController, 'index']).as('chat').use(middleware.auth())
 
+router.get('/unviewed_chats', [MessagesController, 'unviewedChats']).as('chat_fast').use(middleware.auth())
+
 // Route pour se déconnecter
 router.get('/logout', [AuthController, 'logout'])
 
@@ -49,3 +51,5 @@ router.on('/connected').render('pages/connected').use(middleware.auth())
 
 router.get('/messages', [MessagesController, 'getHistory']).use(middleware.auth())
 router.post('/messages', [MessagesController, 'sendMessage']).use(middleware.auth())
+router.post('/messages_viewed', [MessagesController, 'haveView']).use(middleware.auth())
+router.post('/message_viewed', [MessagesController, 'haveViewSingle']).use(middleware.auth())

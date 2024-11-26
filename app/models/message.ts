@@ -21,6 +21,9 @@ export default class Message extends BaseModel {
   @column()
   public content: string // Le contenu du message
 
+  @column()
+  public viewed: boolean = false // Le message a-t-il été vu ?
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime // Date de création du message
 

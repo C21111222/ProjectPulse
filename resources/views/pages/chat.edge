@@ -30,9 +30,15 @@
               <span class="user-fullName" onclick="openChat(999999)">Global</span>
             </li>
           @each(user in users)
-            <li class="user-item" data-user-id="{{ user.id }}">
-              <span class="user-fullName" onclick="openChat({{ user.id }})">{{ user.fullName }}</span>
+            @if(user.messageViewed == 0)
+            <li class="user-item" data-user-id="{{ user.user.id }}" >
+              <span class="user-fullName" onclick="openChat({{ user.user.id }})" style="color: red;">{{ user.user.fullName }}</span>
             </li>
+            @else
+            <li class="user-item" data-user-id="{{ user.user.id }}">
+              <span class="user-fullName" onclick="openChat({{ user.user.id }})">{{ user.user.fullName }}</span>
+            </li>
+            @endif
           @endeach
         </ul>
       </div>
@@ -59,6 +65,7 @@
   })
   let activeSubscription = null;
   let first = true;
+  let unsubscribe = null;
 
   const notifSubscription = transmit.subscription('notifications/' + {{ auth.user.id }});
   notifSubscription.create();
@@ -70,10 +77,6 @@
     const senderName = data.senderName;
     const senderElement = document.querySelector(`[data-user-id="${senderId}"] .user-fullName`);
     senderElement.style.color = 'red';
-    // la couleur redevient noire après avoir cliqué sur l'utilisateur
-    senderElement.addEventListener('click', () => {
-      senderElement.style.color = 'black';
-    });
   });
 
 
@@ -83,14 +86,14 @@
     // Injecter les utilisateurs dans une variable JavaScript
     const users = [
       @each(user in users)
-        @if(user.id !== auth.user.id)
-          { id: {{ user.id }}, fullName: '{{ user.fullName }}' },
+        @if(user.user.id !== auth.user.id)
+          { id: {{ user.user.id }}, fullName: '{{ user.user.fullName }}', messageViewed: {{ user.messageViewed }} },
         @endif
       @endeach
     ];
+    console.log(users);
     // variable pour stocker l'id de l'utilisateur à qui on envoie le message
     let userIdsauv = null;
-    let knownChannels = [];
     function scrollToBottom() {
       const chatBox = document.getElementById('chatBox');
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -128,23 +131,52 @@
       }
       return response;
     }
+
+    async function sendViewedNotification(senderId) {
+      const response = await fetch('/messages_viewed', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sender_id: senderId }),
+      });
+      return response;
+    }
+
+    async function sendViewedNotificationSingle(messageId) {
+      console.log('Envoi de la notification de lecture');
+      console.log(messageId);
+      const response = await fetch(`/message_viewed?message_id=${messageId}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+      });
+      return response;
+    }
     
     // Fonction pour ouvrir un chat
     async function openChat(userId) {
 
       if (activeSubscription) {
         console.log('Fermeture de la souscription active');
-        const unsubscribe = activeSubscription.onMessage(() => {
-            console.log('message received!')
-          })
-
-          // later
-          unsubscribe()
+        unsubscribe()
       }
       userIdsauv = userId;
       const selectedUser = users.find(user => user.id === userId);
+      // on envoie une notification de lecture à l'utilisateur avec qui on discute
+      if (userIdsauv) {
+        sendViewedNotification(userIdsauv);
+      }
       const messages = await loadMessages(userId);
       if (userId !== 999999) {
+        const isRed = document.querySelector(`[data-user-id="${userId}"] .user-fullName`).style.color;
+        if (selectedUser.messageViewed == 0 || isRed == 'red') {
+        const senderElement = document.querySelector(`[data-user-id="${userId}"] .user-fullName`);
+        senderElement.style.color = 'white';
+      }
         document.getElementById('chatBox').innerHTML = `<p><strong>Chat avec ${selectedUser.fullName}</strong></p>`;
       } else {
         document.getElementById('chatBox').innerHTML = `<p><strong>Chat Global</strong></p>`;
@@ -169,21 +201,19 @@
 
       activeSubscription = transmit.subscription('chats/' + channel + '/messages');
       await activeSubscription.create();
-      if (knownChannels.includes(channel)) {
-        console.log('Channel déjà connu');
-      } else {
-        console.log('Nouveau channel');
-        activeSubscription.onMessage((data) => {
-        console.log('Nouveau message reçu');
-        console.log(data);
-        const messageClass = data.sender === {{ auth.user.id }} ? 'sent' : 'received';
-        const formattedTime = new Date(data.createdAt).toLocaleTimeString('fr-FR');
-        document.getElementById('chatBox').innerHTML += `<p class="newmessage${messageClass}">${formattedTime} - ${data.sender === {{ auth.user.id }} ? 'Vous' : data.senderName} : ${data.message}</p>`;
-        scrollToBottom();
-      });
-        knownChannels.push(channel);
-        console.log(knownChannels);
+      console.log('Nouveau channel');
+      unsubscribe = activeSubscription.onMessage((data) => {
+      console.log('Nouveau message reçu');
+      console.log(data);
+      const messageClass = data.sender === {{ auth.user.id }} ? 'sent' : 'received';
+      if ( messageClass === 'received') {
+        sendViewedNotificationSingle(data.messageId);
       }
+      const formattedTime = new Date(data.createdAt).toLocaleTimeString('fr-FR');
+      document.getElementById('chatBox').innerHTML += `<p class="newmessage${messageClass}">${formattedTime} - ${data.sender === {{ auth.user.id }} ? 'Vous' : data.senderName} : ${data.message}</p>`;
+      
+      scrollToBottom();
+      });
 
       document.getElementById('messageInput').disabled = false;
       document.getElementById('sendButton').disabled = false;
