@@ -12,6 +12,7 @@
       <button class="close-btn" onclick="toggleChat()">X</button>
     </div>
     <div class="chat-body">
+      <div class="label">Message(s) non lus de : </div>
       <ul id="chat-users">
       </ul>
       <div class="openChatButton">
@@ -22,7 +23,14 @@
 
   <style>
     /* Styles pour le bouton et le panel de chat */
-    
+    .label {
+      font-size: 16px;
+      margin-bottom: 10px;
+      margin-top: 45px;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
     .chat-button {
       position: fixed;
       bottom: 20px;
@@ -209,7 +217,7 @@
       const chatUsers = document.getElementById('chat-users');
       const user = document.createElement('li');
       user.classList.add('user-item');
-      user.innerHTML = `<a href="/chat" style="color: red">Nouveau message de ${data.senderName}</a>`;
+      user.innerHTML = `<a href="/chat" style="color: red">${data.senderName}</a>`;
       chatUsers.appendChild(user);
       users.push({ id: data.senderId, fullName: data.senderName, messageViewed: false });
       document.getElementById('title-chat').innerText = `Chat (${users.length})`;
@@ -236,7 +244,7 @@
       const userElement = document.createElement('li');
       // on rajoute la classe class="user-item"  pour pouvoir styliser les li
       userElement.classList.add('user-item');
-      userElement.innerHTML = `<a href="/chat">Nouveau message de ${user2.user.fullName}</a>`;
+      userElement.innerHTML = `<a href="/chat">${user2.user.fullName}</a>`;
       chatUsers.appendChild(userElement);
       users.push({ id: user2.id, fullName: user2.fullName, messageViewed: false });
     }
