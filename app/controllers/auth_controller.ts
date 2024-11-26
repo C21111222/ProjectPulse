@@ -5,11 +5,34 @@ import logger from '@adonisjs/core/services/logger'
 import User from '#models/user'
 
 export default class AuthController {
-  // Affiche la page de connexion
+  /**
+   * Renders the login page.
+   *
+   * @param {HttpContextContract} context - The context object containing the view.
+   * @returns {Promise<void>} A promise that resolves to the rendered login page.
+   */
   public async showLogin({ view }: HttpContextContract) {
     return view.render('pages/login')
   }
 
+
+    /**
+     * Handles the login process for a user.
+     * 
+     * @param {HttpContextContract} ctx - The context object containing request, auth, response, and session.
+     * @returns {Promise<void>} - Redirects the user based on the login outcome.
+     * 
+     * @remarks
+     * This method attempts to log in a user using their email and password. If the credentials are correct,
+     * the user is logged in and redirected to the '/connected' page. If the credentials are incorrect, 
+     * a flash message is set and the user is redirected back to the login page. In case of any other errors,
+     * a generic error message is flashed and the user is redirected to the login page.
+     * 
+     * @example
+     * ```typescript
+     * await login({ request, auth, response, session });
+     * ```
+     */
   public async login({ request, auth, response, session}: HttpContextContract) {
       const { email, password } = request.all();
       logger.info('Tentative de connexion avec l\'email %s', email);
@@ -37,6 +60,23 @@ export default class AuthController {
 
     }
 
+    /**
+     * Handles the fast login process for a user.
+     * 
+     * @param {HttpContextContract} ctx - The context object containing request, auth, response, and session.
+     * @returns {Promise<void>} - Redirects the user based on the login outcome.
+     * 
+     * @remarks
+     * This method attempts to log in a user using their email and password. If the credentials are correct,
+     * the user is logged in and redirected to the '/connected' page. If the credentials are incorrect, 
+     * a flash message is set and the user is redirected back to the login page. In case of any other errors,
+     * a generic error message is flashed and the user is redirected to the login page.
+     * 
+     * @example
+     * ```typescript
+     * await loginFast({ request, auth, response, session });
+     * ```
+     */
     public async loginFast({ request, auth, response, session }: HttpContextContract) {
       const { email, password } = request.all();
       logger.info('Tentative de connexion avec l\'email %s', email);
@@ -44,15 +84,12 @@ export default class AuthController {
         const user = await User.verifyCredentials(email, password);
         if (user) {
           await auth.use('web').login(user);
-          logger.info('Connexion réussie pour l\'email %s', email);
           return response.redirect('/connected');
         } else {
-          logger.info('Connexion échouée pour l\'email %s', email);
           session.flash('notification', { type: 'error', message: 'Email ou mot de passe incorrect.' });
           return response.redirect('/login');
         }
       } catch (error) {
-        logger.info('Connexion échouée pour l\'email %s', email);
         if (error.code == 'E_INVALID_CREDENTIALS') {
           session.flash('notification', { type: 'error', message: 'Email ou mot de passe incorrect.' });
           return response.redirect('/login');
@@ -62,13 +99,33 @@ export default class AuthController {
       }
     }
 
-
-  // Affiche la page d'inscription
+  /**
+   * Renders the registration page.
+   *
+   * @param {HttpContextContract} context - The context object containing the view.
+   * @returns {Promise<void>} A promise that resolves to the rendered registration page.
+   */
   public async showRegister({ view }: HttpContextContract) {
     return view.render('pages/register')
   }
 
-  // Gère l'action d'inscription
+  /**
+   * Registers a new user with the provided details.
+   * 
+   * @param {HttpContextContract} ctx - The context object containing request, auth, response, and session.
+   * @returns {Promise<void>} - Redirects the user based on the outcome of the registration process.
+   * 
+   * @remarks
+   * This method performs the following steps:
+   * 1. Extracts `fullName`, `email`, `password`, and `password_confirmation` from the request.
+   * 2. Formats the `fullName` by replacing spaces with hyphens and capitalizing the first letter.
+   * 3. Checks if the `password` matches the `password_confirmation`. If not, flashes an error message and redirects back.
+   * 4. Checks if the `fullName` is one of the disallowed names. If so, flashes an error message and redirects back.
+   * 5. Attempts to create a new user and log them in. If successful, redirects to the connected page.
+   * 6. Handles errors such as duplicate email entries and flashes appropriate error messages.
+   * 
+   * @throws {Error} - Throws an error if there is an issue during the user creation process.
+   */
   public async register({ request, auth, response, session }: HttpContextContract) {
     const { fullName,email, password, password_confirmation } = request.only([
       'fullName',
@@ -103,17 +160,25 @@ export default class AuthController {
     }
   }
 
-  // Gère la déconnexion
+
+  /**
+   * Logs out the currently authenticated user and redirects to the home page.
+   *
+   * @param {HttpContextContract} context - The context object containing the authentication and response objects.
+   * @returns {Promise<void>} A promise that resolves when the user is logged out and the response is redirected.
+   */
   public async logout({ auth, response }: HttpContextContract) {
-    if (auth.user) {
-      auth.user.isActive = false;
-      await auth.user.save();
-    }
     await auth.use('web').logout()
     return response.redirect('/') 
   }
 
-    // Affiche la page de déconnexion
+
+    /**
+     * Renders the logout page.
+     *
+     * @param {HttpContextContract} context - The HTTP context containing the view to render.
+     * @returns {Promise<void>} A promise that resolves when the view is rendered.
+     */
     public async showLogout({ view }: HttpContextContract) {
         return view.render('pages/logout')
     }

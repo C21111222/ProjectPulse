@@ -3,14 +3,24 @@ import User from '#models/user'
 import Message from '#models/message'
 import transmit from '@adonisjs/transmit/services/main'
 import logger from '@adonisjs/core/services/logger'
-import { log } from 'console'
 
 export default class MessageriesController {
+
+    /**
+     * Handles the index action for the messages controller.
+     * 
+     * @param {Object} ctx - The context object.
+     * @param {Object} ctx.auth - The authentication object containing the authenticated user.
+     * @param {Object} ctx.view - The view object used to render the response.
+     * 
+     * @returns {Promise<Object>} The rendered view of the chat page with the list of users.
+     * 
+     * @description
+     * This method retrieves all users and filters out the authenticated user and a global user with a specific ID (999999).
+     * It then renders the chat page with the remaining users.
+     */
     async index({auth, view}) {
-        // Récupérer les utilisateurs actifs (ou tous les utilisateurs, selon vos critères)
         const users = await User.getAllUsers()
-    
-        // on enlève l'utilisateur connecté de la liste des utilisateurs
         const authUser = users.find(user => user.id === auth.user.id)
         const globalUser = users.find(user => user.id === 999999)
         if (authUser) {
@@ -22,14 +32,22 @@ export default class MessageriesController {
         return view.render('pages/chat', { users: users.map(user => user.serialize()) })
     }
 
+    /**
+     * Retrieves the message history between the authenticated user and a specified receiver.
+     * 
+     * @param {Object} context - The context object containing auth, request, and response.
+     * @param {Object} context.auth - The authentication object containing the authenticated user.
+     * @param {Object} context.request - The request object containing the input data.
+     * @param {Object} context.response - The response object used to send back the HTTP response.
+     * 
+     * @returns {Promise<void>} - A promise that resolves with the message history.
+     */
     async getHistory({ auth, request, response }) {
-        // on verifie que reveiverIq correspond à un utilisateur existant
         logger.info('getHistory')
         logger.info(auth.user.id)
         logger.info( request.all())
         const receiverId = request.input('receiver_id')
         if (receiverId == 999999) {
-          // on recupere les  chat du chat global
           const messages = await Message.query().where((query) => {query.where('channel_id', 'global')}).orderBy('created_at', 'asc').exec()
           return response.json(messages)
         }
@@ -44,13 +62,25 @@ export default class MessageriesController {
       return response.json(messages)
     }
 
+    /**
+     * Sends a message from the authenticated user to a specified receiver.
+     * 
+     * @param {Object} context - The context object containing auth, request, response, and session.
+     * @param {Object} context.auth - The authentication object containing the authenticated user.
+     * @param {Object} context.request - The request object containing the input data.
+     * @param {Object} context.response - The response object used to send back the HTTP response.
+     * @param {Object} context.session - The session object.
+     * 
+     * @returns {Promise<void>} - A promise that resolves when the message is sent.
+     * 
+     * @throws {Error} - Throws an error if there is an issue saving the message or broadcasting it.
+     */
     async sendMessage({ auth, request, response, session }) {
         const receiverId = request.input('receiver_id')
         const message = request.input('content')
         logger.info('sendMessage')
         logger.info(receiverId)
         if (receiverId == 999999) {
-          // on envoie le message au chat global
           const newMessage = new Message()
           newMessage.senderId = auth.user.id
           newMessage.receiverId = 999999
@@ -73,7 +103,6 @@ export default class MessageriesController {
         newMessage.senderId = auth.user.id
         newMessage.receiverId = receiverId
         newMessage.content= message
-        // le nom du channel est l'id le plus petit en premier suivi de l'id le plus grand avec un tiret entre les deux
         const channel = auth.user.id < receiverId ? `${auth.user.id}-${receiverId}` : `${receiverId}-${auth.user.id}`
         newMessage.channelId = channel
         logger.info(channel)
