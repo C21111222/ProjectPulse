@@ -29,6 +29,7 @@ export default class ImagesController {
             img.url = `http://projectpulse.pautentia.fr/img/${fileName}`
             await img.save()
         } catch (error) {
+            logger.error("Error uploading file %s", error)
             return response.status(500).json({message: 'Error uploading file ' + error})
         }
         const user = await User.findOrFail(auth.user.id)
