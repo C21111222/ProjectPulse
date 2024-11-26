@@ -37,6 +37,7 @@ export default class MessageriesController {
         })
         .orderBy('created_at', 'desc')
         .first()
+      logger.info(user.imageUrl)
       if (lastMessage) {
         resultat.push({ user: user.serialize(), image : user.imageUrl, messageViewed: lastMessage.viewed })
       } else {
