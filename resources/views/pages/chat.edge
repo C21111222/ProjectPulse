@@ -361,7 +361,8 @@
       // on affiche les precedents messages
       messages.forEach(message => {
         const messageClass = message.senderId === {{ auth.user.id }} ? 'sent' : 'received';
-        document.getElementById('chatBox').innerHTML += `<p class="message${messageClass}">${message.senderId === {{ auth.user.id }} ? 'Vous' : message.senderName} : ${message.content}</p>`;
+        const formattedTime = new Date(message.createdAt).toLocaleTimeString('fr-FR');
+        document.getElementById('chatBox').innerHTML += `<p class="message${messageClass}">${formattedTime} - ${message.senderId === {{ auth.user.id }} ? 'Vous' : message.senderName} : ${message.content}</p>`;
       });
       scrollToBottom();
       // le nom du channel est le plus petit id de l'utilisateur connecté et de l'utilisateur avec qui on discute - le plus grand id
@@ -385,7 +386,8 @@
         console.log('Nouveau message reçu');
         console.log(data);
         const messageClass = data.sender === {{ auth.user.id }} ? 'sent' : 'received';
-        document.getElementById('chatBox').innerHTML += `<p class="newmessage${messageClass}">${data.sender === {{ auth.user.id }} ? 'Vous' : data.senderName} : ${data.message}</p>`;
+        const formattedTime = new Date(data.createdAt).toLocaleTimeString('fr-FR');
+        document.getElementById('chatBox').innerHTML += `<p class="newmessage${messageClass}">${formattedTime} - ${data.sender === {{ auth.user.id }} ? 'Vous' : data.senderName} : ${data.message}</p>`;
         scrollToBottom();
       });
         knownChannels.push(channel);
