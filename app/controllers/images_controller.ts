@@ -4,11 +4,14 @@ import app from '@adonisjs/core/services/app'
 import multer from 'multer'
 import fs from 'fs'
 import User from '#models/user'
+import logger from '@adonisjs/core/services/logger'
 
 export default class ImagesController {
     async upload({auth, request, response } : HttpContext) {
         // Création du dossier de stockage si inexistant
         multer({dest: 'uploads/'})
+        logger .info("Uploading image")
+        logger.info("User id : %s", auth.user.id)
         const image = request.file('image', {
             size : '2mb',
             extnames: ['jpg', 'png', 'jpeg']
