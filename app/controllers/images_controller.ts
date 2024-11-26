@@ -19,6 +19,7 @@ export default class ImagesController {
         if (!image) {
             return response.status(400).json({message: 'No file uploaded'})
         }
+        logger.info("Image uploaded : %s", image.extname)
         let img: Image
         try {
             const fileName = `${new Date().getTime()}.${image.extname}`
