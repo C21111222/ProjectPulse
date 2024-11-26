@@ -23,7 +23,7 @@ export default class ImagesController {
         let img: Image
         try {
             const fileName = `${new Date().getTime()}.${image.extname}`
-            await image.move(app.tmpPath('uploads'), {
+            await image.move(app.makePath('/app/uploads'), {
                 name: fileName
             })
             img  = await Image.create({ name: fileName });
