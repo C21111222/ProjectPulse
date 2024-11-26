@@ -203,7 +203,7 @@
       // Fonction pour gérer l'upload
       function handleFileUpload(file) {
         const formData = new FormData();
-        formData.append('profile_pic', file);
+        formData.append('image', file);
   
         fetch('/img', {
           method: 'POST',
