@@ -45,6 +45,10 @@ export default class User extends compose(BaseModel, AuthFinder) {
     return this.email
   }
 
+  public getImage() {
+    return this.imageUrl
+  }
+
   // method pour recuperer tous les utilisateurs actifs
   public static async getAllUsers() {
     return await User.query().select('id', 'full_name', 'email')
