@@ -13,6 +13,9 @@ export default class Message extends BaseModel {
   public receiverId: number // L'utilisateur qui a reçu le message
 
   @column()
+  public channelId: string // Le canal de discussion
+
+  @column()
   public content: string // Le contenu du message
 
   @column.dateTime({ autoCreate: true })

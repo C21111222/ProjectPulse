@@ -24,6 +24,11 @@ export default class MessageriesController {
         logger.info(auth.user.id)
         logger.info( request.all())
         const receiverId = request.input('receiver_id')
+        if (receiverId === 999999) {
+          // on recupere les  chat du chat global
+          const messages = await Message.query().where((query) => {query.where('channel_id', 'global')}).orderBy('created_at', 'asc').exec()
+          return response.json(messages)
+        }
         const receiver = await User.find(receiverId)
         if (!receiver) {
           return response.status(404).json({ message: 'Utilisateur non trouvé' })
@@ -38,6 +43,20 @@ export default class MessageriesController {
     async sendMessage({ auth, request, response, session }) {
         const receiverId = request.input('receiver_id')
         const message = request.input('content')
+        if (receiverId === 999999) {
+          // on envoie le message au chat global
+          const newMessage = new Message()
+          newMessage.senderId = auth.user.id
+          newMessage.receiverId = 999999
+          newMessage.content = message
+          newMessage.channelId = 'global'
+          try {
+            transmit.broadcast('chats/global/messages', { message: message, sender: auth.user.id })
+            await newMessage.save()
+          } catch (error) {
+            return response.status(500).json({ message: 'Erreur lors de l\'envoi du message' })
+          }
+        }
         const receiver = await User.find(receiverId)
         if (!receiver) {
           return response.status(404).json({ message: 'Utilisateur non trouvé' })
@@ -52,6 +71,7 @@ export default class MessageriesController {
         newMessage.content= message
         // le nom du channel est l'id le plus petit en premier suivi de l'id le plus grand avec un tiret entre les deux
         const channel = auth.user.id < receiverId ? `${auth.user.id}-${receiverId}` : `${receiverId}-${auth.user.id}`
+        newMessage.channelId = channel
         logger.info(channel)
         try {
           transmit.broadcast(`chats/${channel}/messages`, { message: message, sender: auth.user.id })

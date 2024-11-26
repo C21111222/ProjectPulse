@@ -249,6 +249,9 @@
       </div>
       <div class="user-list">
         <ul id="userList">
+            <li class="user-item" data-user-id="999999">
+              <span class="user-fullName" onclick="openChat(999999)">Global</span>
+            </li>
           @each(user in users)
             <li class="user-item" data-user-id="{{ user.id }}">
               <span class="user-fullName" onclick="openChat({{ user.id }})">{{ user.fullName }}</span>
@@ -348,7 +351,11 @@
       const selectedUser = users.find(user => user.id === userId);
       console.log(`Ouverture du chat avec ${selectedUser.fullName}`);
       const messages = await loadMessages(userId);
-      document.getElementById('chatBox').innerHTML = `<p><strong>Chat avec ${selectedUser.fullName}</strong></p>`;
+      if (userId !== 999999) {
+        document.getElementById('chatBox').innerHTML = `<p><strong>Chat avec ${selectedUser.fullName}</strong></p>`;
+      } else {
+        document.getElementById('chatBox').innerHTML = `<p><strong>Chat Global</strong></p>`;
+      }
       // on affiche les precedents messages
       messages.forEach(message => {
         const messageClass = message.senderId === userId ? 'received' : 'sent';
