@@ -1,22 +1,13 @@
 import { DateTime } from 'luxon'
 import User from '#models/user'
 import { BaseModel, column, hasOne } from '@adonisjs/lucid/orm'
-
+import type { HasOne } from '@adonisjs/lucid/types/relations'
 export default class Message extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
   @column()
-  public senderId: number // L'utilisateur qui a envoyé le message
-
-  @column()
   public senderName: string // Le nom de l'utilisateur qui a envoyé le message
-
-  @column()
-  public senderImageUrl: string // L'image de l'utilisateur qui a envoyé le message
-
-  @column()
-  public receiverId: number // L'utilisateur qui a reçu le message
 
   @column()
   public channelId: string // Le canal de discussion
@@ -26,6 +17,12 @@ export default class Message extends BaseModel {
 
   @column()
   public viewed: boolean = false // Le message a-t-il été vu ?
+
+  @column()
+  public senderId: number // ID de l'utilisateur qui a envoyé le message
+
+  @column()
+  public receiverId: number // ID de l'utilisateur qui a reçu le message
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime // Date de création du message
@@ -38,11 +35,11 @@ export default class Message extends BaseModel {
     localKey: 'senderId',
     foreignKey: 'id',
   })
-  declare sender: User
+  declare sender: HasOne<typeof User>
 
   @hasOne(() => User, {
     localKey: 'receiverId',
     foreignKey: 'id',
   })
-  declare receiver: User
+  declare receiver: HasOne<typeof User>
 }

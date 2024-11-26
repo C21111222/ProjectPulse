@@ -208,7 +208,7 @@
         document.getElementById('chatBox').innerHTML += `
         <div class="message-container ${messageClass}" style="display: flex; align-items: center; margin-bottom: 10px;">
           <img 
-            src="${message.senderImageUrl}" 
+            src="${message.sender.imageUrl}" 
             alt="Photo de ${message.senderName}" 
             style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
           />
@@ -246,7 +246,7 @@
         document.getElementById('chatBox').innerHTML += `
           <div class="message-container ${messageClass}" style="display: flex; align-items: center; margin-bottom: 10px;">
             <img 
-              src="${data.sender_image_url}" 
+              src="${data.senderImage}" 
               alt="Photo de ${data.senderName}" 
               style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
             />

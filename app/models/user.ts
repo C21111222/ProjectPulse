@@ -60,6 +60,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
       id: this.id,
       fullName: this.fullName,
       email: this.email,
+      imageUrl: this.imageUrl,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     }

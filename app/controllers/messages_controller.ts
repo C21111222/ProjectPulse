@@ -130,11 +130,12 @@ export default class MessageriesController {
     const receiverId = request.input('receiver_id')
     if (receiverId == 999999) {
       const messages = await Message.query()
-        .where((query) => {
-          query.where('channel_id', 'global')
-        })
-        .orderBy('created_at', 'asc')
-        .exec()
+      .where((query) => {
+        query.where('channel_id', 'global');
+      })
+      .preload('sender') // Charge les informations de l'utilisateur lié
+      .orderBy('created_at', 'asc')
+      .exec();
       return response.json(messages)
     }
     const receiver = await User.find(receiverId)
@@ -148,6 +149,7 @@ export default class MessageriesController {
       .orWhere((query) => {
         query.where('sender_id', receiverId).andWhere('receiver_id', auth.user.id)
       })
+      .preload('sender') // Charge les informations de l'utilisateur lié
       .orderBy('created_at', 'asc')
       .exec()
     return response.json(messages)
@@ -178,7 +180,6 @@ export default class MessageriesController {
       newMessage.content = message
       newMessage.channelId = 'global'
       newMessage.senderName = auth.user.fullName
-      newMessage.senderImageUrl = auth.user.imageUrl
       try {
         transmit.broadcast('chats/global/messages', {
           message: message,
@@ -202,7 +203,6 @@ export default class MessageriesController {
     newMessage.receiverId = receiverId
     newMessage.content = message
     newMessage.senderName = auth.user.fullName
-    newMessage.senderImageUrl = auth.user.imageUrl
     const channel =
       auth.user.id < receiverId ? `${auth.user.id}-${receiverId}` : `${receiverId}-${auth.user.id}`
     newMessage.channelId = channel
@@ -215,6 +215,7 @@ export default class MessageriesController {
         senderName: auth.user.fullName,
         createdAt: Date.now(),
         messageId: newMessage.id,
+        senderImage: auth.user.imageUrl,
       })
       // on attend 0.5s pour être sûr que le message est bien enregistré puis on verifie si le message a été vu
       setTimeout(async () => {
@@ -227,6 +228,7 @@ export default class MessageriesController {
             senderName: auth.user.fullName,
             channelId: channel,
             messageViewed: false,
+            senderImage: auth.user.imageUrl,
           })
         }
       }, 500)
