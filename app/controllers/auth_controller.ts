@@ -185,6 +185,8 @@ export default class AuthController {
         type: 'error',
         message: "Une erreur est survenue lors de l'inscription.",
       })
+      logger.error("Erreur lors de l'inscription de %s avec l'email %s", fullName, email)
+      logger.error(error)
       return response.redirect('back')
     }
   }
