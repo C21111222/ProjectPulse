@@ -60,6 +60,23 @@
   let activeSubscription = null;
   let first = true;
 
+  const notifSubscription = transmit.subscription('notifications/' + {{ auth.user.id }});
+  notifSubscription.create();
+  // quand il y a une nouvelle notification on colori en rouge le pseudo de l'utilisateur envoyeur
+  notifSubscription.onMessage((data) => {
+    console.log('Nouvelle notification reçue');
+    console.log(data);
+    const senderId = data.senderId;
+    const senderName = data.senderName;
+    const senderElement = document.querySelector(`[data-user-id="${senderId}"] .user-fullName`);
+    senderElement.style.color = 'red';
+    // la couleur redevient noire après avoir cliqué sur l'utilisateur
+    senderElement.addEventListener('click', () => {
+      senderElement.style.color = 'black';
+    });
+  });
+
+
 
 
 

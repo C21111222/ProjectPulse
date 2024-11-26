@@ -3,6 +3,7 @@ import User from '#models/user'
 import Message from '#models/message'
 import transmit from '@adonisjs/transmit/services/main'
 import logger from '@adonisjs/core/services/logger'
+import { send } from 'vite'
 
 export default class MessageriesController {
   /**
@@ -124,6 +125,7 @@ export default class MessageriesController {
     logger.info(channel)
     try {
       transmit.broadcast(`chats/${channel}/messages`, { message: message, sender: auth.user.id, senderName: auth.user.fullName, createdAt: Date.now() })
+      transmit.broadcast(`notifications/${receiverId}`, { message: 'msg reçu', senderId : auth.user.id, senderName: auth.user.fullName, channelId: channel })
       await newMessage.save()
     } catch (error) {
       return response.status(500).json({ message: "Erreur lors de l'envoi du message" })
