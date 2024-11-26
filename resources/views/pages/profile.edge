@@ -166,6 +166,7 @@
       <p>{{ auth.user.getMail() }}</p>
     </div>
   </body>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const profilePic = document.getElementById('profile-pic');
@@ -210,15 +211,19 @@
           credentials: 'include',
           body: formData,
         })
-          .then((response) => response.json())
-          .then((data) => {
-            if (!data.success) {
-              alert('Erreur lors de l\'upload.');
-            }
-          })
-          .catch(() => {
-            alert('Erreur lors de l\'upload.');
-          });
+        // on attend 5 secondes pour laisser le temps au serveur de traiter l'image, on utilise sweetalert pour afficher un chargement
+        Swal.fire({
+          title: 'Chargement...',
+          timer: 5000,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+          }
+        }).then(() => {
+          // on recharge la page pour afficher la nouvelle image
+          window.location.reload();
+        });
+          
       }
     });
     document.addEventListener('DOMContentLoaded', () => {
