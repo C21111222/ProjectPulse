@@ -1,18 +1,23 @@
 <div class="loginForm-container" id="loginForm" style="display: none;">
   <button class="close-button" onclick="closeLoginForm()">×</button>
-  <h1>Connexion</h1>
+  <h1>
+    Connexion
+  </h1>
   <div class="form-links-container">
     <form action="/login_fast" method="POST">
-      
-      
+
       <input type="email" name="email" placeholder="Adresse email" required />
       <input type="password" name="password" placeholder="Mot de passe" required />
       <button class="submit-button" type="submit">Se connecter</button>
     </form>
 
     <div class="links">
-      <p>Pas encore de compte ? <a href="/register">S'inscrire</a></p>
-      <p><a href="/forgot-password">Mot de passe oublié ?</a></p>
+      <p>
+        Pas encore de compte ? <a href="/register">S'inscrire</a>
+      </p>
+      <p>
+        <a href="/forgot-password">Mot de passe oublié ?</a>
+      </p>
     </div>
   </div>
 </div>
@@ -21,157 +26,172 @@
 @if(flashMessages.has('notification'))
   <script>
     Swal.fire({
-      icon: "{{ flashMessages.get('notification').type }}", // 'success', 'error', etc.
+      icon: "{{ flashMessages.get('notification').type }}",
+      // 'success', 'error', etc.
       title: "{{ flashMessages.get('notification').message }}",
       showConfirmButton: false,
-      timer: 3000
+      timer: 3e3
     });
   </script>
 @endif
 
 <style>
-/* Fenêtre de connexion */
-#loginForm {
-  display: flex; /* Utiliser flexbox pour centrer */
-  align-items: center; /* Centrer verticalement */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 1);
-  z-index: 9999;
-  font-family: 'Poppins', sans-serif;
-}
-
-/* Conteneur de la fenêtre */
-.loginForm-container {
-  display: flex;
-  flex-direction: column; /* Aligner verticalement */
-  justify-content: center; /* Centrer verticalement */
-  align-items: center; /* Centrer horizontalement */
-  max-height: 50%; /* Limiter la hauteur maximale */
-  margin: auto; /* Centrer horizontalement */
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
-  width: 100%;
-  overflow-y: auto; /* Ajouter un défilement si nécessaire */
-  text-align: center;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Bouton de fermeture */
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-
-.form-links-container {
-  display: flex;
-  flex-direction: column; /* Aligner verticalement */
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.loginForm-container h1 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #17161A;
-}
-
-.loginForm-container input {
-  width: 90%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-}
-
-.submit-button {
-  width: 50%;
-  padding: 12px;
-  background-color: #5A45FF;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.submit-button:hover {
-  background-color: #4a3ae0;
-}
-
-.loginForm-container .links {
-  margin-top: 10px;
-  text-align: center;
-}
-
-.loginForm-container .links a {
-  font-size: 14px;
-  color: #5A45FF;
-  text-decoration: none;
-}
-
-.loginForm-container .links a:hover {
-  text-decoration: underline;
-}
-
-/* Animation d'apparition */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
+  /* Fenêtre de connexion */
+  
+  #loginForm {
+    display: flex;
+    /* Utiliser flexbox pour centrer */
+    align-items: center;
+    /* Centrer verticalement */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 1);
+    z-index: 9999;
+    font-family: 'Poppins', sans-serif;
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Responsivité */
-@media (max-width: 768px) {
+  
+  /* Conteneur de la fenêtre */
+  
   .loginForm-container {
+    display: flex;
+    flex-direction: column;
+    /* Aligner verticalement */
+    justify-content: center;
+    /* Centrer verticalement */
+    align-items: center;
+    /* Centrer horizontalement */
+    max-height: 50%;
+    /* Limiter la hauteur maximale */
+    margin: auto;
+    /* Centrer horizontalement */
     padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 100%;
+    overflow-y: auto;
+    /* Ajouter un défilement si nécessaire */
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
   }
-
+  
+  /* Bouton de fermeture */
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .form-links-container {
+    display: flex;
+    flex-direction: column;
+    /* Aligner verticalement */
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
   .loginForm-container h1 {
-    font-size: 20px;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #17161A;
   }
-
+  
   .loginForm-container input {
+    width: 90%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+  }
+  
+  .submit-button {
+    width: 50%;
+    padding: 12px;
+    background-color: #5A45FF;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #4a3ae0;
+  }
+  
+  .loginForm-container .links {
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .loginForm-container .links a {
     font-size: 14px;
-    padding: 10px;
+    color: #5A45FF;
+    text-decoration: none;
   }
-
-  .loginForm-container button {
-    font-size: 14px;
-    padding: 10px;
+  
+  .loginForm-container .links a:hover {
+    text-decoration: underline;
   }
-}
-
-@media (max-width: 480px) {
-  .loginForm-container {
-    padding: 15px;
+  
+  /* Animation d'apparition */
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+  
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
-
-  .loginForm-container h1 {
-    font-size: 18px;
+  
+  /* Responsivité */
+  
+  @media (max-width: 768px) {
+    .loginForm-container {
+      padding: 20px;
+    }
+  
+    .loginForm-container h1 {
+      font-size: 20px;
+    }
+  
+    .loginForm-container input {
+      font-size: 14px;
+      padding: 10px;
+    }
+  
+    .loginForm-container button {
+      font-size: 14px;
+      padding: 10px;
+    }
   }
-}
+  
+  @media (max-width: 480px) {
+    .loginForm-container {
+      padding: 15px;
+    }
+  
+    .loginForm-container h1 {
+      font-size: 18px;
+    }
+  }
 </style>
 
 <script>
   function closeLoginForm() {
-    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById("loginForm").style.display = "none";
   }
 </script>

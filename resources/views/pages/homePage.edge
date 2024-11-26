@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accueil - Outil de Gestion de Projet</title>
-    <link href="https://fonts.googleapis.com/css?family=Poppins:400,500&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Accueil - Outil de Gestion de Projet
+    </title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,500&display=swap" rel="stylesheet" />
     <style>
-    body {
+      body {
         font-family: 'Poppins', sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f4f4f9;
         color: #333;
-    }
-
-    .content-container {
+      }
+      
+      .content-container {
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
@@ -22,64 +24,69 @@
         background-color: #fff;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         border-radius: 8px;
-    }
-
-    h1, h2 {
+      }
+      
+      h1,
+      h2 {
         color: #2c3e50;
-    }
-
-    h1 {
+      }
+      
+      h1 {
         font-size: 2.5em;
         margin-bottom: 20px;
-    }
-
-    h2 {
+      }
+      
+      h2 {
         font-size: 1.8em;
         margin-top: 40px;
         margin-bottom: 20px;
-    }
-
-    p {
+      }
+      
+      p {
         line-height: 1.6;
         margin-bottom: 20px;
-    }
-
-    ul {
+      }
+      
+      ul {
         list-style-type: disc;
         padding-left: 20px;
-    }
-
-    li {
+      }
+      
+      li {
         margin-bottom: 10px;
-    }
-
-    strong {
+      }
+      
+      strong {
         color: #2980b9;
-    }
-
-    .features, .principles {
+      }
+      
+      .features,
+      .principles {
         margin-bottom: 40px;
-    }
-
-    .features ul, .principles ul {
+      }
+      
+      .features ul,
+      .principles ul {
         list-style-type: none;
         padding-left: 0;
-    }
-
-    .features li, .principles li {
+      }
+      
+      .features li,
+      .principles li {
         background: #ecf0f1;
         padding: 10px;
         border-radius: 4px;
         margin-bottom: 10px;
-    }
-
-    .features li strong, .principles li strong {
+      }
+      
+      .features li strong,
+      .principles li strong {
         display: block;
         margin-bottom: 5px;
         color: #e74c3c;
-    }
-
-    .login-button {
+      }
+      
+      .login-button {
         display: block;
         width: 100px;
         margin: 20px auto;
@@ -89,54 +96,86 @@
         color: #fff;
         text-decoration: none;
         border-radius: 4px;
-    }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     @include('components/navbar')
     @include('components/ChatButton')
     <div class="content-container">
-        <h1>Bienvenue sur l'outil de gestion de projet "ProjectPulse" </h1>
+      <h1>
+        Bienvenue sur l'outil de gestion de projet "ProjectPulse"
+      </h1>
+      <p>
+        Ce projet de génie logiciel est un outil de gestion de projet basé sur le Web, conçu pour aider les petites et moyennes équipes à planifier, suivre et gérer leurs projets efficacement. Il intègre plusieurs fonctionnalités essentielles pour la gestion des tâches, la collaboration en équipe, le suivi du temps, et bien plus encore.
+      </p>
+      <p>
+        L'objectif principal de ce projet est de fournir une plateforme robuste et simple à utiliser, tout en respectant les principes du génie logiciel pour garantir la qualité du code et la fiabilité de l'application.
+      </p>
+
+      <h2>
+        Caractéristiques du projet
+      </h2>
+      <div class="features">
+        <ul>
+          <li>
+            <strong>Authentification et autorisation :</strong>Un système de connexion sécurisé avec des rôles distincts (administrateur, chef de projet, membre).
+          </li>
+          <li>
+            <strong>Tableau de bord :</strong>Un tableau de bord centralisé pour voir les projets en cours, les tâches à venir, et les indicateurs clés de performance.
+          </li>
+          <li>
+            <strong>Gestion de projets et de tâches :</strong>Création et gestion de projets, gestion des tâches avec priorités, échéances et états.
+          </li>
+          <li>
+            <strong>Collaboration d'équipe :</strong>Un système de messagerie ou de commentaires pour améliorer la communication.
+          </li>
+          <li>
+            <strong>Suivi du temps :</strong>Enregistrement du temps passé sur chaque tâche et génération de rapports détaillés.
+          </li>
+          <li>
+            <strong>Notifications et alertes :</strong>Système de notifications pour alerter les utilisateurs sur les échéances et les mises à jour importantes.
+          </li>
+          <li>
+            <strong>Conception réactive :</strong>L'application sera accessible sur tous les appareils (ordinateurs, tablettes, smartphones).
+          </li>
+          <li>
+            <strong>Déploiement et DevOps :</strong>Utilisation de Docker et des pipelines CI/CD pour un déploiement efficace sur le cloud.
+          </li>
+        </ul>
+      </div>
+
+      <h2>
+        Les principes d'AdonisJS
+      </h2>
+      <div class="principles">
         <p>
-            Ce projet de génie logiciel est un outil de gestion de projet basé sur le Web, conçu pour aider les petites et moyennes équipes à planifier, suivre et gérer leurs projets efficacement. Il intègre plusieurs fonctionnalités essentielles pour la gestion des tâches, la collaboration en équipe, le suivi du temps, et bien plus encore.
+          AdonisJS est un framework Node.js qui facilite le développement d'applications web performantes et sécurisées. Il est basé sur le principe de "convention over configuration", ce qui permet de se concentrer sur la logique métier plutôt que sur la configuration du framework.
         </p>
         <p>
-            L'objectif principal de ce projet est de fournir une plateforme robuste et simple à utiliser, tout en respectant les principes du génie logiciel pour garantir la qualité du code et la fiabilité de l'application.
+          Voici quelques principes clés d'AdonisJS :
         </p>
-
-
-
-        <h2>Caractéristiques du projet</h2>
-        <div class="features">
-            <ul>
-                <li><strong>Authentification et autorisation :</strong> Un système de connexion sécurisé avec des rôles distincts (administrateur, chef de projet, membre).</li>
-                <li><strong>Tableau de bord :</strong> Un tableau de bord centralisé pour voir les projets en cours, les tâches à venir, et les indicateurs clés de performance.</li>
-                <li><strong>Gestion de projets et de tâches :</strong> Création et gestion de projets, gestion des tâches avec priorités, échéances et états.</li>
-                <li><strong>Collaboration d'équipe :</strong> Un système de messagerie ou de commentaires pour améliorer la communication.</li>
-                <li><strong>Suivi du temps :</strong> Enregistrement du temps passé sur chaque tâche et génération de rapports détaillés.</li>
-                <li><strong>Notifications et alertes :</strong> Système de notifications pour alerter les utilisateurs sur les échéances et les mises à jour importantes.</li>
-                <li><strong>Conception réactive :</strong> L'application sera accessible sur tous les appareils (ordinateurs, tablettes, smartphones).</li>
-                <li><strong>Déploiement et DevOps :</strong> Utilisation de Docker et des pipelines CI/CD pour un déploiement efficace sur le cloud.</li>
-            </ul>
-        </div>
-
-        <h2>Les principes d'AdonisJS</h2>
-        <div class="principles">
-            <p>
-                AdonisJS est un framework Node.js qui facilite le développement d'applications web performantes et sécurisées. Il est basé sur le principe de "convention over configuration", ce qui permet de se concentrer sur la logique métier plutôt que sur la configuration du framework.
-            </p>
-            <p>
-                Voici quelques principes clés d'AdonisJS :
-            </p>
-            <ul>
-                <li><strong>Structure MVC :</strong> AdonisJS suit le modèle MVC (Model-View-Controller) qui sépare la logique de l'application en trois parties distinctes pour faciliter la gestion et la maintenance du code.</li>
-                <li><strong>ORM Eloquent :</strong> L'ORM d'AdonisJS facilite la gestion des bases de données avec des modèles clairs, permettant une gestion fluide des données.</li>
-                <li><strong>Authentification intégrée :</strong> Il dispose d'un système d'authentification prêt à l'emploi, ce qui permet de gérer facilement les sessions et les rôles des utilisateurs.</li>
-                <li><strong>Sécurité renforcée :</strong> AdonisJS inclut des mécanismes de sécurité comme la protection CSRF, le cryptage des mots de passe, et la gestion des erreurs de manière centralisée.</li>
-                <li><strong>Facilité de test :</strong> Le framework intègre des outils pour effectuer des tests unitaires et d'intégration facilement.</li>
-                <li><strong>Documentation riche :</strong> AdonisJS offre une documentation complète et bien structurée pour accompagner les développeurs tout au long de leur projet.</li>
-            </ul>
-        </div>
+        <ul>
+          <li>
+            <strong>Structure MVC :</strong>AdonisJS suit le modèle MVC (Model-View-Controller) qui sépare la logique de l'application en trois parties distinctes pour faciliter la gestion et la maintenance du code.
+          </li>
+          <li>
+            <strong>ORM Eloquent :</strong>L'ORM d'AdonisJS facilite la gestion des bases de données avec des modèles clairs, permettant une gestion fluide des données.
+          </li>
+          <li>
+            <strong>Authentification intégrée :</strong>Il dispose d'un système d'authentification prêt à l'emploi, ce qui permet de gérer facilement les sessions et les rôles des utilisateurs.
+          </li>
+          <li>
+            <strong>Sécurité renforcée :</strong>AdonisJS inclut des mécanismes de sécurité comme la protection CSRF, le cryptage des mots de passe, et la gestion des erreurs de manière centralisée.
+          </li>
+          <li>
+            <strong>Facilité de test :</strong>Le framework intègre des outils pour effectuer des tests unitaires et d'intégration facilement.
+          </li>
+          <li>
+            <strong>Documentation riche :</strong>AdonisJS offre une documentation complète et bien structurée pour accompagner les développeurs tout au long de leur projet.
+          </li>
+        </ul>
+      </div>
     </div>
-</body>
+  </body>
 </html>

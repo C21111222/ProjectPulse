@@ -15,89 +15,104 @@ export default class AuthController {
     return view.render('pages/login')
   }
 
-
-    /**
-     * Handles the login process for a user.
-     * 
-     * @param {HttpContextContract} ctx - The context object containing request, auth, response, and session.
-     * @returns {Promise<void>} - Redirects the user based on the login outcome.
-     * 
-     * @remarks
-     * This method attempts to log in a user using their email and password. If the credentials are correct,
-     * the user is logged in and redirected to the '/connected' page. If the credentials are incorrect, 
-     * a flash message is set and the user is redirected back to the login page. In case of any other errors,
-     * a generic error message is flashed and the user is redirected to the login page.
-     * 
-     * @example
-     * ```typescript
-     * await login({ request, auth, response, session });
-     * ```
-     */
-  public async login({ request, auth, response, session}: HttpContextContract) {
-      const { email, password } = request.all();
-      logger.info('Tentative de connexion avec l\'email %s', email);
-      try {
-        const user = await User.verifyCredentials(email, password);
-        if (user) {
-          await auth.use('web').login(user);      
-          logger.info('Connexion réussie pour l\'email %s', email);
-          return response.redirect('/connected'); 
-        } else {
-          logger.info('Connexion échouée pour l\'email %s', email);
-          session.flash('notification',{ type: 'error', message: 'Email ou mot de passe incorrect.' });
-          return response.redirect('back');
-        }
-      } catch (error) {
-        logger.info('Connexion échouée pour l\'email %s', email);
-        if (error.code == 'E_INVALID_CREDENTIALS') {
-          session.flash('notification',{ type: 'error', message: 'Email ou mot de passe incorrect.' });
-          return response.redirect('back');
-        }
-        session.flash('notification',{ type: 'error', message: 'Une erreur est survenue lors de la connexion.' });
-        return response.redirect('back');
+  /**
+   * Handles the login process for a user.
+   *
+   * @param {HttpContextContract} ctx - The context object containing request, auth, response, and session.
+   * @returns {Promise<void>} - Redirects the user based on the login outcome.
+   *
+   * @remarks
+   * This method attempts to log in a user using their email and password. If the credentials are correct,
+   * the user is logged in and redirected to the '/connected' page. If the credentials are incorrect,
+   * a flash message is set and the user is redirected back to the login page. In case of any other errors,
+   * a generic error message is flashed and the user is redirected to the login page.
+   *
+   * @example
+   * ```typescript
+   * await login({ request, auth, response, session });
+   * ```
+   */
+  public async login({ request, auth, response, session }: HttpContextContract) {
+    const { email, password } = request.all()
+    logger.info("Tentative de connexion avec l'email %s", email)
+    try {
+      const user = await User.verifyCredentials(email, password)
+      if (user) {
+        await auth.use('web').login(user)
+        logger.info("Connexion réussie pour l'email %s", email)
+        return response.redirect('/connected')
+      } else {
+        logger.info("Connexion échouée pour l'email %s", email)
+        session.flash('notification', {
+          type: 'error',
+          message: 'Email ou mot de passe incorrect.',
+        })
+        return response.redirect('back')
       }
-
-
-    }
-
-    /**
-     * Handles the fast login process for a user.
-     * 
-     * @param {HttpContextContract} ctx - The context object containing request, auth, response, and session.
-     * @returns {Promise<void>} - Redirects the user based on the login outcome.
-     * 
-     * @remarks
-     * This method attempts to log in a user using their email and password. If the credentials are correct,
-     * the user is logged in and redirected to the '/connected' page. If the credentials are incorrect, 
-     * a flash message is set and the user is redirected back to the login page. In case of any other errors,
-     * a generic error message is flashed and the user is redirected to the login page.
-     * 
-     * @example
-     * ```typescript
-     * await loginFast({ request, auth, response, session });
-     * ```
-     */
-    public async loginFast({ request, auth, response, session }: HttpContextContract) {
-      const { email, password } = request.all();
-      logger.info('Tentative de connexion avec l\'email %s', email);
-      try {
-        const user = await User.verifyCredentials(email, password);
-        if (user) {
-          await auth.use('web').login(user);
-          return response.redirect('/connected');
-        } else {
-          session.flash('notification', { type: 'error', message: 'Email ou mot de passe incorrect.' });
-          return response.redirect('/login');
-        }
-      } catch (error) {
-        if (error.code == 'E_INVALID_CREDENTIALS') {
-          session.flash('notification', { type: 'error', message: 'Email ou mot de passe incorrect.' });
-          return response.redirect('/login');
-        } 
-        session.flash('notification', { type: 'error', message: 'Une erreur est survenue lors de la connexion.' });
-        return response.redirect('/login');
+    } catch (error) {
+      logger.info("Connexion échouée pour l'email %s", email)
+      if (error.code == 'E_INVALID_CREDENTIALS') {
+        session.flash('notification', {
+          type: 'error',
+          message: 'Email ou mot de passe incorrect.',
+        })
+        return response.redirect('back')
       }
+      session.flash('notification', {
+        type: 'error',
+        message: 'Une erreur est survenue lors de la connexion.',
+      })
+      return response.redirect('back')
     }
+  }
+
+  /**
+   * Handles the fast login process for a user.
+   *
+   * @param {HttpContextContract} ctx - The context object containing request, auth, response, and session.
+   * @returns {Promise<void>} - Redirects the user based on the login outcome.
+   *
+   * @remarks
+   * This method attempts to log in a user using their email and password. If the credentials are correct,
+   * the user is logged in and redirected to the '/connected' page. If the credentials are incorrect,
+   * a flash message is set and the user is redirected back to the login page. In case of any other errors,
+   * a generic error message is flashed and the user is redirected to the login page.
+   *
+   * @example
+   * ```typescript
+   * await loginFast({ request, auth, response, session });
+   * ```
+   */
+  public async loginFast({ request, auth, response, session }: HttpContextContract) {
+    const { email, password } = request.all()
+    logger.info("Tentative de connexion avec l'email %s", email)
+    try {
+      const user = await User.verifyCredentials(email, password)
+      if (user) {
+        await auth.use('web').login(user)
+        return response.redirect('/connected')
+      } else {
+        session.flash('notification', {
+          type: 'error',
+          message: 'Email ou mot de passe incorrect.',
+        })
+        return response.redirect('/login')
+      }
+    } catch (error) {
+      if (error.code == 'E_INVALID_CREDENTIALS') {
+        session.flash('notification', {
+          type: 'error',
+          message: 'Email ou mot de passe incorrect.',
+        })
+        return response.redirect('/login')
+      }
+      session.flash('notification', {
+        type: 'error',
+        message: 'Une erreur est survenue lors de la connexion.',
+      })
+      return response.redirect('/login')
+    }
+  }
 
   /**
    * Renders the registration page.
@@ -111,10 +126,10 @@ export default class AuthController {
 
   /**
    * Registers a new user with the provided details.
-   * 
+   *
    * @param {HttpContextContract} ctx - The context object containing request, auth, response, and session.
    * @returns {Promise<void>} - Redirects the user based on the outcome of the registration process.
-   * 
+   *
    * @remarks
    * This method performs the following steps:
    * 1. Extracts `fullName`, `email`, `password`, and `password_confirmation` from the request.
@@ -123,11 +138,11 @@ export default class AuthController {
    * 4. Checks if the `fullName` is one of the disallowed names. If so, flashes an error message and redirects back.
    * 5. Attempts to create a new user and log them in. If successful, redirects to the connected page.
    * 6. Handles errors such as duplicate email entries and flashes appropriate error messages.
-   * 
+   *
    * @throws {Error} - Throws an error if there is an issue during the user creation process.
    */
   public async register({ request, auth, response, session }: HttpContextContract) {
-    const { fullName,email, password, password_confirmation } = request.only([
+    const { fullName, email, password, password_confirmation } = request.only([
       'fullName',
       'email',
       'password',
@@ -136,30 +151,43 @@ export default class AuthController {
 
     const fullNameM = fullName.replace(/ /g, '-').charAt(0).toUpperCase() + fullName.slice(1)
 
-
     if (password !== password_confirmation) {
-      session.flash('notification', { type: 'error', message: 'Les mots de passe ne correspondent pas.' })
+      session.flash('notification', {
+        type: 'error',
+        message: 'Les mots de passe ne correspondent pas.',
+      })
       return response.redirect('back')
     }
-    if (fullName == "Kevin" || fullName == "kevin" || fullName == "kévin" || fullName == "Kévin" ||fullName == "Florent" || fullName == "florent" || fullName == "Simon" || fullName == "simon" ) {
+    if (
+      fullName == 'Kevin' ||
+      fullName == 'kevin' ||
+      fullName == 'kévin' ||
+      fullName == 'Kévin' ||
+      fullName == 'Florent' ||
+      fullName == 'florent' ||
+      fullName == 'Simon' ||
+      fullName == 'simon'
+    ) {
       session.flash('notification', { type: 'error', message: 'Va poop fdp.' })
       return response.redirect('back')
     }
     try {
-      logger.info('Inscription de %s avec l\'email %s', fullName, email)
+      logger.info("Inscription de %s avec l'email %s", fullName, email)
       const user = await User.create({ fullName: fullNameM, email, password })
       await auth.use('web').login(user)
       return response.redirect('/connected')
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
-        session.flash('notification', { type: 'error', message: 'Cet email est déjà utilisé'})
+        session.flash('notification', { type: 'error', message: 'Cet email est déjà utilisé' })
         return response.redirect('back')
       }
-      session.flash('notification', { type: 'error', message: 'Une erreur est survenue lors de l\'inscription.' })
+      session.flash('notification', {
+        type: 'error',
+        message: "Une erreur est survenue lors de l'inscription.",
+      })
       return response.redirect('back')
     }
   }
-
 
   /**
    * Logs out the currently authenticated user and redirects to the home page.
@@ -169,17 +197,16 @@ export default class AuthController {
    */
   public async logout({ auth, response }: HttpContextContract) {
     await auth.use('web').logout()
-    return response.redirect('/') 
+    return response.redirect('/')
   }
 
-
-    /**
-     * Renders the logout page.
-     *
-     * @param {HttpContextContract} context - The HTTP context containing the view to render.
-     * @returns {Promise<void>} A promise that resolves when the view is rendered.
-     */
-    public async showLogout({ view }: HttpContextContract) {
-        return view.render('pages/logout')
-    }
+  /**
+   * Renders the logout page.
+   *
+   * @param {HttpContextContract} context - The HTTP context containing the view to render.
+   * @returns {Promise<void>} A promise that resolves when the view is rendered.
+   */
+  public async showLogout({ view }: HttpContextContract) {
+    return view.render('pages/logout')
+  }
 }

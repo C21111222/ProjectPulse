@@ -32,7 +32,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
     return this.fullName
   }
 
-  public getMail() { 
+  public getMail() {
     return this.email
   }
 
@@ -51,5 +51,4 @@ export default class User extends compose(BaseModel, AuthFinder) {
       updatedAt: this.updatedAt,
     }
   }
-  
 }

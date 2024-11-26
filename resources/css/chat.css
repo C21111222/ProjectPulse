@@ -1,4 +1,3 @@
-
 /* CSS pour la page de messagerie */
 body {
   font-family: Arial, sans-serif;
@@ -22,7 +21,6 @@ body {
   padding: 15px;
   flex-shrink: 0; /* Empêche la barre latérale de rétrécir */
 }
-
 
 .search-bar {
   margin-bottom: 20px;
@@ -87,7 +85,7 @@ body {
   display: flex;
   flex-direction: column;
   background-color: #ecf0f1;
-  overflow-y: auto
+  overflow-y: auto;
 }
 
 .chat-box {
@@ -95,7 +93,7 @@ body {
   padding: 20px;
   overflow-y: auto;
   border-bottom: 1px solid #bdc3c7;
-  overflow-y: auto
+  overflow-y: auto;
 }
 
 .message {
@@ -113,7 +111,7 @@ body {
   background-color: #bdc3c7;
 }
 
-.chat-input input[type="text"] {
+.chat-input input[type='text'] {
   flex-grow: 1;
   padding: 10px;
   font-size: 14px;
@@ -209,46 +207,48 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-.container {
-flex-direction: column; /* Superposer les éléments */
-}
+  .container {
+    flex-direction: column; /* Superposer les éléments */
+  }
 
-.chat-sidebar {
-width: 100%; /* La barre latérale occupe toute la largeur */
-height: auto; /* Ajuste la hauteur automatiquement */
-order: 2; /* Place la barre latérale en bas */
-}
+  .chat-sidebar {
+    width: 100%; /* La barre latérale occupe toute la largeur */
+    height: auto; /* Ajuste la hauteur automatiquement */
+    order: 2; /* Place la barre latérale en bas */
+  }
 
-.chat-window {
-height: calc(100vh - 60px); /* Remplit tout l'espace sauf la navbar */
-flex-grow: 1; /* S'adapte à l'espace disponible */
-order: 1; /* Place la fenêtre de chat en haut */
-}
+  .chat-window {
+    height: calc(100vh - 60px); /* Remplit tout l'espace sauf la navbar */
+    flex-grow: 1; /* S'adapte à l'espace disponible */
+    order: 1; /* Place la fenêtre de chat en haut */
+  }
 
-.chat-box, .chat-input {
-padding: 10px;
-}
+  .chat-box,
+  .chat-input {
+    padding: 10px;
+  }
 }
 
 @media (max-width: 480px) {
-.chat-sidebar {
-padding: 10px; /* Réduit l'espacement */
-}
+  .chat-sidebar {
+    padding: 10px; /* Réduit l'espacement */
+  }
 
-.user-item {
-font-size: 14px; /* Réduit la taille de police */
-}
+  .user-item {
+    font-size: 14px; /* Réduit la taille de police */
+  }
 
-.chat-input input[type="text"] {
-font-size: 12px; /* Ajuste la taille du texte */
-margin-right: 5px; /* Réduit l'espacement entre le champ et le bouton */
-}
+  .chat-input input[type='text'] {
+    font-size: 12px; /* Ajuste la taille du texte */
+    margin-right: 5px; /* Réduit l'espacement entre le champ et le bouton */
+  }
 
-.chat-input button {
-padding: 8px 16px; /* Diminue la taille des boutons */
-}
+  .chat-input button {
+    padding: 8px 16px; /* Diminue la taille des boutons */
+  }
 
-.messagesent, .messagereceived {
-max-width: 80%; /* Réduit la largeur des bulles de messages */
-}
+  .messagesent,
+  .messagereceived {
+    max-width: 80%; /* Réduit la largeur des bulles de messages */
+  }
 }

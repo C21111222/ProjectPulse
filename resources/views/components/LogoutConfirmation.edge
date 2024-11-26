@@ -1,6 +1,8 @@
 <div class="logout-confirmation">
   <div class="confirmation-box">
-    <h3>Êtes-vous sûr de vouloir vous déconnecter ?</h3>
+    <h3>
+      Êtes-vous sûr de vouloir vous déconnecter ?
+    </h3>
     <div class="actions">
       <a href="/logout" class="btn-confirm">Oui</a>
       <a href="javascript:void(0)" class="btn-cancel" onclick="closeConfirmation()">Annuler</a>
@@ -21,7 +23,7 @@
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
   }
-
+  
   .confirmation-box {
     background-color: #fff;
     padding: 20px;
@@ -30,18 +32,18 @@
     width: 300px;
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
   }
-
+  
   .confirmation-box h3 {
     margin-bottom: 20px;
     font-size: 18px;
     color: #333;
   }
-
+  
   .actions {
     display: flex;
     justify-content: space-between;
   }
-
+  
   .actions a {
     padding: 10px 20px;
     font-size: 16px;
@@ -49,7 +51,7 @@
     border-radius: 4px;
     cursor: pointer;
   }
-
+  
   .btn-confirm {
     background-color: #5A45FF;
     color: white;
@@ -57,11 +59,11 @@
     height: 20px;
     padding: 10px 20px;
   }
-
+  
   .btn-confirm:hover {
     background-color: #4a3ae0;
   }
-
+  
   .btn-cancel {
     background-color: #ddd;
     color: #333;
@@ -69,7 +71,7 @@
     height: 20px;
     padding: 10px 20px;
   }
-
+  
   .btn-cancel:hover {
     background-color: #bbb;
   }
@@ -78,6 +80,6 @@
 <script>
   // Close the confirmation box
   function closeConfirmation() {
-    document.querySelector('.logout-confirmation').style.display = 'none';
+    document.querySelector(".logout-confirmation").style.display = "none";
   }
 </script>
