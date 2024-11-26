@@ -162,8 +162,15 @@ body {
   justify-content: flex-start;
   flex-direction: row;
   align-self: flex-start;
-  text-align: left;
+  margin-right: auto;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 50%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
 }
+
+
 
 /* Messages envoyés (à droite) */
 .message-container.sent {
@@ -171,6 +178,12 @@ body {
   flex-direction: row-reverse;
   text-align: right;
   align-self: flex-end;
+  margin-left: auto;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 50%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 /* Styles généraux pour les messages */
