@@ -29,17 +29,36 @@
             <li class="user-item user-item-global" data-user-id="999999">
               <span class="user-fullName" onclick="openChat(999999)">Global</span>
             </li>
-          @each(user in users)
+            @each(user in users)
             @if(user.messageViewed == 0)
-            <li class="user-item" data-user-id="{{ user.user.id }}" >
-              <span class="user-fullName" onclick="openChat({{ user.user.id }})" style="color: red;">{{ user.user.fullName }}</span>
+            <li class="user-item" data-user-id="{{ user.user.id }}" style="display: flex; align-items: center;">
+              <!-- Photo de profil -->
+              <img 
+                src="{{ user.image }}" 
+                alt="Photo de profil" 
+                style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
+              />
+              <!-- Nom complet -->
+              <span class="user-fullName" onclick="openChat({{ user.user.id }})" style="color: red;">
+                {{ user.user.fullName }}
+              </span>
             </li>
             @else
-            <li class="user-item" data-user-id="{{ user.user.id }}">
-              <span class="user-fullName" onclick="openChat({{ user.user.id }})">{{ user.user.fullName }}</span>
+            <li class="user-item" data-user-id="{{ user.user.id }}" style="display: flex; align-items: center;">
+              <!-- Photo de profil -->
+              <img 
+                src="{{ user.image }}" 
+                alt="Photo de profil" 
+                style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
+              />
+              <!-- Nom complet -->
+              <span class="user-fullName" onclick="openChat({{ user.user.id }})">
+                {{ user.user.fullName }}
+              </span>
             </li>
             @endif
           @endeach
+          
         </ul>
       </div>
     </div>
@@ -87,7 +106,7 @@
     const users = [
       @each(user in users)
         @if(user.user.id !== auth.user.id)
-          { id: {{ user.user.id }}, fullName: '{{ user.user.fullName }}', messageViewed: {{ user.messageViewed }} },
+          { id: {{ user.user.id }}, fullName: '{{ user.user.fullName }}', imageUrl:'{{ user.image }}',  messageViewed: {{ user.messageViewed }} },
         @endif
       @endeach
     ];
@@ -171,6 +190,7 @@
         sendViewedNotification(userIdsauv);
       }
       const messages = await loadMessages(userId);
+      console.log(messages);
       if (userId !== 999999) {
         const isRed = document.querySelector(`[data-user-id="${userId}"] .user-fullName`).style.color;
         if (selectedUser.messageViewed == 0 || isRed == 'red') {
@@ -185,7 +205,18 @@
       messages.forEach(message => {
         const messageClass = message.senderId === {{ auth.user.id }} ? 'sent' : 'received';
         const formattedTime = new Date(message.createdAt).toLocaleTimeString('fr-FR');
-        document.getElementById('chatBox').innerHTML += `<p class="message${messageClass}">${formattedTime} - ${message.senderId === {{ auth.user.id }} ? 'Vous' : message.senderName} : ${message.content}</p>`;
+        document.getElementById('chatBox').innerHTML += `
+        <div class="message-container ${messageClass}" style="display: flex; align-items: center; margin-bottom: 10px;">
+          <img 
+            src="${message.senderImageUrl}" 
+            alt="Photo de ${message.senderName}" 
+            style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
+          />
+          <p class="message-content" style="margin: 0;">
+            <strong>${message.senderId === {{ auth.user.id }} ? 'Vous' : message.senderName}</strong>: ${message.content} 
+            <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span>
+          </p>
+        </div>`;
       });
       scrollToBottom();
       // le nom du channel est le plus petit id de l'utilisateur connecté et de l'utilisateur avec qui on discute - le plus grand id
@@ -203,16 +234,29 @@
       await activeSubscription.create();
       console.log('Nouveau channel');
       unsubscribe = activeSubscription.onMessage((data) => {
-      console.log('Nouveau message reçu');
-      console.log(data);
-      const messageClass = data.sender === {{ auth.user.id }} ? 'sent' : 'received';
-      if ( messageClass === 'received') {
-        sendViewedNotificationSingle(data.messageId);
-      }
-      const formattedTime = new Date(data.createdAt).toLocaleTimeString('fr-FR');
-      document.getElementById('chatBox').innerHTML += `<p class="newmessage${messageClass}">${formattedTime} - ${data.sender === {{ auth.user.id }} ? 'Vous' : data.senderName} : ${data.message}</p>`;
+        console.log('Nouveau message reçu');
+        console.log(data);
+        const messageClass = data.sender === {{ auth.user.id }} ? 'sent' : 'received';
+        if (messageClass === 'received') {
+          sendViewedNotificationSingle(data.messageId);
+        }
+        const formattedTime = new Date(data.createdAt).toLocaleTimeString('fr-FR');
       
-      scrollToBottom();
+        // Ajouter l'image de profil
+        document.getElementById('chatBox').innerHTML += `
+          <div class="message-container ${messageClass}" style="display: flex; align-items: center; margin-bottom: 10px;">
+            <img 
+              src="${data.sender_image_url}" 
+              alt="Photo de ${data.senderName}" 
+              style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
+            />
+            <p class="message-content" style="margin: 0;">
+              <strong>${data.sender === {{ auth.user.id }} ? 'Vous' : data.senderName}</strong>: ${data.message} 
+              <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span>
+            </p>
+          </div>`;
+        
+        scrollToBottom();
       });
 
       document.getElementById('messageInput').disabled = false;

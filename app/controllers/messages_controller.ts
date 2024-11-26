@@ -38,9 +38,9 @@ export default class MessageriesController {
         .orderBy('created_at', 'desc')
         .first()
       if (lastMessage) {
-        resultat.push({ user: user.serialize(), messageViewed: lastMessage.viewed })
+        resultat.push({ user: user.serialize(), image : user.imageUrl, messageViewed: lastMessage.viewed })
       } else {
-        resultat.push({ user: user.serialize(), messageViewed: true })
+        resultat.push({ user: user.serialize(), image : user.imageUrl, messageViewed: true })
       }
     }
 
@@ -67,7 +67,7 @@ export default class MessageriesController {
         .orderBy('created_at', 'desc')
         .first()
       if (lastMessage && !lastMessage.viewed) {
-        resultat.push({ user: user.serialize(), messageViewed: lastMessage.viewed })
+        resultat.push({ user: user.serialize(), image : user.imageUrl, messageViewed: lastMessage.viewed })
       }
     }
     logger.info(resultat)
@@ -178,6 +178,7 @@ export default class MessageriesController {
       newMessage.content = message
       newMessage.channelId = 'global'
       newMessage.senderName = auth.user.fullName
+      newMessage.senderImageUrl = auth.user.imageUrl
       try {
         transmit.broadcast('chats/global/messages', {
           message: message,
@@ -201,6 +202,7 @@ export default class MessageriesController {
     newMessage.receiverId = receiverId
     newMessage.content = message
     newMessage.senderName = auth.user.fullName
+    newMessage.senderImageUrl = auth.user.imageUrl
     const channel =
       auth.user.id < receiverId ? `${auth.user.id}-${receiverId}` : `${receiverId}-${auth.user.id}`
     newMessage.channelId = channel

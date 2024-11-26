@@ -13,6 +13,9 @@ export default class Message extends BaseModel {
   public senderName: string // Le nom de l'utilisateur qui a envoyé le message
 
   @column()
+  public senderImageUrl: string // L'image de l'utilisateur qui a envoyé le message
+
+  @column()
   public receiverId: number // L'utilisateur qui a reçu le message
 
   @column()
