@@ -162,12 +162,14 @@ body {
   justify-content: flex-start;
   flex-direction: row;
   align-self: flex-start;
+  text-align: left;
 }
 
 /* Messages envoyés (à droite) */
 .message-container.sent {
   justify-content: flex-end;
   flex-direction: row-reverse;
+  text-align: right;
   align-self: flex-end;
 }
 
@@ -199,50 +201,87 @@ body {
   object-fit: cover;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column; /* Superposer les éléments */
-  }
-
-  .chat-sidebar {
-    width: 100%; /* La barre latérale occupe toute la largeur */
-    height: auto; /* Ajuste la hauteur automatiquement */
-    order: 2; /* Place la barre latérale en bas */
-  }
-
-  .chat-window {
-    height: calc(100vh - 60px); /* Remplit tout l'espace sauf la navbar */
-    flex-grow: 1; /* S'adapte à l'espace disponible */
-    order: 1; /* Place la fenêtre de chat en haut */
-  }
-
-  .chat-box,
-  .chat-input {
-    padding: 10px;
-  }
+/* Disposition par défaut (écrans larges) */
+.container {
+  display: flex;
+  flex-direction: row; /* Barre latérale et fenêtre de chat côte à côte */
 }
 
-@media (max-width: 480px) {
+/* Pour les tablettes (largeur max : 1024px) */
+@media (max-width: 1024px) {
   .chat-sidebar {
-    padding: 10px; /* Réduit l'espacement */
+    width: 250px; /* Réduit la largeur de la barre latérale */
+    font-size: 14px; /* Réduit légèrement les textes */
   }
 
-  .user-item {
-    font-size: 14px; /* Réduit la taille de police */
+  .chat-box {
+    padding: 15px; /* Réduit l'espace intérieur */
   }
 
   .chat-input input[type='text'] {
-    font-size: 12px; /* Ajuste la taille du texte */
-    margin-right: 5px; /* Réduit l'espacement entre le champ et le bouton */
+    font-size: 12px; /* Texte légèrement plus petit */
+  }
+}
+
+/* Pour les mobiles (largeur max : 768px) */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column; /* Barre latérale et chat en colonne */
+    height: auto; /* Ajuste la hauteur pour chaque section */
+  }
+
+  .chat-sidebar {
+    width: 100%; /* Barre latérale occupe toute la largeur */
+    height: auto;
+    padding: 10px;
+  }
+
+  .user-item, .user-item-global {
+    padding: 8px; /* Réduit les espaces des éléments utilisateur */
+    font-size: 14px;
+  }
+
+  .chat-window {
+    flex-grow: 1;
+    height: 70vh; /* Hauteur ajustée pour le chat */
+  }
+
+  .chat-input {
+    padding: 10px;
+    flex-wrap: wrap; /* Les enfants passent à la ligne si nécessaire */
+  }
+
+  .chat-input input[type='text'] {
+    margin-bottom: 10px; /* Ajoute un espace entre l'input et le bouton */
+  }
+}
+
+/* Pour les petits mobiles (largeur max : 480px) */
+@media (max-width: 480px) {
+  .chat-sidebar {
+    display: none; /* Cache la barre latérale pour maximiser l'espace */
+  }
+
+  .chat-window {
+    height: calc(100vh - 60px); /* Chat occupe tout l'écran */
+  }
+
+  .message-content {
+    font-size: 12px; /* Texte des messages plus petit */
+    padding: 8px; /* Réduit les marges des messages */
+  }
+
+  .message-container img {
+    width: 20px; /* Réduit la taille des avatars */
+    height: 20px;
+  }
+
+  .chat-input input[type='text'] {
+    font-size: 12px; /* Plus petit champ de saisie */
   }
 
   .chat-input button {
-    padding: 8px 16px; /* Diminue la taille des boutons */
-  }
-
-  .messagesent,
-  .messagereceived {
-    max-width: 80%; /* Réduit la largeur des bulles de messages */
+    font-size: 12px; /* Plus petit bouton */
+    padding: 8px 15px; /* Bouton compact */
   }
 }
