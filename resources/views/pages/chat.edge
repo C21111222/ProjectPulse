@@ -363,10 +363,11 @@
       scrollToBottom();
       // le nom du channel est le plus petit id de l'utilisateur connecté et de l'utilisateur avec qui on discute - le plus grand id
       console.log({{ auth.user.id }});
+      const channel = null
       if (userId == 999999) {
-        const channel = 'global';
+        channel = 'global';
       } else {
-        const channel = Math.min(userId, {{ auth.user.id }}) + '-' + Math.max(userId, {{ auth.user.id }});
+        channel = Math.min(userId, {{ auth.user.id }}) + '-' + Math.max(userId, {{ auth.user.id }});
       }
       // on se connecte au channel
       console.log('Connexion au channel ' + channel);
