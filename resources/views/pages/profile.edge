@@ -86,30 +86,21 @@
       <div class="profile-pic-container" style="position: relative; display: inline-block;">
         <!-- Image de profil -->
         <img 
-          src="{{ auth.user.getImage() }}"
+          src="{{ auth.user.getImage() }}" 
           alt="Image de profil" 
           id="image" 
           style="cursor: pointer;"
         />
-        <!-- Icône de modification -->
+        
+        <!-- Bouton pour sélectionner une photo -->
         <button 
-          id="edit-photo-button" 
-          style="
-            position: absolute; 
-            bottom: 5px; 
-            right: 5px; 
-            background: none; 
-            border: none; 
-            cursor: pointer;
-          "
+          id="select-photo-button" 
+          style="margin-top: 10px; background: none; border: 1px solid #ddd; padding: 5px 10px; cursor: pointer; border-radius: 4px;"
         >
-          <img 
-            src="/resources/img/edit-pencil.png" 
-            alt="Modifier" 
-            style="width: 20px; height: 20px;"
-          />
+          Sélectionner une photo
         </button>
-        <!-- Zone de glisser-déposer -->
+      
+        <!-- Zone de glisser-déposer (seulement sur PC) -->
         <div id="upload-zone" 
              style="
                display: none; 
@@ -126,6 +117,14 @@
              ">
           Glissez-déposez votre image ici
         </div>
+      
+        <!-- Input type file pour mobiles et PC -->
+        <input 
+          type="file" 
+          id="file-input" 
+          accept="image/*" 
+          style="display: none;"
+        />
       </div>
     
       <!-- Nom complet et e-mail -->
@@ -169,29 +168,38 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const profilePic = document.getElementById('profile-pic');
       const editPhotoButton = document.getElementById('edit-photo-button');
+      const selectPhotoButton = document.getElementById('select-photo-button');
+      const fileInput = document.getElementById('file-input');
       const uploadZone = document.getElementById('upload-zone');
-      const uploadInput = document.createElement('input');
-      uploadInput.type = 'file';
-      uploadInput.accept = 'image/*';
-      uploadInput.style.display = 'none';
-  
-      // Événement pour afficher la zone de glisser-déposer
+    
+      // Ouvrir la sélection de fichier via le bouton
+      selectPhotoButton.addEventListener('click', () => {
+        fileInput.click();
+      });
+    
+      // Gestion de la sélection de fichier
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          handleFileUpload(file);
+        }
+      });
+    
+      // Zone de glisser-déposer (optionnelle sur PC)
       editPhotoButton.addEventListener('click', () => {
         uploadZone.style.display = 'block';
       });
-  
-      // Événement pour le glisser-déposer
+    
       uploadZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadZone.style.background = 'rgba(0, 0, 0, 0.7)';
       });
-  
+    
       uploadZone.addEventListener('dragleave', () => {
         uploadZone.style.background = 'rgba(0, 0, 0, 0.5)';
       });
-  
+    
       uploadZone.addEventListener('drop', (e) => {
         e.preventDefault();
         const file = e.dataTransfer.files[0];
@@ -200,32 +208,32 @@
         }
         uploadZone.style.display = 'none';
       });
-  
-      // Fonction pour gérer l'upload
+    
+      // Fonction de gestion de l'upload
       function handleFileUpload(file) {
         const formData = new FormData();
         formData.append('image', file);
-  
+    
         fetch('/img', {
           method: 'POST',
           credentials: 'include',
           body: formData,
         })
-        // on attend 5 secondes pour laisser le temps au serveur de traiter l'image, on utilise sweetalert pour afficher un chargement
-        Swal.fire({
-          title: 'Chargement...',
-          timer: 5000,
-          timerProgressBar: true,
-          didOpen: () => {
-            Swal.showLoading()
-          }
-        }).then(() => {
-          // on recharge la page pour afficher la nouvelle image
-          window.location.reload();
+        .then(() => {
+          Swal.fire({
+            title: 'Chargement...',
+            timer: 5000,
+            timerProgressBar: true,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          }).then(() => {
+            window.location.reload();
+          });
         });
-          
       }
     });
+    
     document.addEventListener('DOMContentLoaded', () => {
       const editButton = document.getElementById('edit-button');
       const fullnameDisplay = document.getElementById('fullname-display');

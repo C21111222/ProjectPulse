@@ -187,6 +187,7 @@ export default class MessageriesController {
           senderName: auth.user.fullName,
           createdAt: Date.now(),
           messageId: newMessage.id,
+          senderImage: auth.user.imageUrl,
         })
         await newMessage.save()
       } catch (error) {

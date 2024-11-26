@@ -157,52 +157,46 @@ body {
   background-color: #1abc9c;
 }
 
-.messagesent {
-  background-color: #3498db;
-  color: white;
-  align-self: flex-end;
-  margin-left: auto;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 50%;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-
-.messagereceived {
-  background-color: #303030;
-  color: white;
+/* Messages reçus (à gauche) */
+.message-container.received {
+  justify-content: flex-start;
+  flex-direction: row;
   align-self: flex-start;
-  margin-right: auto;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 50%;
-  word-wrap: break-word;
-  white-space: pre-wrap;
 }
 
-.newmessagesent {
-  background-color: #3498db;
-  color: white;
+/* Messages envoyés (à droite) */
+.message-container.sent {
+  justify-content: flex-end;
+  flex-direction: row-reverse;
   align-self: flex-end;
-  margin-left: auto;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 50%;
-  word-wrap: break-word;
-  white-space: pre-wrap;
 }
 
-.newmessagereceived {
-  background-color: #303030;
-  color: white;
-  align-self: flex-start;
-  margin-right: auto;
+/* Styles généraux pour les messages */
+.message-container {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.message-content {
+  background-color: #f1f1f1;
   padding: 10px;
   border-radius: 10px;
-  max-width: 50%;
-  word-wrap: break-word;
-  white-space: pre-wrap;
+  max-width: 60%;
+}
+
+/* Messages envoyés avec une couleur différente */
+.message-container.sent .message-content {
+  background-color: #d4f1c5; /* Couleur pour vos messages */
+}
+
+/* Ajout des images dans les messages */
+.message-container img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin: 0 10px;
+  object-fit: cover;
 }
 
 /* Responsive Design */
