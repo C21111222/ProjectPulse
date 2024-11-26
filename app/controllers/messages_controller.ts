@@ -24,7 +24,7 @@ export default class MessageriesController {
         logger.info(auth.user.id)
         logger.info( request.all())
         const receiverId = request.input('receiver_id')
-        if (receiverId === 999999) {
+        if (receiverId == 999999) {
           // on recupere les  chat du chat global
           const messages = await Message.query().where((query) => {query.where('channel_id', 'global')}).orderBy('created_at', 'asc').exec()
           return response.json(messages)
@@ -43,7 +43,9 @@ export default class MessageriesController {
     async sendMessage({ auth, request, response, session }) {
         const receiverId = request.input('receiver_id')
         const message = request.input('content')
-        if (receiverId === 999999) {
+        logger.info('sendMessage')
+        logger.info(receiverId)
+        if (receiverId == 999999) {
           // on envoie le message au chat global
           const newMessage = new Message()
           newMessage.senderId = auth.user.id
@@ -54,6 +56,7 @@ export default class MessageriesController {
             transmit.broadcast('chats/global/messages', { message: message, sender: auth.user.id })
             await newMessage.save()
           } catch (error) {
+            logger.error(error)
             return response.status(500).json({ message: 'Erreur lors de l\'envoi du message' })
           }
         }
