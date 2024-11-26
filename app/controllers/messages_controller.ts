@@ -117,6 +117,7 @@ export default class MessageriesController {
     newMessage.senderId = auth.user.id
     newMessage.receiverId = receiverId
     newMessage.content = message
+    newMessage.senderName = auth.user.fullName
     const channel =
       auth.user.id < receiverId ? `${auth.user.id}-${receiverId}` : `${receiverId}-${auth.user.id}`
     newMessage.channelId = channel
