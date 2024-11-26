@@ -281,7 +281,7 @@
       </div>
       <div class="user-list">
         <ul id="userList">
-            <li class="user-item-global" data-user-id="999999">
+            <li class="user-item user-item-global" data-user-id="999999">
               <span class="user-fullName" onclick="openChat(999999)">Global</span>
             </li>
           @each(user in users)
@@ -474,16 +474,24 @@
       const filteredUsers = users.filter(user => user.fullName.toLowerCase().includes(searchTerm));
       const userList = document.getElementById('userList');
       userList.innerHTML = '';
+
+      // Ajouter l'élément "Global" en haut de la liste
+      const globalItem = document.createElement('li');
+      globalItem.classList.add('user-item', 'user-item-global');
+      globalItem.setAttribute('data-user-id', '999999');
+      globalItem.innerHTML = '<span class="user-fullName" onclick="openChat(999999)">Global</span>';
+      userList.appendChild(globalItem);
+
       filteredUsers.forEach(user => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('user-item');
-        listItem.setAttribute('data-user-id', user.id);
-        listItem.textContent = user.fullName;
+      const listItem = document.createElement('li');
+      listItem.classList.add('user-item');
+      listItem.setAttribute('data-user-id', user.id);
+      listItem.innerHTML = `<span class="user-fullName" onclick="openChat(${user.id})">${user.fullName}</span>`;
 
-        // Attacher l'événement de clic ici
-        listItem.addEventListener('click', () => openChat(user.id));
+      // Attacher l'événement de clic ici
+      listItem.addEventListener('click', () => openChat(user.id));
 
-        userList.appendChild(listItem);
+      userList.appendChild(listItem);
       });
     });
   </script>
