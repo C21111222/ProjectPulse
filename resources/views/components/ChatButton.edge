@@ -208,7 +208,8 @@
     if (userIndex === -1) {
       const chatUsers = document.getElementById('chat-users');
       const user = document.createElement('li');
-      user.innerHTML = `<a href="/chat/${data.senderId}" style="color: red">${data.senderName}</a>`;
+      user.classList.add('user-item');
+      user.innerHTML = `<a href="/chat" style="color: red">${data.senderName}</a>`;
       chatUsers.appendChild(user);
       users.push({ id: data.senderId, fullName: data.senderName, messageViewed: false });
       document.getElementById('title-chat').innerText = `Chat (${users.length})`;
