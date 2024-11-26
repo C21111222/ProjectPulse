@@ -19,6 +19,7 @@ export default class ImagesController {
         if (!image) {
             return response.status(400).json({message: 'No file uploaded'})
         }
+        logger.info("Image name : %s", image.fileName)
         let img: Image
         try {
             const fileName = `${new Date().getTime()}.${image.extname}`
@@ -28,6 +29,7 @@ export default class ImagesController {
             img  = await Image.create({ name: image.fileName });
             img.url = `http://projectpulse.pautentia.fr/img/${fileName}`
             await img.save()
+
         } catch (error) {
             logger.error("Error uploading file %s", error)
             return response.status(500).json({message: 'Error uploading file ' + error})
