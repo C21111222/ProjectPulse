@@ -19,14 +19,13 @@ export default class ImagesController {
         if (!image) {
             return response.status(400).json({message: 'No file uploaded'})
         }
-        logger.info("Image name : %s", image.fileName)
         let img: Image
         try {
             const fileName = `${new Date().getTime()}.${image.extname}`
             await image.move(app.tmpPath('uploads'), {
                 name: fileName
             })
-            img  = await Image.create({ name: image.fileName });
+            img  = await Image.create({ name: fileName });
             img.url = `http://projectpulse.pautentia.fr/img/${fileName}`
             await img.save()
 
