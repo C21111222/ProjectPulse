@@ -73,8 +73,25 @@
       min-width: 100%;
     }
 
+    .user-item-global {
+      padding: 10px;
+      margin: 5px 0;
+      cursor: pointer;
+      border-radius: 5px;
+      background-color: #2c3e10;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.3s;
+      min-width: 100%;
+      font-weight: bold;
+    }
+
     .user-item:hover {
       background-color: #1abc9c;
+    }
+
+    .user-item-global:hover {
+      background-color: #16a085;
     }
 
     .user-fullName {
@@ -264,7 +281,7 @@
       </div>
       <div class="user-list">
         <ul id="userList">
-            <li class="user-item" data-user-id="999999">
+            <li class="user-item-global" data-user-id="999999">
               <span class="user-fullName" onclick="openChat(999999)">Global</span>
             </li>
           @each(user in users)
