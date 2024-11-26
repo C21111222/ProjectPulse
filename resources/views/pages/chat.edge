@@ -349,7 +349,6 @@
       }
       userIdsauv = userId;
       const selectedUser = users.find(user => user.id === userId);
-      console.log(`Ouverture du chat avec ${selectedUser.fullName}`);
       const messages = await loadMessages(userId);
       if (userId !== 999999) {
         document.getElementById('chatBox').innerHTML = `<p><strong>Chat avec ${selectedUser.fullName}</strong></p>`;
