@@ -77,6 +77,9 @@ export default class AuthController {
       'password_confirmation',
     ])
 
+    const fullNameM = fullName.replace(/ /g, '-').charAt(0).toUpperCase() + fullName.slice(1)
+
+
     if (password !== password_confirmation) {
       session.flash('notification', { type: 'error', message: 'Les mots de passe ne correspondent pas.' })
       return response.redirect('back')
@@ -87,7 +90,7 @@ export default class AuthController {
     }
     try {
       logger.info('Inscription de %s avec l\'email %s', fullName, email)
-      const user = await User.create({ fullName, email, password })
+      const user = await User.create({ fullName: fullNameM, email, password })
       await auth.use('web').login(user)
       return response.redirect('/connected')
     } catch (error) {
