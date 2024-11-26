@@ -13,6 +13,16 @@ export default class UsersController {
     const users = await User.query().select('id', 'full_name', 'email')
     return response.json(users)
   }
+  
+  async updateProfile({ request, auth, response }: HttpContext) {
+    const userId = auth.user!.id
+    const user = await User.findOrFail(userId)
+    const fullName = request.input('fullname')
+    user.fullName = fullName
+    await user.save()
+
+    return response.redirect('/profile')
+  }
 
   /**
    * Retrieves a user by their ID.

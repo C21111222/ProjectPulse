@@ -19,7 +19,7 @@
     <a href="/home" class="navbar-logo">ProjectPulse</a>
     <div class="navbar-right">
       <a href="/profile" class="profile-icon">
-        <img src="/resources/img/unknow.jpg" alt="Profile" />
+        <img src="{{ auth.user.imageUrl }}" alt="Profile" />
       </a>
       <a href="#" class="logout-btn" onclick="showLogoutConfirmation()">Déconnexion</a>
     </div>

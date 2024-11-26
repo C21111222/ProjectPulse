@@ -1,17 +1,17 @@
 @if (auth.isAuthenticated)
   <div id="chat-button" class="chat-button" onclick="toggleChat()">
-    <span id="title-chat" >Chat (0)</span>
+    <span id="title-chat" class="noselect">Chat (0)</span>
   </div>
 
   <!-- Chat Panel -->
-  <div id="chat-panel" class="chat-panel">
-    <div class="chat-header">
-      <h3>
+  <div id="chat-panel" class="chat-panel noselect">
+    <div class="chat-header noselect">
+      <h3 class="noselect">
         Chat
       </h3>
       <button class="close-btn" onclick="toggleChat()">X</button>
     </div>
-    <div class="chat-body">
+    <div class="chat-body noselect">
       <div class="label">Message(s) non lus de : </div>
       <ul id="chat-users">
       </ul>
@@ -30,6 +30,12 @@
       position: absolute;
       top: 10px;
       left: 10px;
+    }
+
+
+
+    .noselect {
+      user-select: none;
     }
     .chat-button {
       position: fixed;

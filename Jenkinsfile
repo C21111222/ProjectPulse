@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
                     // Monter le fichier .env dans le conteneur
-                    sh "docker run -d --network=host --name $CONTAINER_NAME -v $ENV_FILE_PATH:/app/.env $DOCKER_IMAGE"
+                    sh "docker run -d --network=host --name $CONTAINER_NAME -v /var/projectpulse/uploads:/app/uploads $ENV_FILE_PATH:/app/.env $DOCKER_IMAGE"
                 }
             }
         }

@@ -65,23 +65,176 @@
       .profile-container .logout-btn:hover {
         background-color: #4a3ae0;
       }
+      #edit-button img {
+        transition: transform 0.2s ease;
+      }
+      #edit-button:hover img {
+        transform: scale(1.1);
+      }
+      
+      /* Formulaire d'édition */
+      #edit-form {
+        text-align: left;
+      }
     </style>
   </head>
   <body>
     @include('components/navbar')
     @include('components/ChatButton')
     <div class="profile-container">
-      <!-- Image de profil -->
-      <img src="/resources/img/unknow.jpg" alt="Image de profil" />
-      <!-- Nom de l'utilisateur -->
-      <h1>
-        {{ auth.user.getFullName() }}
-      </h1>
+      <!-- Section Image de profil -->
+      <div class="profile-pic-container" style="position: relative; display: inline-block;">
+        <!-- Image de profil -->
+        <img 
+          src={{ auth.user.imageURL }}
+          alt="Image de profil" 
+          id="profile-pic" 
+          style="cursor: pointer;"
+        />
+        <!-- Icône de modification -->
+        <button 
+          id="edit-photo-button" 
+          style="
+            position: absolute; 
+            bottom: 5px; 
+            right: 5px; 
+            background: none; 
+            border: none; 
+            cursor: pointer;
+          "
+        >
+          <img 
+            src="/resources/img/edit-pencil.png" 
+            alt="Modifier" 
+            style="width: 20px; height: 20px;"
+          />
+        </button>
+        <!-- Zone de glisser-déposer -->
+        <div id="upload-zone" 
+             style="
+               display: none; 
+               position: absolute; 
+               top: 0; 
+               left: 0; 
+               width: 100%; 
+               height: 100%; 
+               background: rgba(0, 0, 0, 0.5); 
+               color: white; 
+               border-radius: 50%; 
+               text-align: center; 
+               line-height: 100px;
+             ">
+          Glissez-déposez votre image ici
+        </div>
+      </div>
+    
+      <!-- Nom complet et e-mail -->
+      <div class="fullname-container" style="position: relative; display: inline-block; margin-top: 20px;">
+        <h1 id="fullname-display" style="display: inline-block;">
+          {{ auth.user.getFullName() }}
+        </h1>
+        <button 
+          id="edit-button" 
+          style="background: none; border: none; cursor: pointer; margin-left: 10px; vertical-align: middle;"
+        >
+          <img 
+            src="/resources/img/edit-pencil.png" 
+            alt="Modifier" 
+            style="width: 20px; height: 20px;"
+          />
+        </button>
+        <form id="edit-form" action="/profile" method="POST" style="display: none; margin-top: 10px;">
+          <input 
+            type="text" 
+            id="fullname-input" 
+            name="fullname" 
+            value="{{ auth.user.getFullName() }}" 
+            required 
+            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 10px;"
+          />
+          <button 
+            type="submit" 
+            class="logout-btn" 
+            style="background-color: #28a745; margin-top: 10px;"
+          >
+            Enregistrer
+          </button>
+        </form>
+      </div>
+    
       <!-- Adresse e-mail -->
-      <p>
-        {{ auth.user.getMail() }}
-      </p>
-      <!-- Bouton Déconnexion -->
+      <p>{{ auth.user.getMail() }}</p>
     </div>
   </body>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const profilePic = document.getElementById('profile-pic');
+      const editPhotoButton = document.getElementById('edit-photo-button');
+      const uploadZone = document.getElementById('upload-zone');
+      const uploadInput = document.createElement('input');
+      uploadInput.type = 'file';
+      uploadInput.accept = 'image/*';
+      uploadInput.style.display = 'none';
+  
+      // Événement pour afficher la zone de glisser-déposer
+      editPhotoButton.addEventListener('click', () => {
+        uploadZone.style.display = 'block';
+      });
+  
+      // Événement pour le glisser-déposer
+      uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.style.background = 'rgba(0, 0, 0, 0.7)';
+      });
+  
+      uploadZone.addEventListener('dragleave', () => {
+        uploadZone.style.background = 'rgba(0, 0, 0, 0.5)';
+      });
+  
+      uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file) {
+          handleFileUpload(file);
+        }
+        uploadZone.style.display = 'none';
+      });
+  
+      // Fonction pour gérer l'upload
+      function handleFileUpload(file) {
+        const formData = new FormData();
+        formData.append('profile_pic', file);
+  
+        fetch('/img', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (!data.success) {
+              alert('Erreur lors de l\'upload.');
+            }
+          })
+          .catch(() => {
+            alert('Erreur lors de l\'upload.');
+          });
+      }
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+      const editButton = document.getElementById('edit-button');
+      const fullnameDisplay = document.getElementById('fullname-display');
+      const editForm = document.getElementById('edit-form');
+      const fullnameInput = document.getElementById('fullname-input');
+  
+      editButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Masquer le texte et afficher le formulaire
+        fullnameDisplay.style.display = 'none';
+        editButton.style.display = 'none';
+        editForm.style.display = 'block';
+        fullnameInput.focus();
+      });
+    });
+  </script>
 </html>
