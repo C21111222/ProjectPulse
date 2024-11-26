@@ -12,8 +12,12 @@ export default class MessageriesController {
     
         // on enlève l'utilisateur connecté de la liste des utilisateurs
         const authUser = users.find(user => user.id === auth.user.id)
+        const globalUser = users.find(user => user.id === 999999)
         if (authUser) {
             users.splice(users.indexOf(authUser), 1)
+        }
+        if (globalUser) {
+            users.splice(users.indexOf(globalUser), 1)
         }
         return view.render('pages/chat', { users: users.map(user => user.serialize()) })
     }
