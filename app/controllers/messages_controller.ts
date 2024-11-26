@@ -69,10 +69,6 @@ export default class MessageriesController {
         if (!receiver) {
           return response.status(404).json({ message: 'Utilisateur non trouvé' })
         }
-        if (message.length > 128) {
-          session.flash('notification', { type: 'error', message: 'Le message est trop long' })
-          return response.status(400).json({ message: 'Le message est trop long' })
-        }
         const newMessage = new Message()
         newMessage.senderId = auth.user.id
         newMessage.receiverId = receiverId
