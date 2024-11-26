@@ -170,19 +170,14 @@ body {
 .message-container.received .message-content {
   background-color: #c2bdbd; /* Couleur du fond pour les messages reçus */
   border-radius: 0 10px 10px 10px; /* Arrondi à droite, angle gauche non arrondi */
-  padding: 10px; /* Ajout d'espacement interne */
+  padding: 5px 10px; /* Réduction du padding pour éviter l'espace à gauche */
   word-wrap: break-word; /* Gère le texte long */
   white-space: pre-wrap; /* Garde les espaces et retours à la ligne */
   margin-left: 0; /* Pas de marge à gauche */
-  margin-right: auto; /* Force le message à toucher le bord gauche */
+  margin-right: 0; /* Pas de marge à droite */
   max-width: 100%; /* Permet au message de prendre toute la largeur disponible */
 }
 
-
-
-
-
-/* Messages envoyés (à droite) */
 .message-container.sent {
   display: flex;
   justify-content: flex-start; /* Les messages commencent du centre */
@@ -196,13 +191,14 @@ body {
 .message-container.sent .message-content {
   background-color: #d4f1c5; /* Couleur du fond du message */
   border-radius: 10px 0 10px 10px; /* Arrondi à gauche, angle droit non arrondi */
-  padding: 10px; /* Ajout d'espacement interne */
+  padding: 5px 10px; /* Réduction du padding pour éviter l'espace à gauche */
   word-wrap: break-word; /* Gère le texte long */
   white-space: pre-wrap; /* Garde les espaces et retours à la ligne */
   margin-right: 0; /* Pas de marge à droite */
-  margin-left: auto; /* Force le message à toucher le bord droit */
+  margin-left: 0; /* Pas de marge à gauche */
   max-width: 100%; /* Permet au message de prendre toute la largeur disponible */
 }
+
 
 
 .message-content {
