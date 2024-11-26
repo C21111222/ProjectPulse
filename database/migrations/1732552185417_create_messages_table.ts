@@ -7,6 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.integer('sender_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
+      table.string('sender_name')
       table.integer('receiver_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
       table.string('channel_id')
       table.text('content')

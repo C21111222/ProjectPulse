@@ -56,6 +56,7 @@ export default class MessageriesController {
           newMessage.receiverId = 999999
           newMessage.content = message
           newMessage.channelId = 'global'
+          newMessage.senderName = auth.user.fullName
           try {
             transmit.broadcast('chats/global/messages', { message: message, sender: auth.user.id })
             await newMessage.save()

@@ -10,6 +10,9 @@ export default class Message extends BaseModel {
   public senderId: number // L'utilisateur qui a envoyé le message
 
   @column()
+  public senderName: string // Le nom de l'utilisateur qui a envoyé le message
+
+  @column()
   public receiverId: number // L'utilisateur qui a reçu le message
 
   @column()
