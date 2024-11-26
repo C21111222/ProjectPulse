@@ -5,6 +5,7 @@ pipeline {
         DOCKER_IMAGE = 'adonisjs-project'
         CONTAINER_NAME = 'adonisjs-container'
         ENV_FILE_PATH = '/var/secret/.env'  // Chemin du fichier .env sur le VPS
+        UPLOAD_DIR = '/var/projectpulse/uploads'  // Chemin du répertoire d'uploads sur le VPS
     }
 
     stages {
@@ -31,8 +32,8 @@ pipeline {
             steps {
                 script {
                     // Monter le fichier .env dans le conteneur
-                    sh "docker run -d --network=host --name $CONTAINER_NAME -v /var/projectpulse/uploads:/app/uploads $ENV_FILE_PATH:/app/.env $DOCKER_IMAGE"
-                }
+                    sh "docker run -d --network=host --name $CONTAINER_NAME -v $UPLOAD_DIR:/app/uploads -v $ENV_FILE_PATH:/app/.env $DOCKER_IMAGE"
+                } 
             }
         }
     }
