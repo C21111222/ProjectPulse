@@ -159,8 +159,7 @@ body {
 
 .message-container.received {
   display: flex;
-  /* Les messages commencent à gauche */
-  justify-content: flex-start;
+  justify-content: flex-start; /* Les messages commencent du centre */
   flex-direction: row; /* Le texte vient de gauche à droite */
   text-align: left;
   align-self: flex-start;
@@ -181,10 +180,9 @@ body {
 
 .message-container.sent {
   display: flex;
-  /* Les messages commencent à gauche */
-  justify-content: flex-end;
+  justify-content: flex-start; /* Les messages commencent du centre */
   flex-direction: row-reverse; /* Le texte vient de droite à gauche */
-  text-align: right;
+  text-align: left; /* Alignement du texte à droite */
   align-self: flex-end;
   margin-left: auto; /* Pousse le conteneur vers la droite */
   max-width: 50%; /* Limite la largeur du message */
