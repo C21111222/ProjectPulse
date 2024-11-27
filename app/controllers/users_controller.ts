@@ -14,9 +14,16 @@ export default class UsersController {
     return response.json(users)
   }
 
-  async viewPublicProfile({ request, view }: HttpContext) {
+  async viewPublicProfile({ auth, request, view }: HttpContext) {
     const userId = request.input('user_id')
     const user = await User.find(userId)
+    if (!user) {
+      return view.render('pages/404')
+    }
+    if (auth.user!.id === user.id) {
+      return view.render('pages/profile', { user })
+    }
+
     return view.render('pages/publicProfile', { user })
   }
   
