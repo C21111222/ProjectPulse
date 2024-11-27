@@ -29,6 +29,7 @@ export default class MessageriesController {
       users.splice(users.indexOf(globalUser), 1)
     }
     const resultat = []
+    logger.info(users)
     // pour chaque utilisateur, on regarde le dernier message envoyé par celui ci, si il a été vu ou non, on crée un objet avec les infos de l'utilisateur et la variable messageViewed
     for (const user of users) {
       const lastMessage = await Message.query()
