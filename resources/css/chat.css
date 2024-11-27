@@ -159,7 +159,8 @@ body {
 
 .message-container.received {
   display: flex;
-  justify-content: flex-start; /* Les messages commencent du centre */
+  /* Les messages commencent à gauche */
+  justify-content: flex-start;
   flex-direction: row; /* Le texte vient de gauche à droite */
   text-align: left;
   align-self: flex-start;
@@ -173,14 +174,15 @@ body {
   padding: 2px 2px; /* Réduction du padding pour éviter l'espace à gauche */
   word-wrap: break-word; /* Gère le texte long */
   white-space: pre-wrap; /* Garde les espaces et retours à la ligne */
-  margin-left: 0; /* Pas de marge à gauche */
+  margin-left: 5px; /* Pas de marge à gauche */
   margin-right: 5px; /* Pas de marge à droite */
   max-width: 100%; /* Permet au message de prendre toute la largeur disponible */
 }
 
 .message-container.sent {
   display: flex;
-  justify-content: flex-start; /* Les messages commencent du centre */
+  /* Les messages commencent à gauche */
+  justify-content: flex-end;
   flex-direction: row-reverse; /* Le texte vient de droite à gauche */
   text-align: right;
   align-self: flex-end;
@@ -194,7 +196,7 @@ body {
   padding: 2px 2px; /* Réduction du padding pour éviter l'espace à gauche */
   word-wrap: break-word; /* Gère le texte long */
   white-space: pre-wrap; /* Garde les espaces et retours à la ligne */
-  margin-right: 0; /* Pas de marge à droite */
+  margin-right: 5px; /* Pas de marge à droite */
   margin-left: 5px; /* Pas de marge à gauche */
   max-width: 100%; /* Permet au message de prendre toute la largeur disponible */
 }
