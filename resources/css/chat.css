@@ -206,8 +206,6 @@ body {
   max-width: 70%;
 }
 
-
-
 /* Ajout des images dans les messages */
 .message-container img {
   width: 30px;
@@ -252,7 +250,8 @@ body {
     padding: 10px;
   }
 
-  .user-item, .user-item-global {
+  .user-item,
+  .user-item-global {
     padding: 8px; /* Réduit les espaces des éléments utilisateur */
     font-size: 14px;
   }

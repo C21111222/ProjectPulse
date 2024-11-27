@@ -1,35 +1,55 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profil de {{ user.fullName }}</title>
-  <link rel="stylesheet" href="/resources/css/profile.css">
-</head>
-<body>
-  @include('components/navbar') 
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Profil de {{ user.fullName }}
+    </title>
+    <link rel="stylesheet" href="/resources/css/profile.css" />
+  </head>
+  <body>
+    @include('components/navbar')
 
-  <div class="profile-container">
-    <!-- En-tête du profil -->
-    <div class="profile-header">
-      <img src="{{ user.imageUrl }}" alt="Photo de {{ user.fullName }}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
-      <h1>{{ user.fullName }}</h1>
-      <p class="profile-email">{{ user.email }}</p>
-      <p class="profile-createdAt">Membre depuis le {{ user.createdAt.toFormat('dd LLLL yyyy') }}</p>
-    </div>
+    <div class="profile-container">
+      <!-- En-tête du profil -->
+      <div class="profile-header">
+        <img
+          src="{{ user.imageUrl }}"
+          alt="Photo de {{ user.fullName }}"
+          style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;"
+        />
+        <h1>
+          {{ user.fullName }}
+        </h1>
+        <p class="profile-email">
+          {{ user.email }}
+        </p>
+        <p class="profile-createdAt">
+          Membre depuis le {{ user.createdAt.toFormat('dd LLLL yyyy') }}
+        </p>
+      </div>
 
-    <!-- Détails du profil -->
-    <div class="profile-details">
-      <h2>Informations</h2>
-      <ul>
-        <li><strong>Nom complet :</strong> {{ user.fullName }}</li>
-        <li><strong>Email :</strong> {{ user.email }}</li>
-        <li><strong>Date de création :</strong> {{ user.createdAt.toFormat('dd/MM/yyyy') }}</li>
-      </ul>
-      
-      <!-- Bouton pour chatter -->
-      <a href="/personal_chat?receiver_id={{ user.id }}" class="action-button">Chatter avec {{ user.fullName }}</a>
+      <!-- Détails du profil -->
+      <div class="profile-details">
+        <h2>
+          Informations
+        </h2>
+        <ul>
+          <li>
+            <strong>Nom complet :</strong>{{ user.fullName }}
+          </li>
+          <li>
+            <strong>Email :</strong>{{ user.email }}
+          </li>
+          <li>
+            <strong>Date de création :</strong>{{ user.createdAt.toFormat('dd/MM/yyyy') }}
+          </li>
+        </ul>
+
+        <!-- Bouton pour chatter -->
+        <a href="/personal_chat?receiver_id={{ user.id }}" class="action-button">Chatter avec {{ user.fullName }}</a>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

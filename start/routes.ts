@@ -40,7 +40,10 @@ router
 router.get('/chat', [MessagesController, 'index']).as('chat').use(middleware.auth())
 router.get('/personal_chat', [MessagesController, 'singleChat']).use(middleware.auth())
 
-router.get('/unviewed_chats', [MessagesController, 'unviewedChats']).as('chat_fast').use(middleware.auth())
+router
+  .get('/unviewed_chats', [MessagesController, 'unviewedChats'])
+  .as('chat_fast')
+  .use(middleware.auth())
 
 // Route pour se déconnecter
 router.get('/logout', [AuthController, 'logout'])
@@ -59,7 +62,7 @@ router.post('/messages', [MessagesController, 'sendMessage']).use(middleware.aut
 router.post('/messages_viewed', [MessagesController, 'haveView']).use(middleware.auth())
 router.post('/message_viewed', [MessagesController, 'haveViewSingle']).use(middleware.auth())
 
-router.get("/img/:path", async ({ params, response }) => {
+router.get('/img/:path', async ({ params, response }) => {
   return response.download(app.makePath(`/app/uploads/${params.path}`))
 })
 router.post('/img', [ImagesController, 'upload']).use(middleware.auth())

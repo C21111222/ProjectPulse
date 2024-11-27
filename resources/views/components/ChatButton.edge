@@ -12,7 +12,9 @@
       <button class="close-btn" onclick="toggleChat()">X</button>
     </div>
     <div class="chat-body noselect">
-      <div class="label">Message(s) non lus de : </div>
+      <div class="label">
+        Message(s) non lus de :
+      </div>
       <ul id="chat-users">
       </ul>
       <div class="openChatButton">
@@ -23,6 +25,7 @@
 
   <style>
     /* Styles pour le bouton et le panel de chat */
+    
     .label {
       font-size: 16px;
       margin-bottom: 10px;
@@ -31,17 +34,16 @@
       top: 10px;
       left: 10px;
     }
-
-
-
+    
     .noselect {
       user-select: none;
     }
+    
     .chat-button {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      padding: 15px 30px; 
+      padding: 15px 30px;
       font-family: 'Poppins', sans-serif !important;
       /* Augmenter la largeur pour rendre le bouton plus allongé */
       background-color: #5A45FF;
@@ -99,13 +101,14 @@
     }
     
     .unread-count {
-    background-color: red;
-    color: white;
-    border-radius: 50%;
-    padding: 5px 10px;
-    font-size: 14px;
-    margin-left: 10px;
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      padding: 5px 10px;
+      font-size: 14px;
+      margin-left: 10px;
     }
+    
     .chat-body {
       padding: 20px;
       font-size: 16px;
@@ -149,46 +152,61 @@
       transition: background-color 0.3s ease;
       /* Transition pour l'effet de survol */
     }
-
-#chat-users {
-  display: flex;
-  flex-direction: column; /* Pour aligner les éléments verticalement */
-  align-items: center; /* Centre horizontalement les éléments */
-  padding: 0; /* Supprime le padding du `ul` */
-  margin: 0; /* Supprime les marges */
-  list-style-type: none; /* Supprime les puces */
-}
-
-.user-item {
-  display: flex;
-  justify-content: center; /* Centre le contenu dans chaque item */
-  align-items: center; /* Centre verticalement le contenu */
-  width: 80%; /* Ajuste la largeur des items */
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 5px;
-  background-color: #aA45FF; /* Bleu pour le fond */
-  color: white; /* Texte blanc */
-  font-size: 16px; /* Taille du texte */
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  text-align: center;
-}
-
-.user-item:hover {
-  background-color: #4a3ae0; /* Couleur plus sombre au survol */
-}
-
-.user-item a {
-  color: white; /* Assure que les liens sont en blanc */
-  text-decoration: none; /* Supprime le soulignement des liens */
-  width: 100%; /* Assure que le lien occupe tout l'espace disponible */
-}
-
-.user-item a:hover {
-  text-decoration: underline; /* Ajoute un soulignement au survol */
-}
-
+    
+    #chat-users {
+      display: flex;
+      flex-direction: column;
+      /* Pour aligner les éléments verticalement */
+      align-items: center;
+      /* Centre horizontalement les éléments */
+      padding: 0;
+      /* Supprime le padding du `ul` */
+      margin: 0;
+      /* Supprime les marges */
+      list-style-type: none;
+      /* Supprime les puces */
+    }
+    
+    .user-item {
+      display: flex;
+      justify-content: center;
+      /* Centre le contenu dans chaque item */
+      align-items: center;
+      /* Centre verticalement le contenu */
+      width: 80%;
+      /* Ajuste la largeur des items */
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      background-color: #aA45FF;
+      /* Bleu pour le fond */
+      color: white;
+      /* Texte blanc */
+      font-size: 16px;
+      /* Taille du texte */
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-align: center;
+    }
+    
+    .user-item:hover {
+      background-color: #4a3ae0;
+      /* Couleur plus sombre au survol */
+    }
+    
+    .user-item a {
+      color: white;
+      /* Assure que les liens sont en blanc */
+      text-decoration: none;
+      /* Supprime le soulignement des liens */
+      width: 100%;
+      /* Assure que le lien occupe tout l'espace disponible */
+    }
+    
+    .user-item a:hover {
+      text-decoration: underline;
+      /* Ajoute un soulignement au survol */
+    }
     
     .openChatButton .button:hover {
       background-color: #4a3ae0;
@@ -197,71 +215,87 @@
   </style>
   <script>
     function toggleChat() {
-      const chatPanel = document.getElementById('chat-panel');
-      const isHidden = window.getComputedStyle(chatPanel).display === 'none';
-
+      const chatPanel = document.getElementById("chat-panel");
+      const isHidden = window.getComputedStyle(chatPanel).display === "none";
       if (isHidden) {
-        chatPanel.style.display = 'block';
+        chatPanel.style.display = "block";
       } else {
-        chatPanel.style.display = 'none';
+        chatPanel.style.display = "none";
       }
     }
-
   </script>
   <script type="module">
-  console.log("ChatButton component loaded");
-  import { Transmit } from '/node_modules/@adonisjs/transmit-client'
-
-  export const transmit = new Transmit({
-    baseUrl: window.location.origin
-  })
-      
-    const notifSubscription = transmit.subscription('notifications/' + {{ auth.user.id }});
-  notifSubscription.create();
-  // quand il y a une nouvelle notification on colori en rouge le pseudo de l'utilisateur envoyeur
-  notifSubscription.onMessage((data) => {
-    const userIndex = users.findIndex(u => u.id === data.senderId);
-    if (userIndex === -1) {
-      const chatUsers = document.getElementById('chat-users');
-      const user = document.createElement('li');
-      user.classList.add('user-item');
-      user.id = "user-" + data.senderId;
-      user.innerHTML = `<a href="/personal_chat?receiver_id=${data.senderId}">${data.senderName}</a>`;
-      chatUsers.appendChild(user);
-      users.push({ id: data.senderId, fullName: data.senderName, messageViewed: false });
-      document.getElementById('title-chat').innerText = `Chat (${users.length})`;
-    }
-  });
+    console.log("ChatButton component loaded");
+    
+    import {
+      Transmit
+    } from "/node_modules/@adonisjs/transmit-client";
+    
+    export const transmit = new Transmit({
+      baseUrl: window.location.origin
+    });
+    
+    const notifSubscription = transmit.subscription("notifications/" + {{ auth.user.id }});
+    
+    notifSubscription.create();
+    // quand il y a une nouvelle notification on colori en rouge le pseudo de l'utilisateur envoyeur
+    
+    notifSubscription.onMessage(data => {
+      const userIndex = users.findIndex(u => u.id === data.senderId);
+      if (userIndex === -1) {
+        const chatUsers = document.getElementById("chat-users");
+        const user = document.createElement("li");
+        user.classList.add("user-item");
+        user.id = "user-" + data.senderId;
+        user.innerHTML = `<a href="/personal_chat?receiver_id=${data.senderId}">${data.senderName}</a>`;
+        chatUsers.appendChild(user);
+        users.push({
+          id: data.senderId,
+          fullName: data.senderName,
+          messageViewed: false
+        });
+        document.getElementById("title-chat").innerText = `Chat (${users.length})`;
+      }
+    });
+    
     async function getUsers() {
-    const users2Response = await fetch(`/unviewed_chats`, {
-      method: 'GET',
-      credentials: 'include', // Permet d'envoyer les cookies de session
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      const users2Response = await fetch(`/unviewed_chats`, {
+        method: "GET",
+        credentials: "include",
+        // Permet d'envoyer les cookies de session
+        headers: {
+          "Content-Type": "application/json"
+        }
       });
-    return await users2Response.json();
+      return await users2Response.json();
     }
     
     const users2 = await getUsers();
+    
     console.log(users2);
     // pour chaque utilisateur on ajoute un li dans la liste des utilisateurs
-    const chatUsers = document.getElementById('chat-users');
+    
+    const chatUsers = document.getElementById("chat-users");
+    
     const users = [];
-    for (const user2 of users2){
+    
+    for (const user2 of users2) {
       console.log(user2);
-      const userElement = document.createElement('li');
+      const userElement = document.createElement("li");
       // on rajoute la classe class="user-item"  pour pouvoir styliser les li
-      userElement.classList.add('user-item');
+      userElement.classList.add("user-item");
       // on ajoute l'id contenant l'id de l'utilisateur 
       userElement.id = "user-" + user2.user.id;
       userElement.innerHTML = `<a href="/personal_chat?receiver_id=${user2.user.id}">${user2.user.fullName}</a>`;
       chatUsers.appendChild(userElement);
-      users.push({ id: user2.id, fullName: user2.fullName, messageViewed: false });
+      users.push({
+        id: user2.id,
+        fullName: user2.fullName,
+        messageViewed: false
+      });
     }
     // on affiche le nombre d'utilisateurs non vus
-    document.getElementById('title-chat').innerText = `Chat (${users.length})`;
-       
-
+    
+    document.getElementById("title-chat").innerText = `Chat (${users.length})`;
   </script>
 @endif

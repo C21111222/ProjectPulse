@@ -100,7 +100,7 @@
     border-radius: 5px;
     transition: background-color 0.3s;
   }
-
+  
   .navbar-right .dashboard-btn {
     background-color: #5A45FF;
     padding: 8px 16px;
@@ -113,122 +113,135 @@
   .navbar-right .dashboard-btn:hover {
     background-color: #3b29b3;
   }
+  
   /* Barre de recherche */
-/* Centrer la barre de recherche dans la page */
-.search-container {
-  position: absolute; /* Se détache du flux normal */
-  top: 50%; /* Position verticale au milieu */
-  left: 50%; /* Position horizontale au milieu */
-  transform: translate(-50%, -50%); /* Centre par rapport au point de référence */
-  z-index: 1001; /* Place la barre devant les autres éléments */
-}
-
-.search-bar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.search-bar input {
-  width: 400px;
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-  transition: border-color 0.3s;
-}
-
-.search-bar input:focus {
-  outline: none;
-  border-color: #5A45FF; /* Couleur de focus */
-}
-
-.search-bar button {
-  margin-left: 10px;
-  padding: 10px 20px;
-  background-color: #4a3ae0;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.search-bar button:hover {
-  background-color: #3b29b3;
-}
-
-/* Ajustements pour la navbar */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #5A45FF;
-  color: white;
-  padding: 15px 30px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-}
-.suggestions-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background: rgb(105, 103, 220);
-  border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1001;
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.suggestions-list li {
-  padding: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  background-color: #566ed6;
-}
-
-.suggestions-list li:hover {
-  background-color: #8f97f3;
-}
-
-.suggestions-list li.selected {
-  background-color: #5A45FF;
-  color: white;
-}
-
-@media (max-width: 768px) {
-  .search-bar input {
-    width: 80%; /* Réduit la largeur de l'input */
-  }
-
-  .search-bar button {
-    font-size: 14px;
-    padding: 8px 16px;
-  }
-
-  .navbar-logo {
-    font-size: 22px; /* Réduit la taille du logo */
-  }
-
-}
-
-@media (max-width: 480px) {
+  
+  /* Centrer la barre de recherche dans la page */
+  
   .search-container {
-    display: none; /* Cache la barre de recherche */
+    position: absolute;
+    /* Se détache du flux normal */
+    top: 50%;
+    /* Position verticale au milieu */
+    left: 50%;
+    /* Position horizontale au milieu */
+    transform: translate(-50%, -50%);
+    /* Centre par rapport au point de référence */
+    z-index: 1001;
+    /* Place la barre devant les autres éléments */
   }
-
-  .navbar-logo {
-    font-size: 20px; /* Réduit la taille du logo */
+  
+  .search-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-}
-
+  
+  .search-bar input {
+    width: 400px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+  
+  .search-bar input:focus {
+    outline: none;
+    border-color: #5A45FF;
+    /* Couleur de focus */
+  }
+  
+  .search-bar button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    background-color: #4a3ae0;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .search-bar button:hover {
+    background-color: #3b29b3;
+  }
+  
+  /* Ajustements pour la navbar */
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #5A45FF;
+    color: white;
+    padding: 15px 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+  
+  .suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgb(105, 103, 220);
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1001;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .suggestions-list li {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    background-color: #566ed6;
+  }
+  
+  .suggestions-list li:hover {
+    background-color: #8f97f3;
+  }
+  
+  .suggestions-list li.selected {
+    background-color: #5A45FF;
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .search-bar input {
+      width: 80%;
+      /* Réduit la largeur de l'input */
+    }
+  
+    .search-bar button {
+      font-size: 14px;
+      padding: 8px 16px;
+    }
+  
+    .navbar-logo {
+      font-size: 22px;
+      /* Réduit la taille du logo */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .search-container {
+      display: none;
+      /* Cache la barre de recherche */
+    }
+  
+    .navbar-logo {
+      font-size: 20px;
+      /* Réduit la taille du logo */
+    }
+  }
 </style>
 

@@ -40,9 +40,13 @@ export default class MessageriesController {
         .first()
       logger.info(user.imageUrl)
       if (lastMessage) {
-        resultat.push({ user: user.serialize(), image : user.imageUrl, messageViewed: lastMessage.viewed })
+        resultat.push({
+          user: user.serialize(),
+          image: user.imageUrl,
+          messageViewed: lastMessage.viewed,
+        })
       } else {
-        resultat.push({ user: user.serialize(), image : user.imageUrl, messageViewed: true })
+        resultat.push({ user: user.serialize(), image: user.imageUrl, messageViewed: true })
       }
     }
 
@@ -89,7 +93,11 @@ export default class MessageriesController {
         .orderBy('created_at', 'desc')
         .first()
       if (lastMessage && !lastMessage.viewed) {
-        resultat.push({ user: user.serialize(), image : user.imageUrl, messageViewed: lastMessage.viewed })
+        resultat.push({
+          user: user.serialize(),
+          image: user.imageUrl,
+          messageViewed: lastMessage.viewed,
+        })
       }
     }
     logger.info(resultat)
@@ -152,12 +160,12 @@ export default class MessageriesController {
     const receiverId = request.input('receiver_id')
     if (receiverId == 999999) {
       const messages = await Message.query()
-      .where((query) => {
-        query.where('channel_id', 'global');
-      })
-      .preload('sender') // Charge les informations de l'utilisateur lié
-      .orderBy('created_at', 'asc')
-      .exec();
+        .where((query) => {
+          query.where('channel_id', 'global')
+        })
+        .preload('sender') // Charge les informations de l'utilisateur lié
+        .orderBy('created_at', 'asc')
+        .exec()
       return response.json(messages)
     }
     const receiver = await User.find(receiverId)

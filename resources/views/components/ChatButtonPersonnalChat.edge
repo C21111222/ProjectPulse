@@ -9,12 +9,17 @@
   <!-- Chat Panel -->
   <div id="chat-panel" class="chat-panel noselect">
     <div class="chat-header1 noselect">
-      <h3 class="noselect">Chat</h3>
+      <h3 class="noselect">
+        Chat
+      </h3>
       <button class="close-btn" onclick="toggleChat()">X</button>
     </div>
     <div class="chat-body noselect">
-      <div class="label">Message(s) non lus de : </div>
-      <ul id="chat-users"></ul>
+      <div class="label">
+        Message(s) non lus de :
+      </div>
+      <ul id="chat-users">
+      </ul>
       <div class="openChatButton">
         <a href="/chat" class="button">Ouvrir le chat</a>
       </div>
@@ -23,6 +28,7 @@
 
   <style>
     /* Styles pour le bouton et le panel de chat */
+    
     .label {
       font-size: 16px;
       margin-bottom: 10px;
@@ -31,12 +37,13 @@
       top: 10px;
       left: 10px;
     }
-
+    
     .noselect {
       user-select: none;
     }
-
+    
     /* Chat Header */
+    
     .chat-header1 {
       background-color: #5A45FF;
       color: white;
@@ -48,14 +55,14 @@
       top: 0;
       right: 20px;
       left: 20px;
-      z-index: 1000; 
+      z-index: 1000;
     }
-
+    
     .chat-header1 h3 {
       margin: 0;
       font-size: 18px;
     }
-
+    
     .chat-button {
       padding: 10px 20px;
       background-color: #5A45FF;
@@ -65,12 +72,13 @@
       box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
       transition: background-color 0.3s ease;
     }
-
+    
     .chat-button:hover {
       background-color: #4a3ae0;
     }
-
+    
     /* Chat Panel */
+    
     .chat-panel {
       position: fixed;
       bottom: 70px;
@@ -80,11 +88,12 @@
       background-color: white;
       box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.1);
       border-radius: 10px;
-      display: none; /* Cache par défaut */
+      display: none;
+      /* Cache par défaut */
       overflow: hidden;
       z-index: 1000;
     }
-
+    
     .chat-body {
       padding: 20px;
       font-size: 16px;
@@ -94,7 +103,7 @@
       justify-content: center;
       align-items: center;
     }
-
+    
     .openChatButton {
       display: flex;
       justify-content: center;
@@ -104,7 +113,7 @@
       left: 50%;
       transform: translateX(-50%);
     }
-
+    
     .openChatButton .button {
       padding: 10px 20px;
       background-color: #5A45FF;
@@ -114,11 +123,11 @@
       font-size: 16px;
       transition: background-color 0.3s ease;
     }
-
+    
     .openChatButton .button:hover {
       background-color: #4a3ae0;
     }
-
+    
     .user-item {
       display: flex;
       justify-content: center;
@@ -134,11 +143,11 @@
       transition: background-color 0.3s ease;
       text-align: center;
     }
-
+    
     .user-item:hover {
       background-color: #4a3ae0;
     }
-
+    
     .user-item a {
       color: white;
       text-decoration: none;
@@ -147,62 +156,75 @@
 
   <script>
     function toggleChat() {
-      const chatPanel = document.getElementById('chat-panel');
-      const isHidden = window.getComputedStyle(chatPanel).display === 'none';
-
+      const chatPanel = document.getElementById("chat-panel");
+      const isHidden = window.getComputedStyle(chatPanel).display === "none";
       if (isHidden) {
-        chatPanel.style.display = 'block'; // Affiche le panneau de chat
+        chatPanel.style.display = "block"; // Affiche le panneau de chat
       } else {
-        chatPanel.style.display = 'none'; // Cache le panneau de chat
+        chatPanel.style.display = "none"; // Cache le panneau de chat
       }
     }
   </script>
 
   <script type="module">
-    import { Transmit } from '/node_modules/@adonisjs/transmit-client'
-
+    import {
+      Transmit
+    } from "/node_modules/@adonisjs/transmit-client";
+    
     const transmit = new Transmit({
       baseUrl: window.location.origin
-    })
+    });
     
-    const notifSubscription = transmit.subscription('notifications/' + {{ auth.user.id }});
+    const notifSubscription = transmit.subscription("notifications/" + {{ auth.user.id }});
+    
     notifSubscription.create();
-
-    notifSubscription.onMessage((data) => {
+    
+    notifSubscription.onMessage(data => {
       const userIndex = users.findIndex(u => u.id === data.senderId);
       if (userIndex === -1) {
-        const chatUsers = document.getElementById('chat-users');
-        const user = document.createElement('li');
-        user.classList.add('user-item');
+        const chatUsers = document.getElementById("chat-users");
+        const user = document.createElement("li");
+        user.classList.add("user-item");
         user.innerHTML = `<a href="/chat" style="color: red">${data.senderName}</a>`;
         chatUsers.appendChild(user);
-        users.push({ id: data.senderId, fullName: data.senderName, messageViewed: false });
-        document.getElementById('title-chat').innerText = `Chat (${users.length})`;
+        users.push({
+          id: data.senderId,
+          fullName: data.senderName,
+          messageViewed: false
+        });
+        document.getElementById("title-chat").innerText = `Chat (${users.length})`;
       }
     });
-
+    
     async function getUsers() {
       const users2Response = await fetch(`/unviewed_chats`, {
-        method: 'GET',
-        credentials: 'include',
+        method: "GET",
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json',
-        },
+          "Content-Type": "application/json"
+        }
       });
       return await users2Response.json();
     }
-
+    
     const users2 = await getUsers();
-    const chatUsers = document.getElementById('chat-users');
+    
+    const chatUsers = document.getElementById("chat-users");
+    
     const users = [];
+    
     for (const user2 of users2) {
-      const userElement = document.createElement('li');
-      userElement.classList.add('user-item');
+      const userElement = document.createElement("li");
+      userElement.classList.add("user-item");
       userElement.innerHTML = `<a href="/chat">${user2.user.fullName}</a>`;
       chatUsers.appendChild(userElement);
-      users.push({ id: user2.id, fullName: user2.fullName, messageViewed: false });
+      users.push({
+        id: user2.id,
+        fullName: user2.fullName,
+        messageViewed: false
+      });
     }
-
-    document.getElementById('title-chat').innerText = `Chat (${users.length})`;
+    
+    document.getElementById("title-chat").innerText = `Chat (${users.length})`;
   </script>
 @endif

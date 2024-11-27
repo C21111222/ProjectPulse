@@ -1,115 +1,110 @@
- <div class="search-container">
-      <form action="/search" method="GET" class="search-bar" autocomplete="off">
-        <input
-          type="text"
-          id="search-input"
-          name="query"
-          placeholder="Rechercher (profil, dashboard, chat, nom d'utilisateur)"
-          aria-label="Recherche"
-          oninput="filterSuggestions()"
-        />
-        <button type="submit">Rechercher</button>
-      </form>
-      <ul id="suggestions-list" class="suggestions-list"></ul>
-    </div>
+<div class="search-container">
+  <form action="/search" method="GET" class="search-bar" autocomplete="off">
+    <input
+      type="text"
+      id="search-input"
+      name="query"
+      placeholder="Rechercher (profil, dashboard, chat, nom d'utilisateur)"
+      aria-label="Recherche"
+      oninput="filterSuggestions()"
+    />
+    <button type="submit">Rechercher</button>
+  </form>
+  <ul id="suggestions-list" class="suggestions-list">
+  </ul>
+</div>
 
 <script>
-// Liste des pages prédéfinies
-const pages = ["Profil", "Dashboard", "Chat", "Home"];
-
-// Liste des utilisateurs, sera remplie via l'API
-let users = [];
-
-// Éléments DOM
-const input = document.getElementById("search-input");
-const suggestionsList = document.getElementById("suggestions-list");
-
-// Fonction pour récupérer tous les utilisateurs
-async function getAllUsers() {
-    const response = await fetch('/users', {
-    method: 'GET',
-    credentials: 'include', // Permet d'envoyer les cookies de session
-    headers: {
-        'Content-Type': 'application/json',
-    },
+  // Liste des pages prédéfinies
+  const pages = [ "Profil", "Dashboard", "Chat", "Home" ];
+  // Liste des utilisateurs, sera remplie via l'API
+  
+  let users = [];
+  // Éléments DOM
+  
+  const input = document.getElementById("search-input");
+  
+  const suggestionsList = document.getElementById("suggestions-list");
+  // Fonction pour récupérer tous les utilisateurs
+  
+  async function getAllUsers() {
+    const response = await fetch("/users", {
+      method: "GET",
+      credentials: "include",
+      // Permet d'envoyer les cookies de session
+      headers: {
+        "Content-Type": "application/json"
+      }
     });
     const data = await response.json();
     users = data;
-}
-
-// Filtrer les suggestions selon la saisie
-function filterSuggestions() {
+  }
+  // Filtrer les suggestions selon la saisie
+  
+  function filterSuggestions() {
     const query = input.value.toLowerCase();
-
     // Si la saisie est vide, on affiche les pages
     if (query === "") {
-    suggestionsList.innerHTML = "";
-    return;
+      suggestionsList.innerHTML = "";
+      return;
     }
-
     // On filtre les utilisateurs
-    const filteredUsers = users.filter(user => 
-    user.fullName.toLowerCase().includes(query)
-    );
-
+    const filteredUsers = users.filter(user => user.fullName.toLowerCase().includes(query));
     // Afficher les utilisateurs filtrés sous forme de [user] fullName
-    const filteredSuggestions = [
-    ...pages.filter(page => page.toLowerCase().includes(query)), // Pages filtrées
-    ...filteredUsers.map(user => `[user] ${user.fullName}`) // Utilisateurs filtrés
-    ];
-
-    suggestionsList.innerHTML = filteredSuggestions.length
-    ? filteredSuggestions
-        .map((suggestion) => `<li onclick="selectSuggestion('${suggestion}')">${suggestion}</li>`)
-        .join("")
-    : `<li>Aucune suggestion trouvée</li>`;
-}
-
-// Ajouter une suggestion à l'input au clic
-function selectSuggestion(suggestion) {
+    const filteredSuggestions = [ ...pages.filter(page => page.toLowerCase().includes(query)), // Pages filtrées
+    ...filteredUsers.map(user => `[user] ${user.fullName}`) ];
+    suggestionsList.innerHTML = filteredSuggestions.length ? filteredSuggestions.map(suggestion => `<li onclick="selectSuggestion('${suggestion}')">${suggestion}</li>`).join("") : `<li>Aucune suggestion trouvée</li>`;
+  }
+  // Ajouter une suggestion à l'input au clic
+  
+  function selectSuggestion(suggestion) {
     input.value = suggestion;
     suggestionsList.innerHTML = ""; // Cache les suggestions après sélection
-
     // Si c'est une page, on redirige directement
     if (pages.includes(suggestion)) {
-    switch (suggestion) {
-        case "Profil":
+      switch (suggestion) {
+       case "Profil":
         window.location.href = "/profile";
         break;
-        case "Dashboard":
+  
+       case "Dashboard":
         window.location.href = "/dashboard";
         break;
-        case "Chat":
+  
+       case "Chat":
         window.location.href = "/chat";
         break;
-        case "Home":
+  
+       case "Home":
         window.location.href = "/home";
         break;
-        default:
+  
+       default:
         break;
-    }
+      }
     } else {
-    // Si la suggestion est un nom d'utilisateur sous forme de "[user] fullName", on extrait l'ID de l'utilisateur
-    const userFullName = suggestion.replace('[user] ', '');
-    const user = users.find(user => user.fullName === userFullName);
-    window.location.href = `/public_profile?user_id=${user.id}`;
+      // Si la suggestion est un nom d'utilisateur sous forme de "[user] fullName", on extrait l'ID de l'utilisateur
+      const userFullName = suggestion.replace("[user] ", "");
+      const user = users.find(user => user.fullName === userFullName);
+      window.location.href = `/public_profile?user_id=${user.id}`;
     }
-}
-
-// Initialiser les utilisateurs dès que la page est chargée
-window.onload = async function() {
+  }
+  // Initialiser les utilisateurs dès que la page est chargée
+  
+  window.onload = async function() {
     await getAllUsers(); // On récupère les utilisateurs au démarrage
-}
-
-// Gestion de l'affichage des suggestions
-input.addEventListener("click", () => {
+  }
+  // Gestion de l'affichage des suggestions
+  ;
+  
+  input.addEventListener("click", () => {
     suggestionsList.style.display = "block"; // Affiche les suggestions quand on clique dans le champ
-});
-
-// Fermer les suggestions quand on clique en dehors
-document.addEventListener("click", (event) => {
+  });
+  // Fermer les suggestions quand on clique en dehors
+  
+  document.addEventListener("click", event => {
     if (!event.target.closest(".search-container")) {
-    suggestionsList.style.display = "none";
+      suggestionsList.style.display = "none";
     }
-});
+  });
 </script>

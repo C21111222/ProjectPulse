@@ -26,7 +26,7 @@ export default class UsersController {
 
     return view.render('pages/publicProfile', { user })
   }
-  
+
   async updateProfile({ request, auth, response }: HttpContext) {
     const userId = auth.user!.id
     const user = await User.findOrFail(userId)

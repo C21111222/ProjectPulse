@@ -65,14 +65,17 @@
       .profile-container .logout-btn:hover {
         background-color: #4a3ae0;
       }
+      
       #edit-button img {
         transition: transform 0.2s ease;
       }
+      
       #edit-button:hover img {
         transform: scale(1.1);
       }
       
       /* Formulaire d'édition */
+      
       #edit-form {
         text-align: left;
       }
@@ -85,24 +88,20 @@
       <!-- Section Image de profil -->
       <div class="profile-pic-container" style="position: relative; display: inline-block;">
         <!-- Image de profil -->
-        <img 
-          src="{{ auth.user.getImage() }}" 
-          alt="Image de profil" 
-          id="image" 
-          style="cursor: pointer;"
-        />
-        
+        <img src="{{ auth.user.getImage() }}" alt="Image de profil" id="image" style="cursor: pointer;" />
+
         <!-- Bouton pour sélectionner une photo -->
-        <button 
-          id="select-photo-button" 
+        <button
+          id="select-photo-button"
           style="margin-top: 10px; background: none; border: 1px solid #ddd; padding: 5px 10px; cursor: pointer; border-radius: 4px;"
         >
           Sélectionner une photo
         </button>
-      
+
         <!-- Zone de glisser-déposer (seulement sur PC) -->
-        <div id="upload-zone" 
-             style="
+        <div
+          id="upload-zone"
+          style="
                display: none; 
                position: absolute; 
                top: 0; 
@@ -114,113 +113,97 @@
                border-radius: 50%; 
                text-align: center; 
                line-height: 100px;
-             ">
+             "
+        >
           Glissez-déposez votre image ici
         </div>
-      
+
         <!-- Input type file pour mobiles et PC -->
-        <input 
-          type="file" 
-          id="file-input" 
-          accept="image/*" 
-          style="display: none;"
-        />
+        <input type="file" id="file-input" accept="image/*" style="display: none;" />
       </div>
-    
+
       <!-- Nom complet et e-mail -->
       <div class="fullname-container" style="position: relative; display: inline-block; margin-top: 20px;">
         <h1 id="fullname-display" style="display: inline-block;">
           {{ auth.user.getFullName() }}
         </h1>
-        <button 
-          id="edit-button" 
+        <button
+          id="edit-button"
           style="background: none; border: none; cursor: pointer; margin-left: 10px; vertical-align: middle;"
         >
-          <img 
-            src="/resources/img/edit-pencil.png" 
-            alt="Modifier" 
-            style="width: 20px; height: 20px;"
-          />
+          <img src="/resources/img/edit-pencil.png" alt="Modifier" style="width: 20px; height: 20px;" />
         </button>
         <form id="edit-form" action="/profile" method="POST" style="display: none; margin-top: 10px;">
-          <input 
-            type="text" 
-            id="fullname-input" 
-            name="fullname" 
-            value="{{ auth.user.getFullName() }}" 
-            required 
+          <input
+            type="text"
+            id="fullname-input"
+            name="fullname"
+            value="{{ auth.user.getFullName() }}"
+            required
             style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 10px;"
           />
-          <button 
-            type="submit" 
-            class="logout-btn" 
-            style="background-color: #28a745; margin-top: 10px;"
-          >
+          <button type="submit" class="logout-btn" style="background-color: #28a745; margin-top: 10px;">
             Enregistrer
           </button>
         </form>
       </div>
-    
+
       <!-- Adresse e-mail -->
-      <p>{{ auth.user.getMail() }}</p>
+      <p>
+        {{ auth.user.getMail() }}
+      </p>
     </div>
   </body>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const selectPhotoButton = document.getElementById('select-photo-button');
-      const fileInput = document.getElementById('file-input');
-      const uploadZone = document.getElementById('upload-zone');
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
     
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const selectPhotoButton = document.getElementById("select-photo-button");
+      const fileInput = document.getElementById("file-input");
+      const uploadZone = document.getElementById("upload-zone");
       // Ouvrir la sélection de fichier via le bouton
-      selectPhotoButton.addEventListener('click', () => {
+      selectPhotoButton.addEventListener("click", () => {
         fileInput.click();
       });
-    
       // Gestion de la sélection de fichier
-      fileInput.addEventListener('change', (e) => {
+      fileInput.addEventListener("change", e => {
         const file = e.target.files[0];
         if (file) {
           handleFileUpload(file);
         }
       });
-    
-      uploadZone.addEventListener('dragover', (e) => {
+      uploadZone.addEventListener("dragover", e => {
         e.preventDefault();
-        uploadZone.style.background = 'rgba(0, 0, 0, 0.7)';
+        uploadZone.style.background = "rgba(0, 0, 0, 0.7)";
       });
-    
-      uploadZone.addEventListener('dragleave', () => {
-        uploadZone.style.background = 'rgba(0, 0, 0, 0.5)';
+      uploadZone.addEventListener("dragleave", () => {
+        uploadZone.style.background = "rgba(0, 0, 0, 0.5)";
       });
-    
-      uploadZone.addEventListener('drop', (e) => {
+      uploadZone.addEventListener("drop", e => {
         e.preventDefault();
         const file = e.dataTransfer.files[0];
         if (file) {
           handleFileUpload(file);
         }
-        uploadZone.style.display = 'none';
+        uploadZone.style.display = "none";
       });
-    
       // Fonction de gestion de l'upload
       function handleFileUpload(file) {
         const formData = new FormData();
-        formData.append('image', file);
-    
-        fetch('/img', {
-          method: 'POST',
-          credentials: 'include',
-          body: formData,
-        })
-        .then(() => {
+        formData.append("image", file);
+        fetch("/img", {
+          method: "POST",
+          credentials: "include",
+          body: formData
+        }).then(() => {
           Swal.fire({
-            title: 'Chargement...',
-            timer: 5000,
+            title: "Chargement...",
+            timer: 5e3,
             timerProgressBar: true,
             didOpen: () => {
               Swal.showLoading();
-            },
+            }
           }).then(() => {
             window.location.reload();
           });
@@ -228,18 +211,17 @@
       }
     });
     
-    document.addEventListener('DOMContentLoaded', () => {
-      const editButton = document.getElementById('edit-button');
-      const fullnameDisplay = document.getElementById('fullname-display');
-      const editForm = document.getElementById('edit-form');
-      const fullnameInput = document.getElementById('fullname-input');
-  
-      editButton.addEventListener('click', (e) => {
+    document.addEventListener("DOMContentLoaded", () => {
+      const editButton = document.getElementById("edit-button");
+      const fullnameDisplay = document.getElementById("fullname-display");
+      const editForm = document.getElementById("edit-form");
+      const fullnameInput = document.getElementById("fullname-input");
+      editButton.addEventListener("click", e => {
         e.preventDefault();
         // Masquer le texte et afficher le formulaire
-        fullnameDisplay.style.display = 'none';
-        editButton.style.display = 'none';
-        editForm.style.display = 'block';
+        fullnameDisplay.style.display = "none";
+        editButton.style.display = "none";
+        editForm.style.display = "block";
         fullnameInput.focus();
       });
     });
