@@ -38,6 +38,7 @@ router
   .use(middleware.guest())
 
 router.get('/chat', [MessagesController, 'index']).as('chat').use(middleware.auth())
+router.get('/personal_chat', [MessagesController, 'singleChat']).use(middleware.auth())
 
 router.get('/unviewed_chats', [MessagesController, 'unviewedChats']).as('chat_fast').use(middleware.auth())
 
@@ -50,7 +51,8 @@ router.on('/').render('pages/homePage')
 // Page connected, accessible seulement aux utilisateurs connectés
 router.on('/profile').render('pages/profile').use(middleware.auth())
 router.post('/profile', [UsersController, 'updateProfile']).use(middleware.auth())
-router.on('/connected').render('pages/connected').use(middleware.auth())
+router.get('/public_profile', [UsersController, 'viewPublicProfile']).use(middleware.auth())
+router.on('/dashboard').render('pages/dashboard').use(middleware.auth())
 
 router.get('/messages', [MessagesController, 'getHistory']).use(middleware.auth())
 router.post('/messages', [MessagesController, 'sendMessage']).use(middleware.auth())
@@ -62,3 +64,5 @@ router.get("/img/:path", async ({ params, response }) => {
 })
 router.post('/img', [ImagesController, 'upload']).use(middleware.auth())
 router.delete('/img/:filename', [ImagesController, 'deleteImage']).use(middleware.auth())
+
+router.get('/users', [UsersController, 'getAllUsers']).use(middleware.auth())

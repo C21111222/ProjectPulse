@@ -49,6 +49,26 @@ export default class MessageriesController {
     return view.render('pages/chat', { users: resultat })
   }
 
+  async singleChat({ auth, request, view }) {
+    const receiverId = request.input('receiver_id')
+    const receiver = await User.find(receiverId)
+    if (!receiver) {
+      return view.redirect('/chat')
+    }
+    const messages = await Message.query()
+      .where((query) => {
+        query.where('sender_id', auth.user.id).andWhere('receiver_id', receiverId)
+      })
+      .orWhere((query) => {
+        query.where('sender_id', receiverId).andWhere('receiver_id', auth.user.id)
+      })
+      .preload('sender') // Charge les informations de l'utilisateur lié
+      .orderBy('created_at', 'asc')
+      .exec()
+    logger.info(messages)
+    return view.render('pages/personnalChat', { messages: messages, user: receiver.serialize() })
+  }
+
   async unviewedChats({ auth, response }) {
     const users = await User.getAllUsers()
     const authUser = users.find((user) => user.id === auth.user.id)

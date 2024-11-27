@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat avec {{ user.fullName }}</title>
+  
+  @if(flashMessages.has('notification'))
+    <script>
+      Swal.fire({
+        icon: "{{ flashMessages.get('notification').type }}", // 'success', 'error', etc.
+        title: "{{ flashMessages.get('notification').message }}",
+        showConfirmButton: false,
+        timer: 3000
+      });
+    </script>
+  @end
+
+  <link rel="stylesheet" href="/resources/css/chat.css">
+</head>
+<body>
+  @include('components/navbar')
+  @include('components/ChatButton')
+
+  <div class="container">
+    <div class="chat-window">
+      <!-- Entête du chat avec l'utilisateur -->
+      <div class="chat-header">
+        <!-- Lien autour de l'image -->
+        <a href="/public_profile?user_id={{ user.id }}">
+          <img 
+            src="{{ user.imageUrl }}" 
+            alt="Photo de {{ user.fullName }}" 
+            style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 10px;"
+          />
+        </a>
+        
+        <!-- Lien autour du nom -->
+        <a href="/public_profile?user_id={{ user.id }}" style="text-decoration: none; color: #333;">
+          <h2>{{ user.fullName }}</h2>
+        </a>
+
+      </div>
+
+      <!-- Zone des messages -->
+      <div id="chatBox" class="chat-box">
+        <p class="message">Chargement des messages...</p>
+      </div>
+
+      <!-- Zone d'entrée de texte -->
+      <div id="chatInput" class="chat-input">
+        <input type="text" id="messageInput" placeholder="Tapez un message..." disabled />
+        <button id="sendButton" disabled>Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script type="module">
+    import { Transmit } from '/node_modules/@adonisjs/transmit-client'
+
+    const transmit = new Transmit({ baseUrl: window.location.origin });
+
+    let activeSubscription = null;
+
+    // Charger les messages existants
+    async function loadMessages() {
+        // on charge les messages existants se trouvant dans la variable adonis messages
+      const messages =[
+        @each(message in messages)
+          {
+            senderId: {{ message.senderId }},
+            senderName: '{{ message.sender.fullName }}',
+            content: '{{ message.content }}',
+            createdAt: '{{ message.createdAt }}',
+            sender: {
+              imageUrl: '{{ message.sender.imageUrl }}',
+            },
+          },
+        @endeach
+      ];
+      
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML = '';
+      messages.forEach(message => {
+        const messageClass = message.senderId === {{ auth.user.id }} ? 'sent' : 'received';
+        const formattedTime = new Date(message.createdAt).toLocaleTimeString('fr-FR');
+        chatBox.innerHTML += `
+          <div class="message-container ${messageClass}" style="display: flex; margin-bottom: 10px;">
+            <img 
+              src="${message.sender.imageUrl}" 
+              alt="Photo de ${message.senderName}" 
+              style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
+            />
+            <p class="message-content" style="margin: 0;"><strong>${message.senderId === {{ auth.user.id }} ? 'Vous' : message.senderName}</strong>: ${message.content} <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span></p>
+          </div>`;
+      });
+    }
+
+    // Envoyer un message
+    async function sendMessage() {
+      const messageInput = document.getElementById('messageInput');
+      const message = messageInput.value.trim();
+      if (message === '') return;
+
+      const response = await fetch('/messages', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ receiver_id: {{ user.id }}, content: message }),
+      });
+
+      if (response.status === 400) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: 'Une erreur est survenue lors de l\'envoi du message.',
+        });
+      } else {
+        messageInput.value = '';
+      }
+    }
+
+    // Initialisation de la souscription aux messages en temps réel
+    async function initializeChat() {
+      const channel = Math.min({{ auth.user.id }}, {{ user.id }}) + '-' + Math.max({{ auth.user.id }}, {{ user.id }});
+      activeSubscription = transmit.subscription(`chats/${channel}/messages`);
+      await activeSubscription.create();
+
+      activeSubscription.onMessage(data => {
+        const messageClass = data.sender === {{ auth.user.id }} ? 'sent' : 'received';
+        const formattedTime = new Date(data.createdAt).toLocaleTimeString('fr-FR');
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML += `
+          <div class="message-container ${messageClass}" style="display: flex; margin-bottom: 10px;">
+            <img 
+              src="${data.senderImage}" 
+              alt="Photo de ${data.senderName}" 
+              style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
+            />
+            <p class="message-content" style="margin: 0;"><strong>${data.sender === {{ auth.user.id }} ? 'Vous' : data.senderName}</strong>: ${data.message} <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span></p>
+          </div>`;
+          scrollToBottom();
+      });
+
+      document.getElementById('messageInput').disabled = false;
+      document.getElementById('sendButton').disabled = false;
+    }
+
+    // Gestion des événements
+    document.getElementById('sendButton').addEventListener('click', sendMessage);
+    document.getElementById('messageInput').addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+    function scrollToBottom() {
+      const chatBox = document.getElementById('chatBox');
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Charger les messages et initialiser le chat
+    loadMessages();
+    initializeChat();
+    scrollToBottom();
+  </script>
+</body>
+</html>
+
+<style>
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  background-color: #f9f9f9;
+}
+
+.chat-button {
+  background-color: #5A45FF;
+  padding: 8px 16px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  margin-left: 10px;
+  position: fixed;  /* Fixe le bouton par rapport à la fenêtre */
+  top: 100px ;        /* Décale le bouton un peu sous le bord supérieur */
+  bottom: unset;     /* Supprime la propriété bottom */
+  right: 20px;      /* Place le bouton à droite */
+  z-index: 1002;    /* Assure que le bouton soit au-dessus des autres éléments */
+
+}
+
+.chat-panel {
+  position: fixed;
+  top: 133px;
+  right: 20px;
+  width: 350px;
+  /* Largeur augmentée pour un panneau plus allongé */
+  height: 400px;
+  background-color: white;
+  box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  display: none;
+  /* Par défaut, l'onglet est caché */
+  overflow: hidden;
+  z-index: 1000;
+}
+
+</style>

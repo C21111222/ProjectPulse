@@ -23,7 +23,7 @@ export default class AuthController {
    *
    * @remarks
    * This method attempts to log in a user using their email and password. If the credentials are correct,
-   * the user is logged in and redirected to the '/connected' page. If the credentials are incorrect,
+   * the user is logged in and redirected to the '/dashboard' page. If the credentials are incorrect,
    * a flash message is set and the user is redirected back to the login page. In case of any other errors,
    * a generic error message is flashed and the user is redirected to the login page.
    *
@@ -40,7 +40,7 @@ export default class AuthController {
       if (user) {
         await auth.use('web').login(user)
         logger.info("Connexion réussie pour l'email %s", email)
-        return response.redirect('/connected')
+        return response.redirect('/dashboard')
       } else {
         logger.info("Connexion échouée pour l'email %s", email)
         session.flash('notification', {
@@ -74,7 +74,7 @@ export default class AuthController {
    *
    * @remarks
    * This method attempts to log in a user using their email and password. If the credentials are correct,
-   * the user is logged in and redirected to the '/connected' page. If the credentials are incorrect,
+   * the user is logged in and redirected to the '/dashboard' page. If the credentials are incorrect,
    * a flash message is set and the user is redirected back to the login page. In case of any other errors,
    * a generic error message is flashed and the user is redirected to the login page.
    *
@@ -90,7 +90,7 @@ export default class AuthController {
       const user = await User.verifyCredentials(email, password)
       if (user) {
         await auth.use('web').login(user)
-        return response.redirect('/connected')
+        return response.redirect('/dashboard')
       } else {
         session.flash('notification', {
           type: 'error',
@@ -136,7 +136,7 @@ export default class AuthController {
    * 2. Formats the `fullName` by replacing spaces with hyphens and capitalizing the first letter.
    * 3. Checks if the `password` matches the `password_confirmation`. If not, flashes an error message and redirects back.
    * 4. Checks if the `fullName` is one of the disallowed names. If so, flashes an error message and redirects back.
-   * 5. Attempts to create a new user and log them in. If successful, redirects to the connected page.
+   * 5. Attempts to create a new user and log them in. If successful, redirects to the dashboard page.
    * 6. Handles errors such as duplicate email entries and flashes appropriate error messages.
    *
    * @throws {Error} - Throws an error if there is an issue during the user creation process.
@@ -175,7 +175,7 @@ export default class AuthController {
       logger.info("Inscription de %s avec l'email %s", fullName, email)
       const user = await User.create({ fullName: fullNameM, email, password })
       await auth.use('web').login(user)
-      return response.redirect('/connected')
+      return response.redirect('/dashboard')
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
         session.flash('notification', { type: 'error', message: 'Cet email est déjà utilisé' })

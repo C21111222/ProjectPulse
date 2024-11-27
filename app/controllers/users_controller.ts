@@ -13,6 +13,12 @@ export default class UsersController {
     const users = await User.query().select('id', 'full_name', 'email')
     return response.json(users)
   }
+
+  async viewPublicProfile({ request, view }: HttpContext) {
+    const userId = request.input('user_id')
+    const user = await User.find(userId)
+    return view.render('pages/publicProfile', { user })
+  }
   
   async updateProfile({ request, auth, response }: HttpContext) {
     const userId = auth.user!.id
