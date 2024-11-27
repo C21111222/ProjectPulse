@@ -174,7 +174,6 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const editPhotoButton = document.getElementById('edit-photo-button');
       const selectPhotoButton = document.getElementById('select-photo-button');
       const fileInput = document.getElementById('file-input');
       const uploadZone = document.getElementById('upload-zone');
@@ -190,11 +189,6 @@
         if (file) {
           handleFileUpload(file);
         }
-      });
-    
-      // Zone de glisser-déposer (optionnelle sur PC)
-      editPhotoButton.addEventListener('click', () => {
-        uploadZone.style.display = 'block';
       });
     
       uploadZone.addEventListener('dragover', (e) => {
