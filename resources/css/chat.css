@@ -170,7 +170,7 @@ body {
 .message-container.received .message-content {
   background-color: #c2bdbd; /* Couleur du fond pour les messages reçus */
   border-radius: 0 10px 10px 10px; /* Arrondi à droite, angle gauche non arrondi */
-  padding: 5px 10px; /* Réduction du padding pour éviter l'espace à gauche */
+  padding: 2px 2px; /* Réduction du padding pour éviter l'espace à gauche */
   word-wrap: break-word; /* Gère le texte long */
   white-space: pre-wrap; /* Garde les espaces et retours à la ligne */
   margin: 0; 
@@ -190,20 +190,13 @@ body {
 .message-container.sent .message-content {
   background-color: #d4f1c5; /* Couleur du fond du message */
   border-radius: 10px 0 10px 10px; /* Arrondi à gauche, angle droit non arrondi */
-  padding: 5px 10px; /* Réduction du padding pour éviter l'espace à gauche */
+  padding: 2px 2px; /* Réduction du padding pour éviter l'espace à gauche */
   word-wrap: break-word; /* Gère le texte long */
   white-space: pre-wrap; /* Garde les espaces et retours à la ligne */
   margin: 0; 
   max-width: 100%; /* Permet au message de prendre toute la largeur disponible */
 }
 
-
-
-.message-content {
-  background-color: #f1f1f1;
-  padding: 5px;
-  border-radius: 10px;
-}
 
 
 /* Ajout des images dans les messages */
