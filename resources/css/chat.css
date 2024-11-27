@@ -174,7 +174,7 @@ body {
   word-wrap: break-word; /* Gère le texte long */
   white-space: pre-wrap; /* Garde les espaces et retours à la ligne */
   margin-left: 5px; /* Pas de marge à gauche */
-  margin-right: 5px; /* Pas de marge à droite */
+  margin-right: 25px; /* Pas de marge à droite */
   max-width: 100%; /* Permet au message de prendre toute la largeur disponible */
 }
 
@@ -194,7 +194,7 @@ body {
   padding: 2px 2px; /* Réduction du padding pour éviter l'espace à gauche */
   word-wrap: break-word; /* Gère le texte long */
   white-space: pre-wrap; /* Garde les espaces et retours à la ligne */
-  margin-right: 5px; /* Pas de marge à droite */
+  margin-right: 25px; /* Pas de marge à droite */
   margin-left: 5px; /* Pas de marge à gauche */
   max-width: 100%; /* Permet au message de prendre toute la largeur disponible */
 }
