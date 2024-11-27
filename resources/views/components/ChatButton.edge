@@ -252,7 +252,7 @@
       const userElement = document.createElement('li');
       // on rajoute la classe class="user-item"  pour pouvoir styliser les li
       userElement.classList.add('user-item');
-      userElement.innerHTML = `<a href="/chat">${user2.user.fullName}</a>`;
+      userElement.innerHTML = `<a href="/personal_chat?receiver_id=${user2.user.id}">${user2.user.fullName}</a>`;
       chatUsers.appendChild(userElement);
       users.push({ id: user2.id, fullName: user2.fullName, messageViewed: false });
     }
