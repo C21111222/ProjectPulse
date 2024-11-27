@@ -199,6 +199,13 @@ body {
   max-width: 100%; /* Permet au message de prendre toute la largeur disponible */
 }
 
+.message-content {
+  padding: 10px;
+  border-radius: 10px;
+  margin: 5px;
+  max-width: 70%;
+}
+
 
 
 /* Ajout des images dans les messages */
