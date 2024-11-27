@@ -206,7 +206,7 @@
         const messageClass = message.senderId === {{ auth.user.id }} ? 'sent' : 'received';
         const formattedTime = new Date(message.createdAt).toLocaleTimeString('fr-FR');
         document.getElementById('chatBox').innerHTML += `
-        <div class="message-container ${messageClass}" style="display: flex; align-items: center; margin-bottom: 10px;">
+        <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
           <img 
             src="${message.sender.imageUrl}" 
             alt="Photo de ${message.senderName}" 
@@ -244,7 +244,7 @@
       
         // Ajouter l'image de profil
         document.getElementById('chatBox').innerHTML += `
-          <div class="message-container ${messageClass}" style="display: flex; align-items: center; margin-bottom: 10px;">
+          <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
             <img 
               src="${data.senderImage}" 
               alt="Photo de ${data.senderName}" 
