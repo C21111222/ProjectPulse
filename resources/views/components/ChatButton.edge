@@ -225,7 +225,8 @@
       const chatUsers = document.getElementById('chat-users');
       const user = document.createElement('li');
       user.classList.add('user-item');
-      user.innerHTML = `<a href="/personal_chat?receiver_id=${data.senderId}" style="color: red">${data.senderName}</a>`;
+      user.id = "user-" + data.senderId;
+      user.innerHTML = `<a href="/personal_chat?receiver_id=${data.senderId}">${data.senderName}</a>`;
       chatUsers.appendChild(user);
       users.push({ id: data.senderId, fullName: data.senderName, messageViewed: false });
       document.getElementById('title-chat').innerText = `Chat (${users.length})`;
@@ -252,6 +253,8 @@
       const userElement = document.createElement('li');
       // on rajoute la classe class="user-item"  pour pouvoir styliser les li
       userElement.classList.add('user-item');
+      // on ajoute l'id contenant l'id de l'utilisateur 
+      userElement.id = "user-" + user2.user.id;
       userElement.innerHTML = `<a href="/personal_chat?receiver_id=${user2.user.id}">${user2.user.fullName}</a>`;
       chatUsers.appendChild(userElement);
       users.push({ id: user2.id, fullName: user2.fullName, messageViewed: false });

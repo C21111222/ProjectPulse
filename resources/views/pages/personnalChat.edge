@@ -97,6 +97,30 @@
           </div>`;
       });
     }
+    async function sendViewedNotification(senderId) {
+      const response = await fetch('/messages_viewed', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sender_id: senderId }),
+      });
+      return response;
+    }
+
+    async function sendViewedNotificationSingle(messageId) {
+      console.log('Envoi de la notification de lecture');
+      console.log(messageId);
+      const response = await fetch(`/message_viewed?message_id=${messageId}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+      });
+      return response;
+    }
 
     // Envoyer un message
     async function sendMessage() {
@@ -128,12 +152,17 @@
     async function initializeChat() {
       const channel = Math.min({{ auth.user.id }}, {{ user.id }}) + '-' + Math.max({{ auth.user.id }}, {{ user.id }});
       activeSubscription = transmit.subscription(`chats/${channel}/messages`);
+      // on envoye une notification de lecture
+      await sendViewedNotification({{ user.id }});
       await activeSubscription.create();
 
       activeSubscription.onMessage(data => {
         const messageClass = data.sender === {{ auth.user.id }} ? 'sent' : 'received';
         const formattedTime = new Date(data.createdAt).toLocaleTimeString('fr-FR');
         const chatBox = document.getElementById('chatBox');
+        if (data.sender !== {{ auth.user.id }}) {
+          sendViewedNotificationSingle(data.id);
+        }
         chatBox.innerHTML += `
           <div class="message-container ${messageClass}" style="display: flex; margin-bottom: 10px;">
             <img 
@@ -162,11 +191,25 @@
       const chatBox = document.getElementById('chatBox');
       chatBox.scrollTop = chatBox.scrollHeight;
     }
+    function eraseNotification() {
+      const chatUser = document.getElementById('user-' + {{ user.id }});
+      console.log('user-' + {{ user.id }});
+      if (chatUser) {
+        console.log('Effacement de la notification');
+        chatUser.remove();
+        // on recupere le nombre de notifications qui se trouve entre parathese dans document.getElementById('title-chat').innerText
+        const nbNotifications = parseInt(document.getElementById('title-chat').innerText.match(/\((\d+)\)/)[1]);
+        document.getElementById('title-chat').innerText = `Chat (${nbNotifications - 1})`;
+      }
+    }
 
     // Charger les messages et initialiser le chat
     loadMessages();
     initializeChat();
     scrollToBottom();
+    // on attend 1 seconde avant d'effacer la notification
+    setTimeout(eraseNotification, 500);
+    eraseNotification();
   </script>
 </body>
 </html>
