@@ -19,7 +19,7 @@ export default class MessageriesController {
    * It then renders the chat page with the remaining users.
    */
   async index({ auth, view }) {
-    const users = await User.getAllUsers()
+    const users = await User.query().exec()
     const authUser = users.find((user) => user.id === auth.user.id)
     const globalUser = users.find((user) => user.id === 999999)
     if (authUser) {
