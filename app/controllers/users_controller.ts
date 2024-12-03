@@ -51,4 +51,16 @@ export default class UsersController {
     const user = await User.find(params.id)
     return response.json(user)
   }
+
+  /**
+   * Retrieves the teams associated with the authenticated user.
+   *
+   * @param {HttpContext} context - The HTTP context containing the authentication and response objects.
+   * @returns {Promise<void>} - A promise that resolves to a JSON response containing the user's teams.
+   */
+  async getTeams({ auth, response }: HttpContext) {
+    const user = await User.find(auth.user!.id)
+    const teams = await user!.related('teams').query()
+    return response.json(teams)
+  }
 }
