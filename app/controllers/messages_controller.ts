@@ -76,7 +76,7 @@ export default class MessageriesController {
   }
 
   async unviewedChats({ auth, response }) {
-    const users = await User.getAllUsers()
+    const users = await User.query().exec()
     const authUser = users.find((user) => user.id === auth.user.id)
     const globalUser = users.find((user) => user.id === 999999)
     if (authUser) {
