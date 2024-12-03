@@ -1,9 +1,10 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column, hasOne } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasOne, manyToMany } from '@adonisjs/lucid/orm'
+import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
-import Image from '#models/image'
+import Team from '#models/team'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -31,6 +32,15 @@ export default class User extends compose(BaseModel, AuthFinder) {
     this.imageUrl = 'https://projectpulse.pautentia.fr/img/unknow.jpg'
   }
 
+  @manyToMany(() => Team,
+    {
+      pivotTable: 'user_teams',
+      pivotForeignKey: 'user_id',
+      pivotRelatedForeignKey: 'team_id',
+      pivotColumns: ['role'], 
+    })
+  declare teams: ManyToMany<typeof Team>
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -47,11 +57,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   public getImage() {
     return this.imageUrl
-  }
-
-  // method pour recuperer tous les utilisateurs actifs
-  public static async getAllUsers() {
-    return await User.query().select('id', 'full_name', 'email')
   }
 
   // to json

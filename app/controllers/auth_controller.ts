@@ -149,7 +149,7 @@ export default class AuthController {
       'password_confirmation',
     ])
 
-    const fullNameM = fullName.replace(/ /g, '-').charAt(0).toUpperCase() + fullName.slice(1)
+    const fullNameM = fullName.charAt(0).toUpperCase() + fullName.slice(1)
 
     if (password !== password_confirmation) {
       session.flash('notification', {
@@ -159,20 +159,16 @@ export default class AuthController {
       return response.redirect('back')
     }
     if (
-      fullName == 'Kevin' ||
-      fullName == 'kevin' ||
-      fullName == 'kévin' ||
-      fullName == 'Kévin' ||
-      fullName == 'Florent' ||
-      fullName == 'florent' ||
-      fullName == 'Simon' ||
-      fullName == 'simon'
+      fullNameM == 'Kevin' ||
+      fullNameM == 'Kévin' ||
+      fullNameM == 'Florent' ||
+      fullNameM == 'Simon'
     ) {
       session.flash('notification', { type: 'error', message: 'Va poop fdp.' })
       return response.redirect('back')
     }
     try {
-      logger.info("Inscription de %s avec l'email %s", fullName, email)
+      logger.info("Inscription de %s avec l'email %s", fullNameM, email)
       const user = await User.create({ fullName: fullNameM, email, password })
       await auth.use('web').login(user)
       return response.redirect('/dashboard')

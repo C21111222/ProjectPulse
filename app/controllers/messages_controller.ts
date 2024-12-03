@@ -1,10 +1,12 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import Message from '#models/message'
-import transmit from '@adonisjs/transmit/services/main'
 import logger from '@adonisjs/core/services/logger'
+import { NotificationService, ChatMessage, NotificationMessage, NotificationType} from '#services/notification_service'
 
 export default class MessageriesController {
+
+  private notificationService: NotificationService = new NotificationService()
   /**
    * Handles the index action for the messages controller.
    *
@@ -211,14 +213,16 @@ export default class MessageriesController {
       newMessage.channelId = 'global'
       newMessage.senderName = auth.user.fullName
       try {
-        transmit.broadcast('chats/global/messages', {
+        const channel = 'chats/global/messages'
+        const chatMessage: ChatMessage = {
           message: message,
           sender: auth.user.id,
           senderName: auth.user.fullName,
           createdAt: Date.now(),
           messageId: newMessage.id,
           senderImage: auth.user.imageUrl,
-        })
+        }
+        await this.notificationService.sendNotification(channel, chatMessage)
         await newMessage.save()
       } catch (error) {
         logger.error(error)
@@ -240,27 +244,32 @@ export default class MessageriesController {
     logger.info(channel)
     try {
       await newMessage.save()
-      transmit.broadcast(`chats/${channel}/messages`, {
+      const channelT = `chats/${channel}/messages`
+      const chatMessage: ChatMessage = {
         message: message,
         sender: auth.user.id,
         senderName: auth.user.fullName,
         createdAt: Date.now(),
         messageId: newMessage.id,
         senderImage: auth.user.imageUrl,
-      })
+      }
+      await this.notificationService.sendNotification(channelT, chatMessage)
       // on attend 0.5s pour être sûr que le message est bien enregistré puis on verifie si le message a été vu
       setTimeout(async () => {
         const message = await Message.find(newMessage.id)
         if (message && !message.viewed) {
           logger.info('message non vu')
-          transmit.broadcast(`notifications/${receiverId}`, {
+          const channelNotif = `notifications/${receiverId}`
+          const notificationMessage: NotificationMessage = {
             message: 'msg reçu',
             senderId: auth.user.id,
             senderName: auth.user.fullName,
             channelId: channel,
             messageViewed: false,
             senderImage: auth.user.imageUrl,
-          })
+            type: NotificationType.MESSAGE,
+          }
+          await this.notificationService.sendNotification(channelNotif, notificationMessage)
         }
       }, 500)
     } catch (error) {
