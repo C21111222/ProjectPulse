@@ -1,6 +1,7 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 import Team from '#models/team'
 import User from '#models/user'
+import Notification from '#models/notification'
 import { NotificationTeamInvite, NotificationService, NotificationType, NotificationTeamInviteResponse } from '#services/notification_service'
 import db from '@adonisjs/lucid/services/db'
 
@@ -80,6 +81,7 @@ export default class TeamsController {
         const channel = `notifications/${userId}`
         try {
             await this.notificationService.sendNotification(channel, notification)
+            await Notification.create({teamId: teamId, inviterId: auth.user.id, inviteeId: userId, type: NotificationType.TEAM_INVITE})
             return response.json({message: 'Invitation envoyée'})
         } catch (error) {
             return response.status(500).json({message: 'Impossible d\'envoyer l\'invitation'})
@@ -107,11 +109,14 @@ export default class TeamsController {
                 inviterId: user.id,
                 inviterName: user.fullName || '',
                 inviterImage: user.imageUrl,
+                inviteeId: auth.user.id,
+                inviteeName: auth.user.fullName || '',
+                inviteeImage: auth.user.imageUrl,
                 type: NotificationType.TEAM_INVITE_ACCEPTED
             }
             const channel = `teams/${teamId}`
             await this.notificationService.sendNotification(channel, notification)
-
+            await Notification.create({teamId: teamId, inviterId: user.id, inviteeId: auth.user.id, type: NotificationType.TEAM_INVITE_ACCEPTED})
             return response.json({message: 'Invitation acceptée'})
         } catch (error) {
             return response.status(500).json({message: 'Impossible d\'accepter l\'invitation'})
@@ -136,11 +141,15 @@ export default class TeamsController {
             inviterId: user.id,
             inviterName: user.fullName || '',
             inviterImage: user.imageUrl,
+            inviteeId: auth.user.id,
+            inviteeName: auth.user.fullName || '',
+            inviteeImage: auth.user.imageUrl,
             type: NotificationType.TEAM_INVITE_DECLINED
         }
         const channel = `teams/${teamId}`
         try {
             await this.notificationService.sendNotification(channel, notification)
+            await Notification.create({teamId: teamId, inviterId: user.id, inviteeId: auth.user.id, type: NotificationType.TEAM_INVITE_DECLINED})
             return response.json({message: 'Invitation refusée'})
         } catch (error) {
             return response.status(500).json({message: 'Impossible de refuser l\'invitation'})
@@ -185,6 +194,21 @@ export default class TeamsController {
                 return response.status(404).json({message: 'Utilisateur non trouvé'})
             }
             await user.related('teams').detach([teamId])
+            // on envoie une notification à l'utilisateur pour l'informer qu'il a été supprimé de l'équipe
+            const notification: NotificationTeamInviteResponse = {
+                teamId: teamId,
+                teamName: team.name,
+                teamImage: team.imageUrl,
+                inviterId: auth.user.id,
+                inviterName: auth.user.fullName || '',
+                inviterImage: auth.user.imageUrl,
+                inviteeId: userId,
+                inviteeName: user.fullName || '',
+                inviteeImage: user.imageUrl,
+                type: NotificationType.TEAM_BANNED
+            }
+            const channel = `notifications/${userId}`
+            await this.notificationService.sendNotification(channel, notification)
             return response.json({message: 'Utilisateur supprimé de l\'équipe'})
         } catch (error) {
             return response.status(500).json({message: 'Impossible de supprimer l\'utilisateur de l\'équipe'})

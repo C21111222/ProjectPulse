@@ -23,6 +23,7 @@ const MessagesController = () => import('#controllers/messages_controller')
 const UsersController = () => import('#controllers/users_controller')
 const ImagesController = () => import('#controllers/images_controller')
 const TeamController = () => import('#controllers/teams_controller')
+const NotificationController = () => import('#controllers/notifications_controller')
 
 /*
 |--------------------------------------------------------------------------
@@ -88,5 +89,9 @@ router
     router.post('/decline_invitation', [TeamController, 'declineInvitation'])
     router.post('/promote_user', [TeamController, 'promoteUser'])
     router.post('/demote_user', [TeamController, 'demoteUser'])
+
+    // Notifications
+    router.get('/notifications', [NotificationController, 'getNotifications'])
+    router.delete('/notifications/:id', [NotificationController, 'deleteNotification'])
   })
   .use(middleware.auth())

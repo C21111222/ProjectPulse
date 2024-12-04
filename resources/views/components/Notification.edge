@@ -1,0 +1,88 @@
+@if (auth.isAuthenticated)
+  <div id="notification-button" class="notification-button" onclick="toggleNotification()">
+    <img src="/resources/img/notification.png" alt="notification" class="notification-img">
+    <span id="title-notification" class="noselect">Notifications (0)</span>
+  </div>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel" class="notification-panel noselect">
+      <div class="notification-header1 noselect">
+        <h3 class="noselect">
+          Notifications
+        </h3>
+        <button class="close-btn" onclick="toggleNotification()">X</button>
+      </div>
+      <div class="notification-body noselect">
+        <div class="label">
+          Notification(s) non lue(s) :
+        </div>
+        <ul id="notification-list">
+        </ul>
+
+      </div>
+    </div>
+@endif
+
+<script>
+  // Fonction pour afficher ou cacher le panel de notification
+  function toggleNotification() {
+    var notificationPanel = document.getElementById("notification-panel");
+    if (notificationPanel.style.display === "none" || notificationPanel.style.display === "") {
+      notificationPanel.style.display = "block";
+    } else {
+      notificationPanel.style.display = "none";
+    }
+  }
+</script>
+
+<script type="module">
+    import {
+        Transmit
+      } from "/node_modules/@adonisjs/transmit-client";
+      
+    export const transmit = new Transmit({
+    baseUrl: window.location.origin
+    });
+
+    const notifSubscription = transmit.subscription("notifications/" + {{ auth.user.id }});
+    notifSubscription.create();
+
+    export enum NotificationType {
+        MESSAGE = 'MESSAGE',
+        TEAM_INVITE = 'TEAM_INVITE',
+        TEAM_INVITE_ACCEPTED = 'TEAM_INVITE_ACCEPTED',
+        TEAM_INVITE_DECLINED = 'TEAM_INVITE_DECLINED'
+      }
+
+    
+
+    notifSubscription.on("new-notification", (notification) => {
+      console.log("New notification received", notification);
+      const notificationList = document.getElementById("notification-list");
+      const notificationItem = document.createElement("li");
+      switch (notification.type) {
+        case NotificationType.MESSAGE:
+          notificationItem.classList.add("message-notification");
+          notificationItem.id = "message-notification-" + notification.sender.id;
+          notificationItem.innerHTML = `<a href="/chat/${notification.sender.id}">${notification.sender.name}</a> vous a envoyé un message`;
+          break;
+        case NotificationType.TEAM_INVITE:
+          notificationItem.classList.add("team-invite-notification");
+          notificationItem.innerHTML = `<a href="/team/invitation/${notification.team.id}">${notification.sender.name}</a> vous a invité à rejoindre l'équipe ${notification.team.name}`;
+          break;
+        case NotificationType.TEAM_INVITE_ACCEPTED:
+          notificationItem.classList.add("team-invite-accepted-notification");
+          notificationItem.innerText = notification.sender.name + " a accepté votre invitation à rejoindre l'équipe " + notification.team.name;
+          break;
+        case NotificationType.TEAM_INVITE_DECLINED:
+          notificationItem.classList.add("team-invite-declined-notification");
+          notificationItem.innerText = notification.sender.name + " a refusé votre invitation à rejoindre l'équipe " + notification.team.name;
+          break;
+        default:
+          notificationItem.innerText = "Notification inconnue";
+      }
+      notificationList.appendChild(notificationItem);
+      const titleNotification = document.getElementById("title-notification");
+      titleNotification.innerText = "Notifications (" + notificationList.children.length + ")";
+    });
+</script>

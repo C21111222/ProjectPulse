@@ -1,11 +1,11 @@
-import User from '#models/user'
 import transmit from '@adonisjs/transmit/services/main'
 
 export enum NotificationType {
   MESSAGE = 'MESSAGE',
   TEAM_INVITE = 'TEAM_INVITE',
   TEAM_INVITE_ACCEPTED = 'TEAM_INVITE_ACCEPTED',
-  TEAM_INVITE_DECLINED = 'TEAM_INVITE_DECLINED'
+  TEAM_INVITE_DECLINED = 'TEAM_INVITE_DECLINED',
+  TEAM_BANNED = 'TEAM_BANNED'
 }
 export interface ChatMessage {
     message: string
@@ -43,6 +43,9 @@ export interface NotificationTeamInviteResponse{
     inviterId: number
     inviterName: string
     inviterImage: string
+    inviteeId: number
+    inviteeName: string
+    inviteeImage: string
     type: NotificationType
 }
 
