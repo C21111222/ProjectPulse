@@ -15,6 +15,30 @@ export default class TeamsController {
 
     private notificationService = new NotificationService()
 
+    public async create({ view }) {
+        return view.render('pages/create_team')
+      }
+    
+    public async store({ request, response, auth }) {
+        const data = request.only(['name', 'description', 'imageUrl'])
+        const team = new Team()
+        team.name = data.name
+        team.description = data.description
+        team.imageUrl = data.imageUrl
+
+        const user = await User.find(auth.user.id)
+        if (!user) {
+            return response.status(404).json({message: 'Utilisateur non trouvé'})
+        }
+        await team.save()
+        // on ajoute l'utilisateur qui a créé l'équipe en tant qu'admin
+        await team.related('users').attach([auth.user.id])
+        await team.related('users').pivotQuery().where('user_id', auth.user.id).update({role: Role.Admin})
+        await user.related('teams').attach([team.id])
+        await user.related('teams').pivotQuery().where('team_id', team.id).update({role: Role.Admin})
+        return response.redirect('/dashboard')
+    }
+
     async createTeam({ auth, request, response }) {
         const teamData = request.only(['name', 'description', 'imageUrl'])
         // on verifie si une equipe avec le meme nom existe deja

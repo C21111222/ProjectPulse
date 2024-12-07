@@ -23,7 +23,13 @@ export default class NotificationsController {
             inviteeImage: user.imageUrl,
             type: notification.type
         }))
-        return response.status(200).json(formattedNotifications)
+        // on recuoere maintenant les messafes non lus
+        const unreadMessages = await user.getUnreadMessages() 
+        // on les ajoute aux notifications, sans les formatter
+        const result = { notifications: formattedNotifications, messages : unreadMessages }
+
+
+        return response.status(200).json(result)
     }
 
     async deleteNotification({ auth, params, response }) {

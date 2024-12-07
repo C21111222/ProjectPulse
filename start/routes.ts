@@ -83,6 +83,8 @@ router
 
     // Équipes
     router.get('/teams', [UsersController, 'getTeams'])
+    router.get('/create_team', [TeamController, 'create'])
+    router.post('/upload_team_image', [ImagesController, 'uploadTeam'])
     router.post('/teams', [TeamController, 'createTeam'])
     router.post('/send_invitation', [TeamController, 'sendInvitation'])
     router.post('/delete_from_team', [TeamController, 'deleteFromTeam'])

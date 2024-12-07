@@ -54,6 +54,51 @@
         TEAM_INVITE_DECLINED: 'TEAM_INVITE_DECLINED'
       };
 
+      function displayNotif(notification){
+        const notificationList = document.getElementById("notification-list");
+        const notificationItem = document.createElement("li");
+        switch (notification.type) {
+          case NotificationType.MESSAGE:
+            notificationItem.classList.add("message-notification");
+            notificationItem.id = "user-" + notification.user.id;
+            notificationItem.innerHTML = `<a href="/personal_chat?receiver_id=${notification.user.id}" class="notification-link">Nouveau message de <img src="${notification.image}" alt="${notification.senderName}" class="notification-user-img">${notification.user.fullName}</a> `;
+            break;
+          case NotificationType.TEAM_INVITE:
+            notificationItem.classList.add("team-invite-notification");
+            notificationItem.innerHTML = `<a href="/team/invitation/${notification.teamId}">${notification.senderName}</a> vous a invité à rejoindre l'équipe ${notification.team.name}`;
+            break;
+          case NotificationType.TEAM_INVITE_ACCEPTED:
+            notificationItem.classList.add("team-invite-accepted-notification");
+            notificationItem.innerText = notification.senderName + " a accepté votre invitation à rejoindre l'équipe " + notification.teamName;
+            break;
+          case NotificationType.TEAM_INVITE_DECLINED:
+            notificationItem.classList.add("team-invite-declined-notification");
+            notificationItem.innerText = notification.senderName + " a refusé votre invitation à rejoindre l'équipe " + notification.teamName;
+            break;
+          default:
+            notificationItem.innerText = "Notification inconnue";
+        }
+        notificationList.appendChild(notificationItem);
+        const titleNotification = document.getElementById("title-notification");
+        titleNotification.innerText = "Notifications (" + notificationList.children.length + ")";
+      }
+      // on charge les notifications existantes en faisant une requête à l'API /notifications
+      const response = await fetch('/notifications', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const notifications = await response.json();
+      notifications.notifications.forEach(notification => {
+        displayNotif(notification);
+      });
+      notifications.messages.forEach(message => {
+        displayNotif(message);
+      });
+  
+
     
 
       notifSubscription.onMessage(notification => {
@@ -117,7 +162,7 @@
 
 .notification-panel {
   position: fixed;
-  bottom: 150px; /* Ajustez la position selon vos besoins */
+  top: 138px; /* Ajustez la position selon vos besoins */
   right: 20px;
   width: 350px;
   height: 400px;
@@ -141,6 +186,16 @@
 .notification-header1 h3 {
   margin: 0;
   font-size: 18px;
+}
+.notification-link {
+  display: block;
+  text-decoration: none;
+  color: inherit; /* Hérite de la couleur du parent */
+  padding: 10px;
+}
+
+.notification-link:hover {
+  background-color: #f0f0f0; /* Couleur de fond au survol */
 }
 
 .close-btn {
@@ -171,13 +226,14 @@
 }
 
 #notification-list li {
-  padding: 10px;
+  padding: 5px;
   border-bottom: 1px solid #ddd;
 }
 
 #notification-list li a {
   color: #5A45FF;
   text-decoration: none;
+  margin-left: 0px;
 }
 
 #notification-list li a:hover {
@@ -198,5 +254,12 @@
 
 .team-invite-declined-notification {
   background-color: #ffebee;
+}
+.notification-user-img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 0px;
+  vertical-align: middle;
 }
 </style>
