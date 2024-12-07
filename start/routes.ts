@@ -41,6 +41,9 @@ router
   .use(middleware.guest())
 
 router.get('/logout', [AuthController, 'logout'])
+router.get('/img/:path', async ({ params, response }) => {
+  return response.download(app.makePath(`/app/uploads/${params.path}`))
+})
 
 router
   .group(() => {
@@ -71,9 +74,7 @@ router
     router.post('/message_viewed', [MessagesController, 'haveViewSingle'])
 
     // Images
-    router.get('/img/:path', async ({ params, response }) => {
-      return response.download(app.makePath(`/app/uploads/${params.path}`))
-    })
+
     router.post('/img', [ImagesController, 'upload'])
     router.delete('/img/:filename', [ImagesController, 'deleteImage'])
 
