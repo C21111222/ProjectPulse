@@ -47,36 +47,36 @@
     const notifSubscription = transmit.subscription("notifications/" + {{ auth.user.id }});
     notifSubscription.create();
 
-    export enum NotificationType {
-        MESSAGE = 'MESSAGE',
-        TEAM_INVITE = 'TEAM_INVITE',
-        TEAM_INVITE_ACCEPTED = 'TEAM_INVITE_ACCEPTED',
-        TEAM_INVITE_DECLINED = 'TEAM_INVITE_DECLINED'
-      }
+    const NotificationType = {
+        MESSAGE: 'MESSAGE',
+        TEAM_INVITE: 'TEAM_INVITE',
+        TEAM_INVITE_ACCEPTED: 'TEAM_INVITE_ACCEPTED',
+        TEAM_INVITE_DECLINED: 'TEAM_INVITE_DECLINED'
+      };
 
     
 
-    notifSubscription.on("new-notification", (notification) => {
+      notifSubscription.onMessage(notification => {
       console.log("New notification received", notification);
       const notificationList = document.getElementById("notification-list");
       const notificationItem = document.createElement("li");
       switch (notification.type) {
         case NotificationType.MESSAGE:
           notificationItem.classList.add("message-notification");
-          notificationItem.id = "message-notification-" + notification.sender.id;
-          notificationItem.innerHTML = `<a href="/chat/${notification.sender.id}">${notification.sender.name}</a> vous a envoyé un message`;
+          notificationItem.id = "user-" + notification.senderId;
+          notificationItem.innerHTML = `<a href="/personal_chat?receiver_id=${notification.senderId}">${notification.senderName}</a> vous a envoyé un message`;
           break;
         case NotificationType.TEAM_INVITE:
           notificationItem.classList.add("team-invite-notification");
-          notificationItem.innerHTML = `<a href="/team/invitation/${notification.team.id}">${notification.sender.name}</a> vous a invité à rejoindre l'équipe ${notification.team.name}`;
+          notificationItem.innerHTML = `<a href="/team/invitation/${notification.teamId}">${notification.senderName}</a> vous a invité à rejoindre l'équipe ${notification.team.name}`;
           break;
         case NotificationType.TEAM_INVITE_ACCEPTED:
           notificationItem.classList.add("team-invite-accepted-notification");
-          notificationItem.innerText = notification.sender.name + " a accepté votre invitation à rejoindre l'équipe " + notification.team.name;
+          notificationItem.innerText = notification.senderName + " a accepté votre invitation à rejoindre l'équipe " + notification.teamName;
           break;
         case NotificationType.TEAM_INVITE_DECLINED:
           notificationItem.classList.add("team-invite-declined-notification");
-          notificationItem.innerText = notification.sender.name + " a refusé votre invitation à rejoindre l'équipe " + notification.team.name;
+          notificationItem.innerText = notification.senderName + " a refusé votre invitation à rejoindre l'équipe " + notification.teamName;
           break;
         default:
           notificationItem.innerText = "Notification inconnue";
