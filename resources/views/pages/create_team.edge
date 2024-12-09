@@ -106,17 +106,16 @@
           method: 'POST',
           credentials : 'include',
           body: imageFormData,
-        });
-        // on affiche une attente de chargement de 5 secondes avec sweetalert
-        Swal.fire({
-          title: 'Attendez s\'il vous plaît',
-          html: 'Téléchargement de l\'image en cours...',
-          timer: 5000,
-          timerProgressBar: true,
-          didOpen: () => {
-            Swal.showLoading()
-          }
-        })
+        }).then(() => {
+            Swal.fire({
+              title: "Chargement...",
+              timer: 5e3,
+              timerProgressBar: true,
+              didOpen: () => {
+                Swal.showLoading();
+              }
+            })
+            });
 
         if (!imageResponse.ok) {
           throw new Error('Erreur lors du téléchargement de l\'image');
