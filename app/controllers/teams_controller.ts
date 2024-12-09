@@ -19,6 +19,34 @@ export default class TeamsController {
     public async create({ view }) {
         return view.render('pages/create_team')
       }
+
+    public async dashboardTeam({ view, auth, params, response }) {
+        const user = await User.find(auth.user.id)
+        if (!user) {
+            return view.render('pages/dashboard', {teams: []})
+        }
+        // o nrecupere l'id sachant que la route est /team/:id
+        const { teamId } = params;
+        const team = await Team.find(teamId)
+        if (!team) {
+            return response.status(404).json({message: 'Equipe non trouvée'})
+        }
+        // o nrecupere le role de l'utilisateur dans l'equipe
+        const role = await db.from('user_teams').where('team_id', teamId).where('user_id', user.id).select('role').first()
+        if (!role) {
+            return response.status(404).json({message: 'Utilisateur non trouvé'})
+        }
+        // s'il est admin on renvoie la vue avec le role admin
+        if (role.role === Role.Admin) {
+            return view.render('pages/dashboard_team_admin', {team: team})
+        }
+        // s'il est manager on renvoie la vue avec le role manager
+        if (role.role === Role.Manager) {
+            return view.render('pages/dashboard_team_manager', {team: team})
+        }
+        // s'il est membre on renvoie la vue avec le role member
+        return view.render('pages/dashboard_team_member', {team: team})
+    }
     
     public async createTeam1({ request, response, auth }) {
         logger.info('Creating team1')

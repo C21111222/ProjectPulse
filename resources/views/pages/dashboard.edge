@@ -38,6 +38,11 @@
       flex-grow: 1;
       padding: 20px;
     }
+    .img-team {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body>
@@ -74,7 +79,7 @@
         const teams = await response.json();
         teams.forEach(team => {
           const li = document.createElement('li');
-          li.innerHTML = `<a href="/teams/${team.id}"><img src=${team.imageUrl} alt="Logo de l'équipe" style="width: 20px; height: 20px;">${team.name}</a>`;
+          li.innerHTML = `<a href="/team/${team.id}"><img src=${team.imageUrl} alt="Logo de l'équipe" class="img-team">  ${team.name}</a>`;
           teamList.appendChild(li);
         });
       } catch (error) {
