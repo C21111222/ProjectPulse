@@ -4,6 +4,7 @@ import User from '#models/user'
 import Notification from '#models/notification'
 import { NotificationTeamInvite, NotificationService, NotificationType, NotificationTeamInviteResponse } from '#services/notification_service'
 import db from '@adonisjs/lucid/services/db'
+import logger from '@adonisjs/core/services/logger'
 
 enum Role {
     Admin = 'admin',
@@ -19,8 +20,14 @@ export default class TeamsController {
         return view.render('pages/create_team')
       }
     
-    public async store({ request, response, auth }) {
+    public async createTeam1({ request, response, auth }) {
+        logger.info('Creating team1')
+        logger.info('data', request.all())
         const data = request.only(['name', 'description', 'imageUrl'])
+        const teamExist = await Team.findBy('name', data.name)
+        if(teamExist) {
+            return response.status(409).json({message : 'Cette équipe existe déjà'})
+        }
         const team = new Team()
         team.name = data.name
         team.description = data.description
@@ -32,14 +39,13 @@ export default class TeamsController {
         }
         await team.save()
         // on ajoute l'utilisateur qui a créé l'équipe en tant qu'admin
-        await team.related('users').attach([auth.user.id])
-        await team.related('users').pivotQuery().where('user_id', auth.user.id).update({role: Role.Admin})
         await user.related('teams').attach([team.id])
         await user.related('teams').pivotQuery().where('team_id', team.id).update({role: Role.Admin})
         return response.redirect('/dashboard')
     }
 
     async createTeam({ auth, request, response }) {
+        logger.info('Creating team')
         const teamData = request.only(['name', 'description', 'imageUrl'])
         // on verifie si une equipe avec le meme nom existe deja
         const teamExist = await Team.findBy('name', teamData.name)
@@ -65,10 +71,9 @@ export default class TeamsController {
             throw new Error('User not found')
         }
         try {
-            await team.related('users').attach([user.id])
             await user.related('teams').attach([team.id])
-            await team.related('users').pivotQuery().where('user_id', user.id).update({role: role})
             await user.related('teams').pivotQuery().where('team_id', team.id).update({role: role})
+            logger.info('User added to team')
             return true
         } catch (error) {
             throw error
