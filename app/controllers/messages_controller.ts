@@ -187,6 +187,62 @@ export default class MessageriesController {
     return response.json(messages)
   }
 
+  async getTeamHistory({ auth, request, response }) {
+    const teamId = request.input('teamId')
+    // on vérifie que l'utilisateur est bien dans l'équipe
+    const user = await User.find(auth.user.id)
+    if (!user) {
+      return response.status(404).json({ message: 'Utilisateur non trouvé' })
+    }
+    const team = await user.related('teams').query().where('team_id', teamId).first()
+    if (!team) {
+      return response.status(403).json({ message: "Vous n'êtes pas autorisé à accéder à cette équipe" })
+    }
+    const messages = await Message.query()
+      .where((query) => {
+        query.where('team_id', teamId)
+      })
+      .preload('sender') // Charge les informations de l'utilisateur lié
+      .orderBy('created_at', 'asc')
+      .exec()
+    return response.json(messages)
+  }
+
+  async sendTeamMessage({ auth, request, response }) {
+    const teamId = request.input('teamId')
+    const message = request.input('message')
+    // on vérifie que l'utilisateur est bien dans l'équipe
+    const user = await User.find(auth.user.id)
+    if (!user) {
+      return response.status(404).json({ message: 'Utilisateur non trouvé' })
+    }
+    const team = await user.related('teams').query().where('team_id', teamId).first()
+    if (!team) {
+      return response.status(403).json({ message: "Vous n'êtes pas autorisé à envoyer un message à cette équipe" })
+    }
+    const newMessage = new Message()
+    newMessage.senderId = auth.user.id
+    newMessage.teamId = teamId
+    newMessage.content = message
+    newMessage.senderName = auth.user.fullName
+    try {
+      await newMessage.save()
+      const channel = `chats/team-${teamId}/messages`
+      const chatMessage: ChatMessage = {
+        message: message,
+        sender: auth.user.id,
+        senderName: auth.user.fullName,
+        createdAt: Date.now(),
+        messageId: newMessage.id,
+        senderImage: auth.user.imageUrl,
+      }
+      await this.notificationService.sendNotification(channel, chatMessage)
+    } catch (error) {
+      return response.status(500).json({ message: "Erreur lors de l'envoi du message" })
+    }
+    return response.json({ message: 'Message envoyé' })
+  }
+
   /**
    * Sends a message from the authenticated user to a specified receiver.
    *
@@ -257,6 +313,7 @@ export default class MessageriesController {
       // on attend 0.5s pour être sûr que le message est bien enregistré puis on verifie si le message a été vu
       setTimeout(async () => {
         const message = await Message.find(newMessage.id)
+        logger.info('envoi de la notif')
         if (message && !message.viewed) {
           logger.info('message non vu')
           const channelNotif = `notifications/${receiverId}`

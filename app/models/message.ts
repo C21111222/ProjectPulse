@@ -22,6 +22,9 @@ export default class Message extends BaseModel {
   public senderId: number // ID de l'utilisateur qui a envoyé le message
 
   @column()
+  public teamId: number // ID de l'équipe à laquelle appartient l'utilisateur qui a envoyé le message
+
+  @column()
   public receiverId: number // ID de l'utilisateur qui a reçu le message
 
   @column.dateTime({ autoCreate: true })
@@ -41,5 +44,6 @@ export default class Message extends BaseModel {
     localKey: 'receiverId',
     foreignKey: 'id',
   })
+
   declare receiver: HasOne<typeof User>
 }

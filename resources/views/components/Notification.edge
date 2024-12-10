@@ -33,6 +33,73 @@
       notificationPanel.style.display = "none";
     }
   }
+
+  function deleteNotification(notificationId) {
+    fetch(`/notifications/${notificationId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Supprimer la notification de l'interface utilisateur
+      const notificationItem = document.getElementById(`notification-${notificationId}`);
+      if (notificationItem) {
+        notificationItem.remove();
+      }
+      const nbNotifications = parseInt(document.getElementById('title-notification').innerText.match(/\((\d+)\)/)[1]);
+      document.getElementById('title-notification').innerText = `Chat (${nbNotifications - 1})`;
+    })
+    .catch(error => {
+      console.error('Erreur lors de la suppression de la notification:', error);
+    });
+  }
+
+  function acceptInvitation(notificationId) {
+    fetch(`/accept_invitation/${notificationId}`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert('Invitation acceptée');
+      // Vous pouvez également mettre à jour l'interface utilisateur ici
+      const notificationItem = document.getElementById(`notification-${notificationId}`);
+      if (notificationItem) {
+        notificationItem.remove();
+      }
+      const nbNotifications = parseInt(document.getElementById('title-notification').innerText.match(/\((\d+)\)/)[1]);
+      document.getElementById('title-notification').innerText = `Chat (${nbNotifications - 1})`;
+    })
+    .catch(error => {
+      console.error('Erreur lors de l\'acceptation de l\'invitation:', error);
+    });
+  }
+
+  function declineInvitation(notificationId) {
+    fetch(`/decline_invitation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ notificationId }),
+      credentials: 'include',
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert('Invitation déclinée');
+      // Supprimer la notification de l'interface utilisateur
+      const notificationItem = document.getElementById(`notification-${notificationId}`);
+      if (notificationItem) {
+        notificationItem.remove();
+      }
+      const nbNotifications = parseInt(document.getElementById('title-notification').innerText.match(/\((\d+)\)/)[1]);
+      document.getElementById('title-notification').innerText = `Chat (${nbNotifications - 1})`;
+    })
+    .catch(error => {
+      console.error('Erreur lors du déclin de l\'invitation:', error);
+    });
+  }
+
 </script>
 
 <script type="module">
@@ -44,6 +111,8 @@
     baseUrl: window.location.origin
     });
 
+
+
     const notifSubscription = transmit.subscription("notifications/" + {{ auth.user.id }});
     notifSubscription.create();
 
@@ -51,12 +120,15 @@
         MESSAGE: 'MESSAGE',
         TEAM_INVITE: 'TEAM_INVITE',
         TEAM_INVITE_ACCEPTED: 'TEAM_INVITE_ACCEPTED',
-        TEAM_INVITE_DECLINED: 'TEAM_INVITE_DECLINED'
+        TEAM_INVITE_DECLINED: 'TEAM_INVITE_DECLINED',
+        TEAM_BANNED: 'TEAM_BANNED',
       };
 
       function displayNotif(notification){
+        console.log("New notification received", notification);
         const notificationList = document.getElementById("notification-list");
         const notificationItem = document.createElement("li");
+        notificationItem.id = `notification-${notification.notificationId}`;
         switch (notification.type) {
           case NotificationType.MESSAGE:
             notificationItem.classList.add("message-notification");
@@ -65,16 +137,34 @@
             break;
           case NotificationType.TEAM_INVITE:
             notificationItem.classList.add("team-invite-notification");
-            notificationItem.innerHTML = `<a href="/team/invitation/${notification.teamId}">${notification.senderName}</a> vous a invité à rejoindre l'équipe ${notification.team.name}`;
-            break;
-          case NotificationType.TEAM_INVITE_ACCEPTED:
-            notificationItem.classList.add("team-invite-accepted-notification");
-            notificationItem.innerText = notification.senderName + " a accepté votre invitation à rejoindre l'équipe " + notification.teamName;
-            break;
-          case NotificationType.TEAM_INVITE_DECLINED:
-            notificationItem.classList.add("team-invite-declined-notification");
-            notificationItem.innerText = notification.senderName + " a refusé votre invitation à rejoindre l'équipe " + notification.teamName;
-            break;
+            notificationItem.innerHTML = `    <div><p><img src="${notification.inviterImage}" class="img-inviter"> ${notification.inviterName} vous a invité à rejoindre l'équipe <img src="${notification.teamImage}" class="img-team"> ${notification.teamName}</p>
+      <div class="notification-buttons">
+        <button onclick="acceptInvitation(${notification.notificationId})">Accepter</button>
+        <button onclick="declineInvitation(${notification.notificationId})">Décliner</button>
+      </div>
+    </div>`;
+    break;
+      case NotificationType.TEAM_INVITE_ACCEPTED:
+      notificationItem.classList.add("team-invite-accepted-notification");
+      notificationItem.innerHTML = `
+        ${notification.inviterName} a accepté l'invitation à rejoindre l'équipe ${notification.teamName}
+        <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+      `;
+      break;
+    case NotificationType.TEAM_INVITE_DECLINED:
+      notificationItem.classList.add("team-invite-declined-notification");
+      notificationItem.innerHTML = `
+        ${notification.inviterName} a refusé votre invitation à rejoindre l'équipe ${notification.teamName}
+        <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+      `;
+      break;
+    case NotificationType.TEAM_BANNED:
+      notificationItem.classList.add("team-banned-notification");
+      notificationItem.innerHTML = `
+        ${notification.inviterName} a été banni de l'équipe ${notification.teamName}
+        <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+      `;
+      break;
           default:
             notificationItem.innerText = "Notification inconnue";
         }
@@ -105,24 +195,43 @@
       console.log("New notification received", notification);
       const notificationList = document.getElementById("notification-list");
       const notificationItem = document.createElement("li");
+      notificationItem.id = `notification-${notification.notificationId}`;
       switch (notification.type) {
         case NotificationType.MESSAGE:
           notificationItem.classList.add("message-notification");
           notificationItem.id = "user-" + notification.senderId;
-          notificationItem.innerHTML = `<a href="/personal_chat?receiver_id=${notification.senderId}">${notification.senderName}</a> vous a envoyé un message`;
+          notificationItem.innerHTML = `<a href="/personal_chat?receiver_id=${notification.senderId}" class="notification-link">Nouveau message de <img src="${notification.senderImage}" alt="${notification.senderName}" class="notification-user-img">${notification.senderName}</a> `;
           break;
-        case NotificationType.TEAM_INVITE:
-          notificationItem.classList.add("team-invite-notification");
-          notificationItem.innerHTML = `<a href="/team/invitation/${notification.teamId}">${notification.senderName}</a> vous a invité à rejoindre l'équipe ${notification.team.name}`;
-          break;
-        case NotificationType.TEAM_INVITE_ACCEPTED:
-          notificationItem.classList.add("team-invite-accepted-notification");
-          notificationItem.innerText = notification.senderName + " a accepté votre invitation à rejoindre l'équipe " + notification.teamName;
-          break;
-        case NotificationType.TEAM_INVITE_DECLINED:
-          notificationItem.classList.add("team-invite-declined-notification");
-          notificationItem.innerText = notification.senderName + " a refusé votre invitation à rejoindre l'équipe " + notification.teamName;
-          break;
+          case NotificationType.TEAM_INVITE:
+            notificationItem.classList.add("team-invite-notification");
+            notificationItem.innerHTML = `    <div><p><img src="${notification.inviterImage}" class="img-inviter"> ${notification.inviterName} vous a invité à rejoindre l'équipe <img src="${notification.teamImage}" class="img-team"> ${notification.teamName}</p>
+      <div class="notification-buttons">
+        <button onclick="acceptInvitation(${notification.notificationId})">Accepter</button>
+        <button onclick="declineInvitation(${notification.notificationId})">Décliner</button>
+      </div>
+    </div>`;
+            break;
+            case NotificationType.TEAM_INVITE_ACCEPTED:
+            notificationItem.classList.add("team-invite-accepted-notification");
+            notificationItem.innerHTML = `
+              ${notification.inviterName} a accepté l'invitation à rejoindre l'équipe ${notification.teamName}
+              <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+            `;
+            break;
+          case NotificationType.TEAM_INVITE_DECLINED:
+            notificationItem.classList.add("team-invite-declined-notification");
+            notificationItem.innerHTML = `
+              ${notification.inviterName} a refusé votre invitation à rejoindre l'équipe ${notification.teamName}
+              <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+            `;
+            break;
+          case NotificationType.TEAM_BANNED:
+            notificationItem.classList.add("team-banned-notification");
+            notificationItem.innerHTML = `
+              ${notification.inviterName} a été banni de l'équipe ${notification.teamName}
+              <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+            `;
+            break;
         default:
           notificationItem.innerText = "Notification inconnue";
       }
@@ -261,5 +370,55 @@
   border-radius: 50%;
   margin-right: 0px;
   vertical-align: middle;
+}
+.img-inviter {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 0px;
+  vertical-align: middle;
+}
+.img-team{
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 0px;
+  vertical-align: middle;
+}
+.notification-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.notification-buttons button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.notification-buttons button:hover {
+  background-color: #ddd;
+}
+
+.notification-buttons button:first-child {
+  background-color: #4CAF50; /* Vert pour accepter */
+  color: white;
+}
+
+.notification-buttons button:last-child {
+  background-color: #f44336; /* Rouge pour décliner */
+  color: white;
+}
+.close-btn-notification {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 10px;
+  cursor: pointer;
+  float: right;
+  margin-left: 5px;
 }
 </style>

@@ -2,6 +2,7 @@
 
 import User from "#models/user";
 import Notification from "#models/notification";
+import logger from "@adonisjs/core/services/logger";
 
 export default class NotificationsController {
 
@@ -12,6 +13,7 @@ export default class NotificationsController {
         }
         const notifications = await Notification.query().where('invitee_id', user.id).preload('inviter').preload('team')
         const formattedNotifications = notifications.map(notification => ({
+            notificationId: notification.id,
             teamId: notification.team.id,
             teamName: notification.team.name,
             teamImage: notification.team.imageUrl,
@@ -33,6 +35,7 @@ export default class NotificationsController {
     }
 
     async deleteNotification({ auth, params, response }) {
+        logger.info('Deleting notification')
         const user = await User.find(auth.user.id)
         if(!user) {
             return response.status(404).json({ message: 'User not found' })
@@ -42,6 +45,9 @@ export default class NotificationsController {
             return response.status(404).json({ message: 'Notification not found' })
         }
         await notification.delete()
-        return response.status(204).send()
+        logger.info('Notification deleted')
+        return response.ok(JSON.stringify({ message: 'Notification deleted' }))
     }
+
+
 }

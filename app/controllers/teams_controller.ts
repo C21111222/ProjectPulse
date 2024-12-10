@@ -6,6 +6,7 @@ import { NotificationTeamInvite, NotificationService, NotificationType, Notifica
 import db from '@adonisjs/lucid/services/db'
 import logger from '@adonisjs/core/services/logger'
 import { json } from 'stream/consumers'
+import { log } from 'console'
 
 enum Role {
     Admin = 'admin',
@@ -39,30 +40,27 @@ export default class TeamsController {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
         // s'il est admin on renvoie la vue avec le role admin
-        if (role.role === Role.Admin) {
-            // on charge tous les utilisateurs de l'equipe
+        if (role.role === Role.Admin || role.role === Role.Manager) {
+            // on charge tous les utilisateurs de l'equipe sauf l'utilisateur actuel
             logger.info( teamId)
-            const members = await db.from('user_teams').where('team_id', teamId).select('user_id', 'role')
+            const members = await db.from('user_teams').where('team_id', teamId).andWhere('user_id', '!=', user.id).select('user_id', 'role')
             // on charge les utilisateurs de l'equipe
             const usersMembers = await db
             .from('users')
             .join('user_teams', 'users.id', 'user_teams.user_id')
             .where('user_teams.team_id', teamId)
-            .select('users.id', 'users.fullName', 'users.email', 'user_teams.role')
+            .andWhere('users.id', '!=', 999999)
+            .select('users.id', 'users.full_name', 'users.email', 'user_teams.role', 'users.image_url')
             // on charge tous les utilisateurs du site qui ne sont pas dans l'equipe
             logger.info('selecting users')
             const users = await db
             .from('users')
             .whereNotIn('id', members.map(member => member.user_id))
-            .andWhere('id', '!=', 999999).select('id','fullName','email')
+            .andWhere('id', '!=', 999999).andWhere('id', '!=', user.id).select('id', 'full_name', 'email', 'image_url')
 
-            logger.info(JSON.stringify(users))
-            logger.info(JSON.stringify(usersMembers))
-            return view.render('pages/dashboard_team_admin', {team: team, members: JSON.stringify(usersMembers), users: JSON.stringify(users)})
-        }
-        // s'il est manager on renvoie la vue avec le role manager
-        if (role.role === Role.Manager) {
-            return view.render('pages/dashboard_team_manager', {team: team})
+            logger.info(users)
+            logger.info(usersMembers)
+            return view.render('pages/dashboard_team_admin', {team: team, members: usersMembers, users: users})
         }
 
         // s'il est membre on renvoie la vue avec le role member
@@ -72,8 +70,8 @@ export default class TeamsController {
     
     public async createTeam1({ request, response, auth }) {
         logger.info('Creating team1')
-        logger.info('data', request.all())
-        const data = request.only(['name', 'description', 'imageUrl'])
+        logger.info( request.all())
+        const data = request.only(['name', 'description', 'imageUrl', 'status', 'startDate', 'endDate'])
         const teamExist = await Team.findBy('name', data.name)
         if(teamExist) {
             return response.status(409).json({message : 'Cette équipe existe déjà'})
@@ -82,6 +80,9 @@ export default class TeamsController {
         team.name = data.name
         team.description = data.description
         team.imageUrl = data.imageUrl
+        team.status = data.status
+        team.startDate = data.startDate
+        team.endDate = data.endDate
 
         const user = await User.find(auth.user.id)
         if (!user) {
@@ -96,13 +97,14 @@ export default class TeamsController {
 
     async createTeam({ auth, request, response }) {
         logger.info('Creating team')
-        const teamData = request.only(['name', 'description', 'imageUrl', 'status', 'startDate', 'endDate'])
+        const teamData = request.only(['name', 'description', 'imageUrl', 'status', 'start_date', 'end_date'])
+        logger.info(teamData)
         // on verifie si une equipe avec le meme nom existe deja
         const teamExist = await Team.findBy('name', teamData.name)
         if(teamExist) {
             return response.status(409).json({message : 'Cette équipe existe déjà'})
         }
-        const team = await Team.create({name : teamData.name, description : teamData.description, imageUrl : teamData.imageUrl, status : teamData.status, startDate : teamData.startDate, endDate : teamData.endDate})
+        const team = await Team.create({name : teamData.name, description : teamData.description, imageUrl : teamData.imageUrl, status : teamData.status, startDate : teamData.start_date, endDate : teamData.end_date})
         try {
             await this.addMember(auth.user.id, team.id, Role.Admin)
         } catch (error) {
@@ -159,6 +161,7 @@ export default class TeamsController {
     }
 
     async sendInvitation({ auth, request, response }) {
+        logger.info('Sending invitation')
         const { teamId, userId } = request.only(['teamId', 'userId'])
         // on verifie que l'utilisateur qui envoie la requete est bien admin ou manager de l'equipe
 
@@ -166,38 +169,57 @@ export default class TeamsController {
         if (!user) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
+        logger.info('User found')
         // on recupere le role de l'utilisateur dans l'equipe qui se trouve dans le pivot
         const role = await db.from('user_teams').where('team_id', teamId).where('user_id', user.id).select('role').first()
         if (!role) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
-        if (role !== Role.Admin && role !== Role.Manager) {
+        logger.info('Role found')
+        if (role.role !== 'admin' && role.role !== 'manager') {
+            logger.info('Role is member')
             return response.status(403).json({message: 'Vous n\'avez pas les droits pour effectuer cette action'})
         }
+        logger.info('Role is admin or manager')
 
         const team = await Team.find(teamId)
-        const notification: NotificationTeamInvite = {
-            teamId: teamId,
-            teamName: team!.name,
-            teamImage: team!.imageUrl,
-            inviterId: auth.user.id,
-            inviterName: auth.user.fullName,
-            inviterImage: auth.user.imageUrl,
-            type: NotificationType.TEAM_INVITE
+        // on verifie qu'il n'y a pas déjà une invitation en cours
+        const invitation = await Notification.query().where('teamId', teamId).where('inviteeId', userId).where('type', NotificationType.TEAM_INVITE).first()
+        if (invitation) {
+            return response.status(409).json({message: 'Une invitation est déjà en cours'})
         }
-        const channel = `notifications/${userId}`
         try {
-            await this.notificationService.sendNotification(channel, notification)
-            await Notification.create({teamId: teamId, inviterId: auth.user.id, inviteeId: userId, type: NotificationType.TEAM_INVITE})
-            return response.json({message: 'Invitation envoyée'})
+
+            const notif = await Notification.create({teamId: teamId, inviterId: auth.user.id, inviteeId: userId, type: NotificationType.TEAM_INVITE})
+            
+            const notification: NotificationTeamInvite = {
+                notificationId: notif.id,
+                teamId: teamId,
+                teamName: team!.name,
+                teamImage: team!.imageUrl,
+                inviterId: auth.user.id,
+                inviterName: auth.user.fullName,
+                inviterImage: auth.user.imageUrl,
+                type: NotificationType.TEAM_INVITE
+            }
+            await this.notificationService.sendNotification(`notifications/${userId}`, notification)
+            logger.info('Invitation sent')
+            return response.ok(JSON.stringify({message: 'Invitation envoyée'}))
         } catch (error) {
+            logger.error('Error sending invitation %s', error)
             return response.status(500).json({message: 'Impossible d\'envoyer l\'invitation'})
         }
         
     }
 
-    async acceptInvitation({ auth, request, response }) {
-        const { teamId } = request.only(['teamId'])
+    async acceptInvitation({ auth, params, response }) {
+        logger.info('Accepting invitation')
+        const notification1 = await Notification.query().where('id', params.id).where('invitee_id', auth.user.id).first()
+        if (!notification1) {
+            return response.status(404).json({message: 'Notification not found'})
+        }
+        const teamId = notification1.teamId
+        logger.info('Team id %s', teamId)
         const user = await User.find(auth.user.id)
         if (!user) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
@@ -209,7 +231,9 @@ export default class TeamsController {
             if (!team) {
                 return response.status(404).json({message: 'Equipe non trouvée'})
             }
+            const notif = await Notification.create({teamId: teamId, inviterId: user.id, inviteeId: auth.user.id, type: NotificationType.TEAM_INVITE_ACCEPTED})
             const notification: NotificationTeamInviteResponse = {
+                notificationId: notif.id,
                 teamId: teamId,
                 teamName: team.name,
                 teamImage: team.imageUrl,
@@ -221,17 +245,27 @@ export default class TeamsController {
                 inviteeImage: auth.user.imageUrl,
                 type: NotificationType.TEAM_INVITE_ACCEPTED
             }
-            const channel = `teams/${teamId}`
-            await this.notificationService.sendNotification(channel, notification)
-            await Notification.create({teamId: teamId, inviterId: user.id, inviteeId: auth.user.id, type: NotificationType.TEAM_INVITE_ACCEPTED})
-            return response.json({message: 'Invitation acceptée'})
+
+            await this.notificationService.sendTeamNotification(teamId, notification)
+            // on supprime la notification d'invitation
+            await notification1.delete()
+            return response.ok(JSON.stringify({message: 'Invitation acceptée'}))
         } catch (error) {
+            logger.error('Error accepting invitation %s', error)
             return response.status(500).json({message: 'Impossible d\'accepter l\'invitation'})
         }
     }
+    
 
     async declineInvitation({ auth, request, response }) {
-        const { teamId } = request.only(['teamId'])
+        logger.info('Declining invitation')
+        const notificationId = request.input('notificationId')
+        const notification1 = await Notification.query().where('id',notificationId).where('invitee_id', auth.user.id).first()
+        if (!notification1) {
+            return response.status(404).json({message: 'Notification not found'})
+        }
+
+        const teamId = notification1.teamId
         const user = await User.find(auth.user.id)
         if (!user) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
@@ -241,54 +275,65 @@ export default class TeamsController {
             return response.status(404).json({message: 'Equipe non trouvée'})
         }
         // on envoie une notification à tous les membres de l'équipe pour les informer du refus de l'invitation
-        const notification: NotificationTeamInviteResponse = {
-            teamId: teamId,
-            teamName: team.name,
-            teamImage: team.imageUrl,
-            inviterId: user.id,
-            inviterName: user.fullName || '',
-            inviterImage: user.imageUrl,
-            inviteeId: auth.user.id,
-            inviteeName: auth.user.fullName || '',
-            inviteeImage: auth.user.imageUrl,
-            type: NotificationType.TEAM_INVITE_DECLINED
-        }
-        const channel = `teams/${teamId}`
+
         try {
-            await this.notificationService.sendNotification(channel, notification)
-            await Notification.create({teamId: teamId, inviterId: user.id, inviteeId: auth.user.id, type: NotificationType.TEAM_INVITE_DECLINED})
-            return response.json({message: 'Invitation refusée'})
+            const notif = await Notification.create({teamId: teamId, inviterId: user.id, inviteeId: auth.user.id, type: NotificationType.TEAM_INVITE_DECLINED})
+            const notification: NotificationTeamInviteResponse = {
+                notificationId: notif.id,
+                teamId: teamId,
+                teamName: team.name,
+                teamImage: team.imageUrl,
+                inviterId: user.id,
+                inviterName: user.fullName || '',
+                inviterImage: user.imageUrl,
+                inviteeId: auth.user.id,
+                inviteeName: auth.user.fullName || '',
+                inviteeImage: auth.user.imageUrl,
+                type: NotificationType.TEAM_INVITE_DECLINED
+            }
+            await this.notificationService.sendTeamNotification(teamId, notification)
+            // on supprime la notification d'invitation
+            await notification1.delete()
+            logger.info('Invitation declined')
+            return response.ok(JSON.stringify({message: 'Invitation refusée'}))
         } catch (error) {
+            logger.error('Error declining invitation %s', error)
             return response.status(500).json({message: 'Impossible de refuser l\'invitation'})
         }
     }
 
     async deleteFromTeam({ auth, request, response }) {
-        const { teamId, userId } = request.only(['teamId', 'userId'])
+        logger.info('Deleting from team')
+        const  teamId = request.input('teamId')
+        const  userId = request.input('userId')
+        console.log( request.all())
         // on verifie que l'utilisateur qui envoie la requete est bien admin ou manager de l'equipe
 
         const user = await User.find(auth.user.id)
         if (!user) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
+        logger.info('User found')
         // on recupere le role de l'utilisateur dans l'equipe qui se trouve dans le pivot
         const role = await db.from('user_teams').where('team_id', teamId).where('user_id', user.id).select('role').first()
         if (!role) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
-        if (role !== Role.Admin && role !== Role.Manager) {
+        if (role.role !== Role.Admin && role.role !== Role.Manager) {
             return response.status(403).json({message: 'Vous n\'avez pas les droits pour effectuer cette action'})
         }
+        logger.info('Role found')
         // on verifie que l'utilisateur que l'on veut supprimer est bien dans l'equipe et qu'il est en dessous du role de l'utilisateur qui envoie la requete
         const userRole = await db.from('user_teams').where('team_id', teamId).where('user_id', userId).select('role').first()
-        if (!userRole) {
+        if (!userRole.role) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
-        if (userRole === Role.Admin) {
+        if (userRole.role === Role.Admin) {
             return response.status(403).json({message: 'Vous ne pouvez pas supprimer un administrateur de l\'équipe'})
-        } else if (userRole === Role.Manager && role !== Role.Admin) {
+        } else if (userRole.role === Role.Manager && role !== Role.Admin) {
             return response.status(403).json({message: 'Vous ne pouvez pas supprimer un manager de l\'équipe'})
         }
+        logger.info('User role found2')
 
         const team = await Team.find(teamId)
         if (!team) {
@@ -299,29 +344,32 @@ export default class TeamsController {
             if (!user) {
                 return response.status(404).json({message: 'Utilisateur non trouvé'})
             }
-            await user.related('teams').detach([teamId])
+            const notif = await Notification.create({teamId: teamId, inviterId: auth.user.id, inviteeId: userId, type: NotificationType.TEAM_BANNED})
             // on envoie une notification à l'utilisateur pour l'informer qu'il a été supprimé de l'équipe
             const notification: NotificationTeamInviteResponse = {
+                notificationId: notif.id,
                 teamId: teamId,
                 teamName: team.name,
                 teamImage: team.imageUrl,
                 inviterId: auth.user.id,
                 inviterName: auth.user.fullName || '',
                 inviterImage: auth.user.imageUrl,
-                inviteeId: userId,
+                inviteeId: user.id,
                 inviteeName: user.fullName || '',
                 inviteeImage: user.imageUrl,
                 type: NotificationType.TEAM_BANNED
             }
-            const channel = `notifications/${userId}`
-            await this.notificationService.sendNotification(channel, notification)
+            await this.notificationService.sendTeamNotification(teamId, notification)
+            await user.related('teams').detach([teamId])
             return response.json({message: 'Utilisateur supprimé de l\'équipe'})
         } catch (error) {
+            logger.error('Error deleting user from team %s', error)
             return response.status(500).json({message: 'Impossible de supprimer l\'utilisateur de l\'équipe'})
         }
     }
 
     async promoteUser({ auth, request, response }) {
+        logger.info('Promoting user')
         const { teamId, userId } = request.only(['teamId', 'userId'])
         // on verifie que l'utilisateur qui envoie la requete est bien admin de l'equipe
 
@@ -334,7 +382,7 @@ export default class TeamsController {
         if (!role) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
-        if (role !== Role.Admin) {
+        if (role.role !== Role.Admin) {
             return response.status(403).json({message: 'Vous n\'avez pas les droits pour effectuer cette action'})
         }
         // on verifie que l'utilisateur que l'on veut promouvoir est bien dans l'equipe et qu'il est en dessous du role de l'utilisateur qui envoie la requete
@@ -342,18 +390,22 @@ export default class TeamsController {
         if (!userRole) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
-        if (userRole === Role.Admin) {
+        if (userRole.role === Role.Admin) {
             return response.status(403).json({message: 'Vous ne pouvez pas promouvoir un administrateur de l\'équipe'})
         }
 
         const team = await Team.find(teamId)
+        const promotedUser = await User.find(userId)
+        if (!promotedUser) {
+            return response.status(404).json({message: 'Utilisateur non trouvé'})
+        }
         if (!team) {
             return response.status(404).json({message: 'Equipe non trouvée'})
         }
         // si l'utilisateur est deja manager on le promouvoit admin
-        if (userRole === Role.Manager) {
+        if (userRole.role === Role.Manager) {
             try {
-                await user.related('teams').pivotQuery().where('team_id', teamId).update({role: Role.Admin})
+                await promotedUser.related('teams').pivotQuery().where('team_id', teamId).update({role: Role.Admin})
                 return response.json({message: 'Utilisateur promu admin'})
             } catch (error) {
                 return response.status(500).json({message: 'Impossible de promouvoir l\'utilisateur'})
@@ -362,7 +414,7 @@ export default class TeamsController {
 
         // si l'utilisateur est membre on le promouvoit manager
         try {
-            await user.related('teams').pivotQuery().where('team_id', teamId).update({role: Role.Manager})
+            await promotedUser.related('teams').pivotQuery().where('team_id', teamId).update({role: Role.Manager})
             return response.json({message: 'Utilisateur promu manager'})
         } catch (error) {
             return response.status(500).json({message: 'Impossible de promouvoir l\'utilisateur'})
@@ -370,6 +422,7 @@ export default class TeamsController {
     }
 
     async demoteUser({ auth, request, response }) {
+        logger.info('Demoting user')
         const { teamId, userId } = request.only(['teamId', 'userId'])
         // on verifie que l'utilisateur qui envoie la requete est bien admin de l'equipe
 
@@ -382,7 +435,8 @@ export default class TeamsController {
         if (!role) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
-        if (role !== Role.Admin) {
+        logger.info(role.role)
+        if (role.role !== Role.Admin) {
             return response.status(403).json({message: 'Vous n\'avez pas les droits pour effectuer cette action'})
         }
         // on verifie que l'utilisateur que l'on veut promouvoir est bien dans l'equipe et qu'il est en dessous du role de l'utilisateur qui envoie la requete
@@ -390,25 +444,31 @@ export default class TeamsController {
         if (!userRole) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
-        if (userRole === Role.Admin) {
+        if (userRole.role === Role.Admin) {
             return response.status(403).json({message: 'Vous ne pouvez pas rétrograder un administrateur de l\'équipe'})
         }
         const team = await Team.find(teamId)
+        const demotedUser = await User.find(userId)
+        if (!demotedUser) {
+            return response.status(404).json({message: 'Utilisateur non trouvé'})
+        }
         if (!team) {
             return response.status(404).json({message : 'Equipe non trouvée'})
         }
         // si l'utilisateur est manager on le retrograde membre
-        if (userRole === Role.Manager) {
+        if (userRole.role === Role.Manager) {
             try {
-                await user.related('teams').pivotQuery().where('team_id', teamId).update({role: Role.Member})
+                await demotedUser.related('teams').pivotQuery().where('team_id', teamId).update({role: Role.Member})
                 return response.json({message: 'Utilisateur retrogradé membre'})
             } catch (error) {
                 return response.status(500).json({message: 'Impossible de rétrograder l\'utilisateur'})
             }
         }
+        return response.status(500).json({message: 'Impossible de rétrograder l\'utilisateur, il est déjà membre'})
     }
 
     async getMembers({ auth, request, response }) {
+        logger.info('Getting members')
         const teamId = request.input('teamId')
         const user = await User.find(auth.user.id)
         if (!user) {
@@ -435,7 +495,9 @@ export default class TeamsController {
     }
 
     async deleteTeam({ auth, request, response }) {
+        logger.info('Deleting team')
         const teamId = request.input('teamId')
+        logger.info('Team id %s', teamId)
         const user = await User.find(auth.user.id)
         if (!user) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
