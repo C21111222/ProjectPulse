@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion de l'équipe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      width: 90%;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .user-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .user-list li {
+      background-color: #f4f4f9;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .button {
+      padding: 5px 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+    }
+
+    .invite {
+      background-color: #007BFF;
+    }
+
+    .invite:hover {
+      background-color: #0056b3;
+    }
+
+    .promote {
+      background-color: #4CAF50;
+    }
+
+    .promote:hover {
+      background-color: #388E3C;
+    }
+
+    .demote {
+      background-color: #FFC107;
+    }
+
+    .demote:hover {
+      background-color: #FFA000;
+    }
+
+    .delete {
+      background-color: #e53935;
+    }
+
+    .delete:hover {
+      background-color: #c62828;
+    }
+
+    .back-button {
+      margin-top: 20px;
+      background-color: #e53935;
+    }
+
+    .back-button:hover {
+      background-color: #c62828;
+    }
+  </style>
+</head>
+<body>
+  @include('components/navbar')
+
+  <div class="container">
+    <h1>Gestion de l'équipe</h1>
+    <ul class="user-list">
+      @each(user in users)
+        <li>
+          <span>{{ user.fullName }}</span>
+          <div class="user-actions">
+            <button class="button invite" onclick="sendInvitation({{ user.id }})">Inviter</button>
+            <button class="button promote" onclick="promoteToManager({{ user.id }})">Promouvoir</button>
+            <button class="button demote" onclick="demoteManager({{ user.id }})">Rétrograder</button>
+            <button class="button delete" onclick="deleteUser({{ user.id }})">Supprimer</button>
+          </div>
+        </li>
+      @endeach
+    </ul>
+    <a href="/dashboard" class="button back-button">Retour</a>
+  </div>
+
+  <script>
+    function sendInvitation(userId) {
+      fetch(`/send_invitation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'credentials': 'include',
+        },
+        body: JSON.stringify({ user_id: userId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Invitation envoyée avec succès.');
+        } else {
+          alert('Erreur lors de l\'envoi de l\'invitation.');
+        }
+      });
+    }
+
+    function promoteToManager(userId) {
+      fetch(`/promote_to_manager`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'credentials': 'include',
+        },
+        body: JSON.stringify({ user_id: userId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Utilisateur promu en manager avec succès.');
+        } else {
+          alert('Erreur lors de la promotion de l\'utilisateur.');
+        }
+      });
+    }
+
+    function demoteManager(userId) {
+      fetch(`/demote_manager`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'credentials': 'include',
+        },
+        body: JSON.stringify({ user_id: userId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Manager rétrogradé avec succès.');
+        } else {
+          alert('Erreur lors de la rétrogradation du manager.');
+        }
+      });
+    }
+
+    function deleteUser(userId) {
+      fetch(`/delete_user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'credentials': 'include',
+        },
+        body: JSON.stringify({ user_id: userId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Utilisateur supprimé avec succès.');
+          location.reload();
+        } else {
+          alert('Erreur lors de la suppression de l\'utilisateur.');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
