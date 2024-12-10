@@ -39,33 +39,34 @@ export default class TeamsController {
         if (!role) {
             return response.status(404).json({message: 'Utilisateur non trouvé'})
         }
+        // on charge tous les utilisateurs de l'equipe sauf l'utilisateur actuel
+        logger.info( teamId)
+        const members = await db.from('user_teams').where('team_id', teamId).andWhere('user_id', '!=', user.id).select('user_id', 'role')
+        // on charge les utilisateurs de l'equipe
+        const usersMembers = await db
+        .from('users')
+        .join('user_teams', 'users.id', 'user_teams.user_id')
+        .where('user_teams.team_id', teamId)
+        .andWhere('users.id', '!=', 999999)
+        .select('users.id', 'users.full_name', 'users.email', 'user_teams.role', 'users.image_url')
+        // on charge tous les utilisateurs du site qui ne sont pas dans l'equipe
+        logger.info('selecting users')
+        const users = await db
+        .from('users')
+        .whereNotIn('id', members.map(member => member.user_id))
+        .andWhere('id', '!=', 999999).andWhere('id', '!=', user.id).select('id', 'full_name', 'email', 'image_url')
+
+        logger.info(users)
+        logger.info(usersMembers)
         // s'il est admin on renvoie la vue avec le role admin
         if (role.role === Role.Admin || role.role === Role.Manager) {
-            // on charge tous les utilisateurs de l'equipe sauf l'utilisateur actuel
-            logger.info( teamId)
-            const members = await db.from('user_teams').where('team_id', teamId).andWhere('user_id', '!=', user.id).select('user_id', 'role')
-            // on charge les utilisateurs de l'equipe
-            const usersMembers = await db
-            .from('users')
-            .join('user_teams', 'users.id', 'user_teams.user_id')
-            .where('user_teams.team_id', teamId)
-            .andWhere('users.id', '!=', 999999)
-            .select('users.id', 'users.full_name', 'users.email', 'user_teams.role', 'users.image_url')
-            // on charge tous les utilisateurs du site qui ne sont pas dans l'equipe
-            logger.info('selecting users')
-            const users = await db
-            .from('users')
-            .whereNotIn('id', members.map(member => member.user_id))
-            .andWhere('id', '!=', 999999).andWhere('id', '!=', user.id).select('id', 'full_name', 'email', 'image_url')
 
-            logger.info(users)
-            logger.info(usersMembers)
             return view.render('pages/dashboard_team_admin', {team: team, members: usersMembers, users: users})
         }
 
         // s'il est membre on renvoie la vue avec le role member
 
-        return view.render('pages/dashboard_team_member', {team: team})
+        return view.render('pages/dashboard_team_member', {team: team, members: usersMembers, users: users})
     }
     
     public async createTeam1({ request, response, auth }) {
