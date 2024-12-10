@@ -83,7 +83,7 @@ router
 
     // Équipes
     router.get('/teams', [UsersController, 'getTeams'])
-    router.get('/team/:id', [TeamController, 'dashboard'])
+    router.get('/team/:id', [TeamController, 'dashboardTeam'])
     router.get('/create_team', [TeamController, 'create'])
     router.post('/upload_team_image', [ImagesController, 'uploadTeam'])
     router.post('/teams', [TeamController, 'createTeam'])
