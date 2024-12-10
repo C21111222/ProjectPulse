@@ -147,10 +147,10 @@
   @include('components/navbar')
 
   <div class="container">
-    <h1>Gestion de l'équipe</h1>
+    <h1>Gestion de l'équipe {{ team.name }}</h1>
     <h2>Membres de l'équipe</h2>
     <ul class="user-list">
-      @each(user in teamUsers)
+      @each(user in members)
         <li>
           <span>{{ user.fullName }}</span>
           <div class="user-actions">
@@ -171,7 +171,7 @@
       <span class="close" onclick="closeInviteModal()">&times;</span>
       <h2>Inviter des utilisateurs</h2>
       <ul class="invite-list">
-        @each(user in allUsers)
+        @each(user in users)
           <li>
             <span>{{ user.fullName }}</span>
             <div class="invite-actions">

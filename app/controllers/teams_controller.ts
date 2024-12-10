@@ -38,13 +38,19 @@ export default class TeamsController {
         }
         // s'il est admin on renvoie la vue avec le role admin
         if (role.role === Role.Admin) {
-            return view.render('pages/dashboard_team_admin', {team: team})
+            // on charge tous les utilisateurs de l'equipe
+            const members = await db.from('user_teams').where('team_id', teamId).select('user_id', 'role')
+            // on charge tous les utilisateurs du site qui ne sont pas dans l'equipe
+            const users = await db.from('users').whereNotIn('id', members.map(member => member.user_id)).select('id', 'fullName', 'imageUrl')
+            return view.render('pages/dashboard_team_admin', {team: team, members: members, users: users})
         }
         // s'il est manager on renvoie la vue avec le role manager
         if (role.role === Role.Manager) {
             return view.render('pages/dashboard_team_manager', {team: team})
         }
+
         // s'il est membre on renvoie la vue avec le role member
+
         return view.render('pages/dashboard_team_member', {team: team})
     }
     
