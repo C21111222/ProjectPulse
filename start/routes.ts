@@ -24,6 +24,7 @@ const UsersController = () => import('#controllers/users_controller')
 const ImagesController = () => import('#controllers/images_controller')
 const TeamController = () => import('#controllers/teams_controller')
 const NotificationController = () => import('#controllers/notifications_controller')
+const TaskController = () => import('#controllers/tasks_controller')
 
 /*
 |--------------------------------------------------------------------------
@@ -93,7 +94,17 @@ router
     router.post('/decline_invitation', [TeamController, 'declineInvitation'])
     router.post('/promote_user', [TeamController, 'promoteUser'])
     router.post('/demote_user', [TeamController, 'demoteUser'])
+    router.post('/delete_team', [TeamController, 'deleteTeam'])
+    router.post('/change_status', [TeamController, 'changeStatus'])
 
+    // Tâches
+    router.get('/tasks', [TaskController, 'getUserTasks'])
+    router.get('/team_tasks', [TaskController, 'getTeamTasks'])
+    router.post('/tasks', [TaskController, 'addTask'])
+    router.post('/delete_task', [TaskController, 'deleteTask'])
+    router.post('/add_user_task', [TaskController, 'addUsersToTask'])
+
+    
     // Notifications
     router.get('/notifications', [NotificationController, 'getNotifications'])
     router.delete('/notifications/:id', [NotificationController, 'deleteNotification'])

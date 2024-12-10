@@ -26,7 +26,7 @@ export default class TeamsController {
             return view.render('pages/dashboard', {teams: []})
         }
         // o nrecupere l'id sachant que la route est /team/:id
-        const { teamId } = params;
+        const  teamId  = params.id;
         const team = await Team.find(teamId)
         if (!team) {
             return response.status(404).json({message: 'Equipe non trouvée'})
@@ -74,18 +74,46 @@ export default class TeamsController {
 
     async createTeam({ auth, request, response }) {
         logger.info('Creating team')
-        const teamData = request.only(['name', 'description', 'imageUrl'])
+        const teamData = request.only(['name', 'description', 'imageUrl', 'status', 'startDate', 'endDate'])
         // on verifie si une equipe avec le meme nom existe deja
         const teamExist = await Team.findBy('name', teamData.name)
         if(teamExist) {
             return response.status(409).json({message : 'Cette équipe existe déjà'})
         }
-        const team = await Team.create({name : teamData.name, description : teamData.description, imageUrl : teamData.imageUrl})
+        const team = await Team.create({name : teamData.name, description : teamData.description, imageUrl : teamData.imageUrl, status : teamData.status, startDate : teamData.startDate, endDate : teamData.endDate})
         try {
             await this.addMember(auth.user.id, team.id, Role.Admin)
         } catch (error) {
             return response.status(500).json({message : 'Impossible de créer l\'équipe' + error.message})
         }
+        return response.json(team)
+    }
+
+    async changeStatus({ auth, request, response }) {
+        const  teamId  = request.input('teamId')
+        const user = await User.find(auth.user.id)
+        if (!user) {
+            return response.status(404).json({message: 'Utilisateur non trouvé'})
+        }
+        // on verifie que l'utilisateur est bien admin de l'equipe
+        const role = await db.from('user_teams').where('team_id', teamId).where('user_id', user.id).select('role').first()
+        if (!role) {
+            return response.status(404).json({message: 'Utilisateur non trouvé'})
+        }
+        if (role.role !== Role.Admin) {
+            return response.status(403).json({message: 'Vous n\'avez pas les droits pour effectuer cette action'})
+        }
+        const team = await Team.find(teamId)
+        if (!team) {
+            return response.status(404).json({message: 'Equipe non trouvée'})
+        }
+        // si le status est active on le passe à inactive et inversement
+        if (team.status === 'active') {
+            team.status = 'inactive'
+        } else {
+            team.status = 'active'
+        }
+        await team.save()
         return response.json(team)
     }
 
@@ -245,7 +273,6 @@ export default class TeamsController {
             return response.status(404).json({message: 'Equipe non trouvée'})
         }
         try {
-            await team.related('users').detach([userId])
             const user = await User.find(userId)
             if (!user) {
                 return response.status(404).json({message: 'Utilisateur non trouvé'})
@@ -304,7 +331,6 @@ export default class TeamsController {
         // si l'utilisateur est deja manager on le promouvoit admin
         if (userRole === Role.Manager) {
             try {
-                await team.related('users').pivotQuery().where('user_id', userId).update({role: Role.Admin})
                 await user.related('teams').pivotQuery().where('team_id', teamId).update({role: Role.Admin})
                 return response.json({message: 'Utilisateur promu admin'})
             } catch (error) {
@@ -314,7 +340,6 @@ export default class TeamsController {
 
         // si l'utilisateur est membre on le promouvoit manager
         try {
-            await team.related('users').pivotQuery().where('user_id', userId).update({role: Role.Manager})
             await user.related('teams').pivotQuery().where('team_id', teamId).update({role: Role.Manager})
             return response.json({message: 'Utilisateur promu manager'})
         } catch (error) {
@@ -353,7 +378,6 @@ export default class TeamsController {
         // si l'utilisateur est manager on le retrograde membre
         if (userRole === Role.Manager) {
             try {
-                await team.related('users').pivotQuery().where('user_id', userId).update({role: Role.Member})
                 await user.related('teams').pivotQuery().where('team_id', teamId).update({role: Role.Member})
                 return response.json({message: 'Utilisateur retrogradé membre'})
             } catch (error) {
@@ -361,5 +385,51 @@ export default class TeamsController {
             }
         }
     }
+
+    async getMembers({ auth, request, response }) {
+        const teamId = request.input('teamId')
+        const user = await User.find(auth.user.id)
+        if (!user) {
+            return response.status(404).json({message: 'Utilisateur non trouvé'})
+        }
+        // on verifie que l'utilisateur fait bien partie de l'equipe
+        const team = await user.related('teams').query().where('team_id', teamId).first()
+        if (!team) {
+            return response.status(403).json({message: 'Vous n\'êtes pas membre de cette équipe'})
+        }
+        // on recupere les membres de l'equipe
+        const members = await db.from('user_teams').where('team_id', teamId).select('user_id', 'role')
+        const users = []
+        for (const member of members) {
+            if (member.user_id === auth.user.id) {
+                continue
+            }
+            const user = await User.find(member.user_id)
+            if (user) {
+                users.push({id: user.id, fullName: user.fullName, imageUrl: user.imageUrl, role: member.role})
+            }
+        }
+        return response.json(users)
+    }
+
+    async deleteTeam({ auth, request, response }) {
+        const teamId = request.input('teamId')
+        const user = await User.find(auth.user.id)
+        if (!user) {
+            return response.status(404).json({message: 'Utilisateur non trouvé'})
+        }
+        // on verifie que l'utilisateur est bien admin de l'equipe
+        const role = await db.from('user_teams').where('team_id', teamId).where('user_id', user.id).select('role').first()
+        if (!role) {
+            return response.status(404).json({message: 'Utilisateur non trouvé'})
+        }
+        if (role.role !== Role.Admin) {
+            return response.status(403).json({message: 'Vous n\'avez pas les droits pour effectuer cette action'})
+        }
+        // on supprime l'equipe
+        await db.from('teams').where('id', teamId).delete()
+        return response.json({message: 'Equipe supprimée'})
+    }
+
 
 }

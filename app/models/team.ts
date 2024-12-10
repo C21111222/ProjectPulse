@@ -17,6 +17,15 @@ export default class Team extends BaseModel {
   @column()
   declare imageUrl: string
 
+  @column()
+  declare status: 'active' | 'inactive'
+
+  @column()
+  declare startDate: DateTime
+
+  @column()
+  declare endDate: DateTime
+
   @manyToMany(() => User)
   declare users: ManyToMany<typeof User>
 

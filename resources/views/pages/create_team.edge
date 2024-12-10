@@ -32,7 +32,8 @@
       margin-bottom: 5px;
     }
     .form-container input,
-    .form-container textarea {
+    .form-container textarea,
+    .form-container select {
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
@@ -54,7 +55,6 @@
   </style>
 </head>
 <body>
-    @include('components/navbar')
   <div class="form-container">
     <h2>Créer une équipe</h2>
     <form id="create-team-form" enctype="multipart/form-data">
@@ -63,6 +63,18 @@
 
       <label for="description">Description</label>
       <textarea id="description" name="description" rows="4" required></textarea>
+
+      <label for="status">Statut</label>
+      <select id="status" name="status" required>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+
+      <label for="start_date">Date de début</label>
+      <input type="date" id="start_date" name="start_date" required>
+
+      <label for="end_date">Date de fin</label>
+      <input type="date" id="end_date" name="end_date" required>
 
       <label for="image">Image de l'équipe</label>
       <input type="file" id="image" name="image" accept="image/*" required>
@@ -81,13 +93,15 @@
         // Étape 1 : Créer l'équipe
         const response = await fetch('/teams', {
           method: 'POST',
-            credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             name: formData.get('name'),
-            description: formData.get('description')
+            description: formData.get('description'),
+            status: formData.get('status'),
+            start_date: formData.get('start_date'),
+            end_date: formData.get('end_date')
           }),
         });
 
@@ -104,18 +118,8 @@
 
         const imageResponse = await fetch('/upload_team_image', {
           method: 'POST',
-          credentials : 'include',
           body: imageFormData,
-        }).then(() => {
-            Swal.fire({
-              title: "Chargement...",
-              timer: 5e3,
-              timerProgressBar: true,
-              didOpen: () => {
-                Swal.showLoading();
-              }
-            })
-            });
+        });
 
         if (!imageResponse.ok) {
           throw new Error('Erreur lors du téléchargement de l\'image');

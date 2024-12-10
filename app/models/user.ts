@@ -6,6 +6,7 @@ import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import Team from '#models/team'
 import Message from '#models/message'
+import Task from './task.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -41,6 +42,14 @@ export default class User extends compose(BaseModel, AuthFinder) {
       pivotColumns: ['role'], 
     })
   declare teams: ManyToMany<typeof Team>
+
+  @manyToMany(() => Task,
+    {
+      pivotTable: 'user_tasks',
+      pivotForeignKey: 'user_id',
+      pivotRelatedForeignKey: 'task_id',
+    })
+  declare tasks: ManyToMany<typeof Task>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

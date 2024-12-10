@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
-import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import type { HasMany, HasOne } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, hasMany, hasOne } from '@adonisjs/lucid/orm'
 import User from '#models/user'
+import Team from '#models/team'
 
 
 export default class Task extends BaseModel {
@@ -15,13 +16,22 @@ export default class Task extends BaseModel {
   declare description: string
 
   @column()
-  declare status: string
+  declare status: 'active' | 'inactive'
+
+  @column()
+  declare priority: 'high' | 'medium' | 'low'
 
   @column()
   declare startDate: DateTime
 
   @column()
   declare endDate: DateTime
+
+  @column()
+  declare teamId: number
+
+  @hasOne(() => Team)
+  declare team: HasOne<typeof Team>
 
   @hasMany(() => User)
   declare users: HasMany<typeof User>
