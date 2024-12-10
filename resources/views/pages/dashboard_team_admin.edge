@@ -31,13 +31,13 @@
       margin-bottom: 20px;
     }
 
-    .user-list {
+    .user-list, .invite-list {
       list-style-type: none;
       padding: 0;
       margin: 0;
     }
 
-    .user-list li {
+    .user-list li, .invite-list li {
       background-color: #f4f4f9;
       padding: 10px;
       margin-bottom: 10px;
@@ -48,7 +48,7 @@
       align-items: center;
     }
 
-    .user-actions {
+    .user-actions, .invite-actions {
       display: flex;
       gap: 10px;
     }
@@ -103,6 +103,44 @@
     .back-button:hover {
       background-color: #c62828;
     }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 10px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -110,12 +148,12 @@
 
   <div class="container">
     <h1>Gestion de l'équipe</h1>
+    <h2>Membres de l'équipe</h2>
     <ul class="user-list">
-      @each(user in users)
+      @each(user in teamUsers)
         <li>
           <span>{{ user.fullName }}</span>
           <div class="user-actions">
-            <button class="button invite" onclick="sendInvitation({{ user.id }})">Inviter</button>
             <button class="button promote" onclick="promoteToManager({{ user.id }})">Promouvoir</button>
             <button class="button demote" onclick="demoteManager({{ user.id }})">Rétrograder</button>
             <button class="button delete" onclick="deleteUser({{ user.id }})">Supprimer</button>
@@ -123,10 +161,37 @@
         </li>
       @endeach
     </ul>
+    <button class="button invite" onclick="openInviteModal()">Inviter</button>
     <a href="/dashboard" class="button back-button">Retour</a>
   </div>
 
+  <!-- Modal pour inviter des utilisateurs -->
+  <div id="inviteModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeInviteModal()">&times;</span>
+      <h2>Inviter des utilisateurs</h2>
+      <ul class="invite-list">
+        @each(user in allUsers)
+          <li>
+            <span>{{ user.fullName }}</span>
+            <div class="invite-actions">
+              <button class="button invite" onclick="sendInvitation({{ user.id }})">Inviter</button>
+            </div>
+          </li>
+        @endeach
+      </ul>
+    </div>
+  </div>
+
   <script>
+    function openInviteModal() {
+      document.getElementById('inviteModal').style.display = 'block';
+    }
+
+    function closeInviteModal() {
+      document.getElementById('inviteModal').style.display = 'none';
+    }
+
     function sendInvitation(userId) {
       fetch(`/send_invitation`, {
         method: 'POST',
