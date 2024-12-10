@@ -5,6 +5,7 @@ import Notification from '#models/notification'
 import { NotificationTeamInvite, NotificationService, NotificationType, NotificationTeamInviteResponse } from '#services/notification_service'
 import db from '@adonisjs/lucid/services/db'
 import logger from '@adonisjs/core/services/logger'
+import { json } from 'stream/consumers'
 
 enum Role {
     Admin = 'admin',
@@ -21,6 +22,7 @@ export default class TeamsController {
       }
 
     public async dashboardTeam({ view, auth, params, response }) {
+        logger.info('Dashboard team')
         const user = await User.find(auth.user.id)
         if (!user) {
             return view.render('pages/dashboard', {teams: []})
@@ -39,10 +41,24 @@ export default class TeamsController {
         // s'il est admin on renvoie la vue avec le role admin
         if (role.role === Role.Admin) {
             // on charge tous les utilisateurs de l'equipe
+            logger.info( teamId)
             const members = await db.from('user_teams').where('team_id', teamId).select('user_id', 'role')
+            // on charge les utilisateurs de l'equipe
+            const usersMembers = await db
+            .from('users')
+            .join('user_teams', 'users.id', 'user_teams.user_id')
+            .where('user_teams.team_id', teamId)
+            .select('users.id', 'users.fullName', 'users.email', 'user_teams.role')
             // on charge tous les utilisateurs du site qui ne sont pas dans l'equipe
-            const users = await db.from('users').whereNotIn('id', members.map(member => member.user_id)).select('id', 'fullName', 'imageUrl')
-            return view.render('pages/dashboard_team_admin', {team: team, members: members, users: users})
+            logger.info('selecting users')
+            const users = await db
+            .from('users')
+            .whereNotIn('id', members.map(member => member.user_id))
+            .andWhere('id', '!=', 999999).select('id','fullName','email')
+
+            logger.info(JSON.stringify(users))
+            logger.info(JSON.stringify(usersMembers))
+            return view.render('pages/dashboard_team_admin', {team: team, members: JSON.stringify(usersMembers), users: JSON.stringify(users)})
         }
         // s'il est manager on renvoie la vue avec le role manager
         if (role.role === Role.Manager) {
