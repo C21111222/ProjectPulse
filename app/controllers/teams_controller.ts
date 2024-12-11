@@ -35,7 +35,7 @@ export default class TeamsController {
     }
     // o nrecupere l'id sachant que la route est /team/:id
     const teamId = params.id
-    const team = await Team.find(teamId)
+    const team = await db.from('teams').where('id', teamId).first()
     if (!team) {
       return response.status(404).json({ message: 'Equipe non trouvée' })
     }

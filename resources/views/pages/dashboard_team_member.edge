@@ -6,7 +6,7 @@
     <title>
       Gestion de l'équipe
     </title>
-    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/resources/css/dashboard.css" />
   </head>
   <body>
     @include('components/navbar')
@@ -54,8 +54,8 @@
       <div class="timeline-header">
         <h2>Tâches de l'équipe</h2>
         <div class="project-dates">
-          <span>Début : {{ team.startDate }}</span>
-          <span>Fin : {{ teamt.endDate }}</span>
+          <span>Début : {{ team.start_date }}</span>
+          <span>Fin : </span>
         </div>
       </div>
       <button class="button invite" onclick="toggleTaskModal()">Ajouter une tâche</button>
