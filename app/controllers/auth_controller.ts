@@ -36,6 +36,7 @@ export default class AuthController {
   public async login({ request, auth, response, session }: HttpContextContract) {
       let email: string
       let password: string
+      logger.info("Tentative de connexion avec l'email " + request.input('email'))
   
       try {
         const validatedData = await request.validate(loginValidator)
@@ -46,7 +47,6 @@ export default class AuthController {
         return response.redirect('/dashboard')
       } catch (error) {
         logger.error("Erreur lors de la validation des données de connexion")
-        logger.error(error)
         session.flash('notification', {
           type: 'error',
           message: 'Une erreur est survenue lors de la connexion.',
