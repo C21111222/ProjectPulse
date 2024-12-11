@@ -66,9 +66,9 @@ export default class TeamsController {
     logger.info('selecting users')
     const invitedUserIds = await db
     .from('notifications')
-    .where('teamId', teamId)
+    .where('team_id', teamId)
     .where('type', NotificationType.TEAM_INVITE)
-    .select('inviteeId');
+    .select('invitee_id');
   
   const users = await db
     .from('users')
