@@ -60,8 +60,8 @@
     <div class="timeline-header">
       <h2>Tâches de l'équipe</h2>
       <div class="project-dates">
-        <span>Début : {{ team.start_date }}</span>
-        <span>Fin : {{ team.end_date }}</span>
+        <span>Début : <span id="start-date"></span></span>
+        <span>Fin : <span id="end-date"></span></span>
       </div>
     </div>
     <button class="button invite" onclick="toggleTaskModal()">Ajouter une tâche</button>
@@ -134,6 +134,8 @@
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('fr-FR', options);
       }
+      document.getElementById('start-date').innerText = formatDate('{{ team.start_date }}');
+      document.getElementById('end-date').innerText = formatDate('{{ team.end_date }}');
       function loadTasks(){
         fetch(`/team_task/{{ team.id }}`, {
           method: "GET",
