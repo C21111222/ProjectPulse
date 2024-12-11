@@ -14,7 +14,19 @@ body {
     justify-content: space-between;
     align-items: center;
   }
+  .project-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+    color: #888;
+  }
   
+  .project-period,
+  .task-dates {
+    display: flex;
+    gap: 20px;
+  }
   .project-dates {
     display: flex;
     gap: 20px;
