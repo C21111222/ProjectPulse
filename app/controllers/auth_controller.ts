@@ -1,6 +1,7 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { registerValidator, loginValidator } from '#validators/auth'
 import logger from '@adonisjs/core/services/logger'
 import User from '#models/user'
 
@@ -33,7 +34,7 @@ export default class AuthController {
    * ```
    */
   public async login({ request, auth, response, session }: HttpContextContract) {
-    const { email, password } = request.all()
+    const { email, password } = request.validateUsing(loginValidator)
     logger.info("Tentative de connexion avec l'email %s", email)
     try {
       const user = await User.verifyCredentials(email, password)
@@ -84,7 +85,7 @@ export default class AuthController {
    * ```
    */
   public async loginFast({ request, auth, response, session }: HttpContextContract) {
-    const { email, password } = request.all()
+    const { email, password } = request.validateUsing(loginValidator)
     logger.info("Tentative de connexion avec l'email %s", email)
     try {
       const user = await User.verifyCredentials(email, password)
@@ -142,12 +143,7 @@ export default class AuthController {
    * @throws {Error} - Throws an error if there is an issue during the user creation process.
    */
   public async register({ request, auth, response, session }: HttpContextContract) {
-    const { fullName, email, password, password_confirmation } = request.only([
-      'fullName',
-      'email',
-      'password',
-      'password_confirmation',
-    ])
+    const { fullName, email, password, password_confirmation } = request.validateUsing(registerValidator)
 
     const fullNameM = fullName.charAt(0).toUpperCase() + fullName.slice(1)
 
