@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('title').notNullable()
       table.text('description').notNullable()
-      table.enu('status', ['active', 'inactive']).defaultTo('active')
+      table.enu('status', ['waiting', 'in_progress', 'done']).defaultTo('waiting')
       table.enum('priority', ['low', 'medium', 'high']).defaultTo('medium')
       table.dateTime('start_date').notNullable()
       table.dateTime('end_date').notNullable()

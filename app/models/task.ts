@@ -15,7 +15,7 @@ export default class Task extends BaseModel {
   declare description: string
 
   @column()
-  declare status: 'active' | 'inactive'
+  declare status: 'waiting' | 'in_progress' | 'done'
 
   @column()
   declare priority: 'high' | 'medium' | 'low'

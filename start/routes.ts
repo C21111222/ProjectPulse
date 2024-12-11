@@ -100,7 +100,7 @@ router
 
     // Tâches
     router.get('/tasks', [TaskController, 'getUserTasks'])
-    router.get('/team_tasks', [TaskController, 'getTeamTasks'])
+    router.get('/team_tasks/:id', [TaskController, 'getTeamTasks'])
     router.post('/tasks', [TaskController, 'addTask'])
     router.post('/delete_task', [TaskController, 'deleteTask'])
     router.post('/add_user_task', [TaskController, 'addUsersToTask'])

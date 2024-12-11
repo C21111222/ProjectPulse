@@ -2,10 +2,11 @@
 
 import Task from '#models/task'
 import User from '#models/user'
+import logger from '@adonisjs/core/services/logger'
 import db from '@adonisjs/lucid/services/db'
 
 export default class TasksController {
-  async getUserTasks({ response, auth, response, request }) {
+  async getUserTasks({ response, auth, request }) {
     const user = await User.find(auth.user.id)
     if (!user) {
       return response.status(404).json({
@@ -17,15 +18,17 @@ export default class TasksController {
     return response.status(200).json(tasks)
   }
 
-  async getTeamTasks({ response, auth, request }) {
+  async getTeamTasks({ response, auth, params }) {
+    logger.info('Getting team tasks')
     const user = await User.find(auth.user.id)
+    logger.info('Getting team tasks')
     if (!user) {
       return response.status(404).json({
         message: 'User not found',
       })
     }
     // on recupere l'id de l'equipe de l'utilisateur
-    const teamId = request.input('teamId')
+    const teamId = params.id
     if (!teamId) {
       return response.status(400).json({
         message: 'Team id is required',
@@ -38,12 +41,21 @@ export default class TasksController {
         message: 'You are not part of this team',
       })
     }
-    // on recupere les taches de l'equipe
-    const tasks = await db.from('tasks').where('team_id', teamId)
+    // on recupere les taches de l'equipe, ordonnees par date de debut on charge les utilisateurs assignes a chaque tache
+    const tasks = await db.from('tasks').where('team_id', teamId).orderBy('start_date', 'asc')
+    for (const task of tasks) {
+      task.users = await db
+        .from('user_tasks')
+        .where('task_id', task.id)
+        .innerJoin('users', 'users.id', 'user_tasks.user_id')
+        .select('users.id', 'users.email')
+    }
+
     return response.status(200).json(tasks)
   }
 
   async addTask({ response, auth, request }) {
+    logger.info('Adding task')
     const user = await User.find(auth.user.id)
     if (!user) {
       return response.status(404).json({
@@ -67,11 +79,20 @@ export default class TasksController {
       description: request.input('description'),
       status: request.input('status'),
       priority: request.input('priority'),
-      startDate: request.input('startDate'),
-      endDate: request.input('endDate'),
+      startDate: request.input('start_date'),
+      endDate: request.input('end_date'),
       teamId: teamId,
     })
-    await user.related('tasks').attach([task.id])
+    const users = request.input('users')
+    if (users) {
+      for (const userId of users) {
+        const userToAdd = await User.find(userId)
+        if (userToAdd) {
+          await userToAdd.related('tasks').attach([task.id])
+        }
+      }
+    }
+
     return response.status(201).json(task)
   }
 

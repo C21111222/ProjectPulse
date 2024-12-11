@@ -50,7 +50,6 @@ export default class TeamsController {
       return response.status(404).json({ message: 'Utilisateur non trouvé' })
     }
     // on charge tous les utilisateurs de l'equipe sauf l'utilisateur actuel
-    logger.info(teamId)
     const members = await db
       .from('user_teams')
       .where('team_id', teamId)
@@ -74,9 +73,6 @@ export default class TeamsController {
       .andWhere('id', '!=', 999999)
       .andWhere('id', '!=', user.id)
       .select('id', 'full_name', 'email', 'image_url')
-
-    logger.info(users)
-    logger.info(usersMembers)
     // s'il est admin on renvoie la vue avec le role admin
     if (role.role === Role.Admin || role.role === Role.Manager) {
       return view.render('pages/dashboard_team_admin', {
