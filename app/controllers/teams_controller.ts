@@ -10,6 +10,7 @@ import {
 } from '#services/notification_service'
 import db from '@adonisjs/lucid/services/db'
 import logger from '@adonisjs/core/services/logger'
+import { log } from 'console'
 
 enum Role {
   Admin = 'admin',
@@ -65,24 +66,21 @@ export default class TeamsController {
     // on charge tous les utilisateurs du site qui ne sont pas dans l'equipe
     logger.info('selecting users')
     const invitedUserIds = await db
-    .from('notifications')
-    .where('team_id', teamId)
-    .where('type', NotificationType.TEAM_INVITE)
-    .select('invitee_id');
-  
-  const users = await db
-    .from('users')
-    .whereNotIn(
-      'id',
-      members.map((member) => member.user_id)
-    )
-    .andWhere('id', '!=', 999999)
-    .andWhere('id', '!=', user.id)
-    .whereNotIn(
-      'id',
-      invitedUserIds.map((invitation) => invitation.inviteeId)
-    )
-    .select('id', 'full_name', 'email', 'image_url');
+      .from('notifications')
+      .where('team_id', teamId)
+      .where('type', NotificationType.TEAM_INVITE)
+      .select('invitee_id');
+    logger.info('invited users')
+    logger.info(invitedUserIds)
+    const users = await db
+      .from('users')
+      .whereNotIn(
+        'id',
+        members.map((member) => member.user_id)
+      )
+      .andWhere('id', '!=', 999999)
+      .andWhere('id', '!=', user.id)
+      .select('id', 'full_name', 'email', 'image_url')
     
     // s'il est admin on renvoie la vue avec le role admin
     if (role.role === Role.Admin || role.role === Role.Manager) {
