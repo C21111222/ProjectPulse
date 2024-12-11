@@ -3,7 +3,6 @@ import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import { column, BaseModel, manyToMany } from '@adonisjs/lucid/orm'
 import User from '#models/user'
 
-
 export default class Team extends BaseModel {
   @column({ isPrimary: true })
   declare id: number

@@ -46,11 +46,10 @@ router.get('/img/:path', async ({ params, response }) => {
   return response.download(app.makePath(`/app/uploads/${params.path}`))
 })
 
-router
-  .group(() => {
-    router.on('/').render('pages/homePage')
-    router.on('/home').render('pages/homePage')
-  })
+router.group(() => {
+  router.on('/').render('pages/homePage')
+  router.on('/home').render('pages/homePage')
+})
 
 /*
 |--------------------------------------------------------------------------
@@ -106,7 +105,6 @@ router
     router.post('/delete_task', [TaskController, 'deleteTask'])
     router.post('/add_user_task', [TaskController, 'addUsersToTask'])
 
-    
     // Notifications
     router.get('/notifications', [NotificationController, 'getNotifications'])
     router.delete('/notifications/:id', [NotificationController, 'deleteNotification'])

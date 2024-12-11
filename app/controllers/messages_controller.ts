@@ -2,10 +2,14 @@
 import User from '#models/user'
 import Message from '#models/message'
 import logger from '@adonisjs/core/services/logger'
-import { NotificationService, ChatMessage, NotificationMessage, NotificationType} from '#services/notification_service'
+import {
+  NotificationService,
+  ChatMessage,
+  NotificationMessage,
+  NotificationType,
+} from '#services/notification_service'
 
 export default class MessageriesController {
-
   private notificationService: NotificationService = new NotificationService()
   /**
    * Handles the index action for the messages controller.
@@ -196,7 +200,9 @@ export default class MessageriesController {
     }
     const team = await user.related('teams').query().where('team_id', teamId).first()
     if (!team) {
-      return response.status(403).json({ message: "Vous n'êtes pas autorisé à accéder à cette équipe" })
+      return response
+        .status(403)
+        .json({ message: "Vous n'êtes pas autorisé à accéder à cette équipe" })
     }
     const messages = await Message.query()
       .where((query) => {
@@ -218,7 +224,9 @@ export default class MessageriesController {
     }
     const team = await user.related('teams').query().where('team_id', teamId).first()
     if (!team) {
-      return response.status(403).json({ message: "Vous n'êtes pas autorisé à envoyer un message à cette équipe" })
+      return response
+        .status(403)
+        .json({ message: "Vous n'êtes pas autorisé à envoyer un message à cette équipe" })
     }
     const newMessage = new Message()
     newMessage.senderId = auth.user.id

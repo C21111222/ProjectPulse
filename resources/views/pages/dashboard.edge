@@ -1,91 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="/path/to/your/styles.css">
-  <style>
-    body {
-      display: flex;
-      font-family: 'Poppins', sans-serif;
-      background-color: #F7F8FA;
-      margin: 0;
-      padding: 0;
-      color: #46444c;
-      padding-top: 60px;
-    }
-    .sidebar {
-      width: 250px;
-      background-color: #2c3e50;
-      color: white;
-      padding: 20px;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    }
-    .sidebar h2 {
-      margin-top: 0;
-    }
-    .sidebar a {
-      color: white;
-      text-decoration: none;
-      display: block;
-      margin: 10px 0;
-    }
-    .sidebar a:hover {
-      text-decoration: underline;
-    }
-    .container {
-      flex-grow: 1;
-      padding: 20px;
-    }
-    .img-team {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-  </style>
-</head>
-<body>
-  @include('components/navbar')
-
-  <div class="sidebar">
-    <h2>Équipes</h2>
-    <a href="/create_team">Créer équipe</a>
-    <ul id="team-list">
-      <!-- Les équipes seront chargées ici -->
-    </ul>
-  </div>
-
-  <div class="container">
-    <h1>
-      Bienvenue, {{ auth.user?.fullName || 'Utilisateur' }} !
-    </h1>
-    <p>
-      Vous êtes connecté(e) avec succès. Profitez de votre espace personnel.
-    </p>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-      const teamList = document.getElementById('team-list');
-      try {
-        const response = await fetch('/teams', {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        const teams = await response.json();
-        teams.forEach(team => {
-          const li = document.createElement('li');
-          li.innerHTML = `<a href="/team/${team.id}"><img src=${team.imageUrl} alt="Logo de l'équipe" class="img-team">  ${team.name}</a>`;
-          teamList.appendChild(li);
-        });
-      } catch (error) {
-        console.error('Erreur lors du chargement des équipes:', error);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Dashboard
+    </title>
+    <link rel="stylesheet" href="/path/to/your/styles.css" />
+    <style>
+      body {
+        display: flex;
+        font-family: 'Poppins', sans-serif;
+        background-color: #F7F8FA;
+        margin: 0;
+        padding: 0;
+        color: #46444c;
+        padding-top: 60px;
       }
-    });
-  </script>
-</body>
+      
+      .sidebar {
+        width: 250px;
+        background-color: #2c3e50;
+        color: white;
+        padding: 20px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      }
+      
+      .sidebar h2 {
+        margin-top: 0;
+      }
+      
+      .sidebar a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        margin: 10px 0;
+      }
+      
+      .sidebar a:hover {
+        text-decoration: underline;
+      }
+      
+      .container {
+        flex-grow: 1;
+        padding: 20px;
+      }
+      
+      .img-team {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    @include('components/navbar')
+
+    <div class="sidebar">
+      <h2>
+        Équipes
+      </h2>
+      <a href="/create_team">Créer équipe</a>
+      <ul id="team-list">
+        <!-- Les équipes seront chargées ici -->
+      </ul>
+    </div>
+
+    <div class="container">
+      <h1>
+        Bienvenue, {{ auth.user?.fullName || 'Utilisateur' }} !
+      </h1>
+      <p>
+        Vous êtes connecté(e) avec succès. Profitez de votre espace personnel.
+      </p>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async function() {
+        const teamList = document.getElementById("team-list");
+        try {
+          const response = await fetch("/teams", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+          const teams = await response.json();
+          teams.forEach(team => {
+            const li = document.createElement("li");
+            li.innerHTML = `<a href="/team/${team.id}"><img src=${team.imageUrl} alt="Logo de l'équipe" class="img-team">  ${team.name}</a>`;
+            teamList.appendChild(li);
+          });
+        } catch (error) {
+          console.error("Erreur lors du chargement des équipes:", error);
+        }
+      });
+    </script>
+  </body>
 </html>

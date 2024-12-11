@@ -9,14 +9,18 @@ import logger from '@adonisjs/core/services/logger'
 import db from '@adonisjs/lucid/services/db'
 
 export default class ImagesController {
-
   async uploadTeam({ auth, request, response }: HttpContext) {
     multer({ dest: 'uploads/' })
     const teamId = request.input('team_id')
     const team = await Team.findOrFail(teamId)
     // on vérifie que l'utilisateur est bien admin de l'équipe
     const user = await User.findOrFail(auth.user.id)
-    const role = await db.from('user_teams').where('team_id', teamId).where('user_id', user.id).select('role').first()
+    const role = await db
+      .from('user_teams')
+      .where('team_id', teamId)
+      .where('user_id', user.id)
+      .select('role')
+      .first()
     if (!role || role.role !== 'admin') {
       return response.status(403).json({ message: 'You are not allowed to do this' })
     }

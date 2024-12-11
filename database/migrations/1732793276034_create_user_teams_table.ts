@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
       table.integer('team_id').unsigned().references('id').inTable('teams').onDelete('CASCADE')
-      table.enu('role', ['admin','manager', 'member']).defaultTo('member')
+      table.enu('role', ['admin', 'manager', 'member']).defaultTo('member')
       table.unique(['user_id', 'team_id'])
       table.timestamp('created_at')
       table.timestamp('updated_at')

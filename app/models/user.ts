@@ -34,21 +34,19 @@ export default class User extends compose(BaseModel, AuthFinder) {
     this.imageUrl = 'https://projectpulse.pautentia.fr/img/unknow.jpg'
   }
 
-  @manyToMany(() => Team,
-    {
-      pivotTable: 'user_teams',
-      pivotForeignKey: 'user_id',
-      pivotRelatedForeignKey: 'team_id',
-      pivotColumns: ['role'], 
-    })
+  @manyToMany(() => Team, {
+    pivotTable: 'user_teams',
+    pivotForeignKey: 'user_id',
+    pivotRelatedForeignKey: 'team_id',
+    pivotColumns: ['role'],
+  })
   declare teams: ManyToMany<typeof Team>
 
-  @manyToMany(() => Task,
-    {
-      pivotTable: 'user_tasks',
-      pivotForeignKey: 'user_id',
-      pivotRelatedForeignKey: 'task_id',
-    })
+  @manyToMany(() => Task, {
+    pivotTable: 'user_tasks',
+    pivotForeignKey: 'user_id',
+    pivotRelatedForeignKey: 'task_id',
+  })
   declare tasks: ManyToMany<typeof Task>
 
   @column.dateTime({ autoCreate: true })
@@ -111,5 +109,4 @@ export default class User extends compose(BaseModel, AuthFinder) {
     }
     return resultat
   }
-
 }

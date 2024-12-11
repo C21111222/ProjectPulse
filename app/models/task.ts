@@ -4,7 +4,6 @@ import { BaseModel, column, hasMany, hasOne } from '@adonisjs/lucid/orm'
 import User from '#models/user'
 import Team from '#models/team'
 
-
 export default class Task extends BaseModel {
   @column({ isPrimary: true })
   declare id: number

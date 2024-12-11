@@ -44,6 +44,5 @@ export default class Message extends BaseModel {
     localKey: 'receiverId',
     foreignKey: 'id',
   })
-
   declare receiver: HasOne<typeof User>
 }
