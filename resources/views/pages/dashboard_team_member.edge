@@ -330,6 +330,138 @@
         </div>
       </div>
     </div>
+    <div class="timeline-container">
+      <h2>Tâches de l'équipe</h2>
+      <button class="button invite" onclick="toggleTaskModal()">Ajouter une tâche</button>
+      <div class="timeline">
+      
+      </div>
+    </div>
+    <script>
+
+        function formatDate(dateString) {
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          return new Date(dateString).toLocaleDateString('fr-FR', options);
+        }
+        function loadTasks(){
+          fetch(`/team_task/{{ team.id }}`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          }).then(response => {
+            if (!response.ok) {
+              return response.json().then(errorData => {
+                throw new Error("Erreur lors du chargement des tâches : " + errorData.message);
+              });
+            }
+            return response.json();
+          }).then(data => {
+            console.log("Tâches récupérées :");
+            console.log(data);
+            // on récupère l'élément timeline et on supprime les tâches déjà affichées
+            const timeline = document.querySelector(".timeline");
+            timeline.innerHTML = "";
+            // on trie les tâches par date de début
+            data.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            data.forEach(task => {
+              const taskElement = document.createElement("div");
+              taskElement.classList.add("task");
+              taskElement.classList.add(task.status);
+              taskElement.innerHTML = `
+                <div class="content">
+                  <span>Titre : ${task.title}</span>
+                  <span> Desc : ${task.description}</span>
+                  <span>${formatDate(task.start_date)} - ${formatDate(task.end_date)}</span>
+                  <span> Priorité : ${task.priority}</span>
+                  <span> Status : ${task.status}</span>
+                  ${task.users.map(user => `<img src="${user.image_url}" alt="Photo de ${user.full_name}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;" />`).join("")}
+                </div>
+              `;
+              timeline.appendChild(taskElement);
+            });
+          }).catch(error => {
+            console.error("Erreur lors du chargement des tâches :", error);
+            alert("Erreur lors du chargement des tâches : " + error.message);
+          });
+        }
+  
+        loadTasks();
+        function toggleTaskModal() {
+          const today = new Date().toISOString().split('T')[0];
+          const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+          document.getElementById('taskStartDate').value = today;
+          document.getElementById('taskEndDate').value = tomorrow;
+          document.getElementById("taskModal").style.display = "block";
+        }
+  
+        function closeTaskModal() {
+          document.getElementById("taskModal").style.display = "none";
+        }
+        document.getElementById('taskForm').addEventListener('submit', function(event) {
+          event.preventDefault();
+          addTask();
+        });
+  
+        function addTask() {
+    
+          const name = document.getElementById("taskName").value;
+          const description = document.getElementById("taskDescription").value;
+          const status = document.getElementById("taskStatus").value;
+          const start_date = document.getElementById("taskStartDate").value;
+          const end_date = document.getElementById("taskEndDate").value;
+          const priority = document.getElementById("taskPriority").value;
+          const users = Array.from(document.getElementById("taskUsers").selectedOptions).map(option => option.value);
+        
+          console.log("Données de la tâche :", {
+            teamId: {{ team.id }},
+            title: name,
+            description: description,
+            priority: priority,
+            status: status,
+            start_date: start_date,
+            end_date: end_date,
+            users: users,
+          });
+          alert("Ajout de tâche");
+          fetch(`/tasks`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "credentials": "include"
+            },
+            body: JSON.stringify({
+              teamId: {{ team.id }},
+              title: name,
+              description: description,
+              priority: priority,
+              status: status,
+              start_date: start_date,
+              end_date: end_date,
+              users: users,
+            })
+          }).then(response => {
+            if (!response.ok) {
+              alert("Erreur lors de l'ajout de la tâche : " + response );
+              return response.json().then(errorData => {
+                throw new Error("Erreur lors de l'ajout de la tâche : " + errorData.message);
+              });
+            }
+            return response.json();
+          }).then(data => {
+            alert("Tâche ajoutée avec succès.");
+            // on recharge la page pour mettre à jour la liste des tâches
+            location.reload();
+          }).catch(error => {
+            console.error("Erreur lors de l'ajout de la tâche :", error);
+            alert("Erreur lors de l'ajout de la tâche : " + error.message);
+          });
+          loadTasks();
+          // on ferme la modal après avoir ajouté la tâche
+          closeTaskModal();
+        }
+    </script>
 
     <script type="module">
       import {
