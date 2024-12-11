@@ -453,8 +453,15 @@
           })
         });
         console.log(response);
+        document.getElementById('messageInput').value = '';
         return response.json();
       }
+      document.getElementById('messageInput').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          sendMessage();
+        }
+      });
       
       document.getElementById("sendButton").addEventListener("click", sendMessage);
       

@@ -177,6 +177,17 @@
       });
       return response;
     }
+    function eraseNotification(userId) {
+      const chatUser = document.getElementById('user-' + userId);
+      console.log('user-' + userId);
+      if (chatUser) {
+        console.log('Effacement de la notification');
+        chatUser.remove();
+        // on recupere le nombre de notifications qui se trouve entre parathese dans document.getElementById('title-chat').innerText
+        const nbNotifications = parseInt(document.getElementById('title-notification').innerText.match(/\((\d+)\)/)[1]);
+        document.getElementById('title-notification').innerText = `Notifications (${nbNotifications - 1})`;
+      }
+    }
     
     // Fonction pour ouvrir un chat
     async function openChat(userId) {
@@ -191,6 +202,7 @@
       if (userIdsauv) {
         sendViewedNotification(userIdsauv);
       }
+      eraseNotification(userId);
       const messages = await loadMessages(userId);
       console.log(messages);
       if (userId !== 999999) {

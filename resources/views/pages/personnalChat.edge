@@ -198,8 +198,8 @@
         console.log('Effacement de la notification');
         chatUser.remove();
         // on recupere le nombre de notifications qui se trouve entre parathese dans document.getElementById('title-chat').innerText
-        const nbNotifications = parseInt(document.getElementById('title-chat').innerText.match(/\((\d+)\)/)[1]);
-        document.getElementById('title-chat').innerText = `Chat (${nbNotifications - 1})`;
+        const nbNotifications = parseInt(document.getElementById('title-notification').innerText.match(/\((\d+)\)/)[1]);
+        document.getElementById('title-notification').innerText = `Notifications (${nbNotifications - 1})`;
       }
     }
 

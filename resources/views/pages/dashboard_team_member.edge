@@ -270,7 +270,14 @@
         });
         console.log(response);
         return response.json();
+        messageInput.value = "";
       }
+      document.getElementById('messageInput').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          sendMessage();
+        }
+      });
       
       document.getElementById("sendButton").addEventListener("click", sendMessage);
       
