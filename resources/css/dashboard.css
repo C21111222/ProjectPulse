@@ -241,14 +241,21 @@ padding-top: 60px; /* Espacement en haut */
 }
 
 .modal-content {
-background-color: #fefefe;
-margin: 5% auto; /* 5% du haut et centré */
-padding: 20px;
-border: 1px solid #888;
-width: 80%; /* Largeur du contenu */
-max-width: 600px; /* Largeur maximale */
-border-radius: 10px; /* Bordures arrondies */
-}
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+    max-height: 80vh; /* Fixe la hauteur maximale de la modal */
+    overflow-y: auto; /* Ajoute une barre de défilement verticale */
+  }
+  
+  .invite-list-container {
+    max-height: 60vh; /* Fixe la hauteur maximale de la liste */
+    overflow-y: auto; /* Ajoute une barre de défilement verticale */
+  }
 
 .close {
 color: #aaa;

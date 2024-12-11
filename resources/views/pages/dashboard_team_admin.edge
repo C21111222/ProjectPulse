@@ -116,12 +116,11 @@
   </div>
 
   <!-- Modal pour inviter des utilisateurs -->
-  <div id="inviteModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeInviteModal()">&times;</span>
-      <h2>
-        Inviter des utilisateurs
-      </h2>
+<div id="inviteModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeInviteModal()">&times;</span>
+    <h2>Inviter des utilisateurs</h2>
+    <div class="invite-list-container">
       <ul class="invite-list">
         @each(user in users)
           <li>
@@ -134,6 +133,7 @@
       </ul>
     </div>
   </div>
+</div>
     <script>
 
       function formatDate(dateString) {
