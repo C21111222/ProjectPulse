@@ -505,7 +505,7 @@
         return new Date(dateString).toLocaleDateString('fr-FR', options);
       }
       function loadTasks(){
-        fetch(`/tasks?teamId={{ team.id }}`, {
+        fetch(`/team_task/{{ team.id }}`, {
           method: "GET",
           credentials: "include",
           headers: {
@@ -532,11 +532,12 @@
             taskElement.classList.add(task.status);
             taskElement.innerHTML = `
               <div class="content">
-                <span>${task.title}</span>
-                <span>${task.description}</span>
-                <span>${formatDate(task.startDate)} - ${formatDate(task.endDate)}</span>
-                <span>${task.priority}</span>
-                <span>${task.status}</span>
+                <span>Titre : ${task.title}</span>
+                <span> Desc : ${task.description}</span>
+                <span>${formatDate(task.start_date)} - ${formatDate(task.end_date)}</span>
+                <span> Priorité : ${task.priority}</span>
+                <span> Status : ${task.status}</span>
+                ${task.users.map(user => `<img src="${user.image_url}" alt="Photo de ${user.full_name}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;" />`).join("")}
               </div>
             `;
             timeline.appendChild(taskElement);

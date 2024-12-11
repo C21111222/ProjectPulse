@@ -19,7 +19,6 @@ export default class TasksController {
   }
 
   async getTeamTasks({ response, auth, params }) {
-    logger.info('Getting team tasks')
     const user = await User.find(auth.user.id)
     logger.info('Getting team tasks')
     if (!user) {
@@ -29,28 +28,31 @@ export default class TasksController {
     }
     // on recupere l'id de l'equipe de l'utilisateur
     const teamId = params.id
+    logger.info('Team id: ' + teamId)
     if (!teamId) {
       return response.status(400).json({
         message: 'Team id is required',
       })
     }
     // on verifie que l'utilisateur fait bien partie de l'equipe
-    const team = await user.related('teams').query().where('team_id', teamId).first()
+    const team = await db.from('user_teams').where('user_id', user.id).andWhere('team_id', teamId).first()
     if (!team) {
       return response.status(403).json({
         message: 'You are not part of this team',
       })
     }
-    // on recupere les taches de l'equipe, ordonnees par date de debut on charge les utilisateurs assignes a chaque tache
+    // on recupere les taches de l'equipe, ordonnees par date de debut 
     const tasks = await db.from('tasks').where('team_id', teamId).orderBy('start_date', 'asc')
+    // 
     for (const task of tasks) {
       task.users = await db
-        .from('user_tasks')
-        .where('task_id', task.id)
-        .innerJoin('users', 'users.id', 'user_tasks.user_id')
-        .select('users.id', 'users.email')
+      .from('users')
+      .select('user_id', 'full_name', 'email', 'image_url') // Select only the necessary fields
+      .innerJoin('user_tasks', 'users.id', 'user_tasks.user_id')
+      .where('user_tasks.task_id', task.id)
     }
-
+    logger.info('Tasks retrieved')
+    logger.info(tasks)
     return response.status(200).json(tasks)
   }
 
