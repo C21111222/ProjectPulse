@@ -1,0 +1,386 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+}
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .project-dates {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    color: #888;
+  }
+.message-container.received {
+  display: flex;
+  justify-content: flex-start;
+  /* Les messages commencent du centre */
+  flex-direction: row;
+  /* Le texte vient de gauche à droite */
+  text-align: left;
+  align-self: flex-start;
+  margin-right: auto;
+  /* Pousse le conteneur vers la gauche */
+  max-width: 50%;
+  /* Limite la largeur du message */
+}
+
+.message-container.received .message-content {
+  background-color: #c2bdbd;
+  /* Couleur du fond pour les messages reçus */
+  border-radius: 0 10px 10px 10px;
+  /* Arrondi à droite, angle gauche non arrondi */
+  padding: 12px 12px;
+  /* Réduction du padding pour éviter l'espace à gauche */
+  word-wrap: break-word;
+  /* Gère le texte long */
+  white-space: pre-wrap;
+  /* Garde les espaces et retours à la ligne */
+  margin-left: 5px;
+  /* Pas de marge à gauche */
+  margin-right: 25px;
+  /* Pas de marge à droite */
+  max-width: 100%;
+  /* Permet au message de prendre toute la largeur disponible */
+}
+
+.message-container.sent {
+  display: flex;
+  justify-content: flex-start;
+  /* Les messages commencent du centre */
+  flex-direction: row-reverse;
+  /* Le texte vient de droite à gauche */
+  text-align: left;
+  /* Alignement du texte à droite */
+  align-self: flex-end;
+  margin-left: auto;
+  /* Pousse le conteneur vers la droite */
+  max-width: 50%;
+  /* Limite la largeur du message */
+}
+
+.message-container.sent .message-content {
+  background-color: #d4f1c5;
+  /* Couleur du fond du message */
+  border-radius: 10px 0 10px 10px;
+  /* Arrondi à gauche, angle droit non arrondi */
+  padding: 12px 12px;
+  /* Réduction du padding pour éviter l'espace à gauche */
+  word-wrap: break-word;
+  /* Gère le texte long */
+  white-space: pre-wrap;
+  /* Garde les espaces et retours à la ligne */
+  margin-right: 25px;
+  /* Pas de marge à droite */
+  margin-left: 5px;
+  /* Pas de marge à gauche */
+  max-width: 100%;
+  /* Permet au message de prendre toute la largeur disponible */
+}
+
+.message-content {
+  padding: 10px;
+  border-radius: 10px;
+  margin: 5px;
+  max-width: 70%;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 1400px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .main-container {
+    flex-direction: row;
+  }
+}
+
+.container {
+  flex: 1;
+  padding: 30px;
+  text-align: center;
+}
+
+.chat-container {
+  flex: 1;
+  padding: 30px;
+  border-top: 1px solid #ddd;
+}
+
+@media (min-width: 768px) {
+  .chat-container {
+    border-top: none;
+    border-left: 1px solid #ddd;
+  }
+}
+
+h1, h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.user-list,
+.invite-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-list li,
+.invite-list li {
+  background-color: #f4f4f9;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-actions,
+.invite-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.button {
+  padding: 5px 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+}
+
+.invite {
+  background-color: #007BFF;
+}
+
+.invite:hover {
+  background-color: #0056b3;
+}
+
+.promote {
+  background-color: #4CAF50;
+}
+
+.promote:hover {
+  background-color: #388E3C;
+}
+
+.demote {
+  background-color: #FFC107;
+}
+
+.demote:hover {
+  background-color: #FFA000;
+}
+
+.delete {
+  background-color: #e53935;
+}
+
+.delete:hover {
+  background-color: #c62828;
+}
+
+.back-button {
+  margin-top: 20px;
+  background-color: #e53935;
+}
+
+.back-button:hover {
+  background-color: #c62828;
+}
+
+/* Styles pour le modal */
+.modal {
+display: none; /* Masqué par défaut */
+position: fixed; /* Reste en place même lors du défilement */
+z-index: 1; /* Au-dessus de tout autre contenu */
+left: 0;
+top: 0;
+width: 100%; /* Largeur complète */
+height: 100%; /* Hauteur complète */
+overflow: auto; /* Activer le défilement si nécessaire */
+background-color: rgb(0,0,0); /* Couleur de fond */
+background-color: rgba(0,0,0,0.4); /* Couleur de fond avec opacité */
+padding-top: 60px; /* Espacement en haut */
+}
+
+.modal-content {
+background-color: #fefefe;
+margin: 5% auto; /* 5% du haut et centré */
+padding: 20px;
+border: 1px solid #888;
+width: 80%; /* Largeur du contenu */
+max-width: 600px; /* Largeur maximale */
+border-radius: 10px; /* Bordures arrondies */
+}
+
+.close {
+color: #aaa;
+float: right;
+font-size: 28px;
+font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+color: black;
+text-decoration: none;
+cursor: pointer;
+}
+
+.modal-content h2 {
+margin-top: 0;
+}
+
+.modal-content label {
+display: block;
+margin-top: 10px;
+font-weight: bold;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="date"],
+.modal-content textarea,
+.modal-content select {
+width: 100%;
+padding: 10px;
+margin-top: 5px;
+margin-bottom: 15px;
+border: 1px solid #ccc;
+border-radius: 5px;
+box-sizing: border-box;
+}
+
+.modal-content button {
+background-color: #007BFF;
+color: white;
+padding: 10px 20px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 16px;
+}
+
+.modal-content button:hover {
+background-color: #0056b3;
+}
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.user-role {
+  margin-left: 10px;
+  font-style: italic;
+  color: #888;
+}
+
+.chat-box {
+  height: 300px;
+  overflow-y: scroll;
+  border: 1px solid #ddd;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+.chat-input {
+  display: flex;
+  margin-top: 10px;
+}
+
+.chat-input input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px 0 0 5px;
+}
+
+.chat-input button {
+  padding: 10px;
+  border: none;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background-color: #0056b3;
+}
+
+.timeline-container {
+  width: 90%;
+  max-width: 1400px;
+  background-color: white;
+  padding: 30px;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid #ddd;
+  border-radius: 10px;
+  overflow-x: auto; /* Ajout de la barre de défilement horizontale */
+  white-space: nowrap; /* Empêche le retour à la ligne pour les éléments enfants */
+}
+
+.timeline {
+  display: inline-block; /* Affiche les éléments en ligne */
+  position: relative;
+  margin: 0 auto;
+}
+
+
+.task {
+  display: inline-block; /* Affiche les tâches en ligne */
+  padding: 10px 40px;
+  position: relative;
+  background-color: inherit;
+  width: auto; /* Ajuste la largeur automatiquement */
+}
+
+
+.content {
+  padding: 20px 30px;
+  background-color: white;
+  position: relative;
+  border-radius: 6px;
+  display: inline-block;
+  text-align: left;
+  white-space: normal; /* Permet le retour à la ligne pour le texte */
+}
+
+.task span {
+  display: block;
+  margin-bottom: 5px;
+}
