@@ -647,6 +647,10 @@
             </div>`;
         scrollToBottom();
       });
+
+      window.addEventListener("beforeunload", () => {
+        unsubscribe();
+      });
     </script>
   </body>
 </html>

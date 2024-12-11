@@ -831,6 +831,11 @@
             </div>`;
         scrollToBottom();
       });
+
+      // lorsqu'on quitte la page, on se désabonne des notifications
+      window.addEventListener("beforeunload", () => {
+        unsubscribe();
+      });
     </script>
   </body>
 </html>
