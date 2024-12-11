@@ -53,6 +53,7 @@ export default class AuthController {
         })
         return response.redirect('back')
       }
+  }
 
   /**
    * Handles the fast login process for a user.
@@ -72,9 +73,10 @@ export default class AuthController {
    * ```
    */
   public async loginFast({ request, auth, response, session }: HttpContextContract) {
-    const { email, password } = request.validateUsing(loginValidator)
-    logger.info("Tentative de connexion avec l'email %s", email)
+
+    logger.info("Tentative de connexion avec l'email " + request.input('email'))
     try {
+      const { email, password } = request.validateUsing(loginValidator)
       const user = await User.verifyCredentials(email, password)
       if (user) {
         await auth.use('web').login(user)
@@ -130,42 +132,52 @@ export default class AuthController {
    * @throws {Error} - Throws an error if there is an issue during the user creation process.
    */
   public async register({ request, auth, response, session }: HttpContextContract) {
-    const { fullName, email, password, password_confirmation } = request.validateUsing(registerValidator)
-
-    const fullNameM = fullName.charAt(0).toUpperCase() + fullName.slice(1)
-
-    if (password !== password_confirmation) {
-      session.flash('notification', {
-        type: 'error',
-        message: 'Les mots de passe ne correspondent pas.',
-      })
-      return response.redirect('back')
-    }
-    if (
-      fullNameM == 'Kevin' ||
-      fullNameM == 'Kévin' ||
-      fullNameM == 'Florent' ||
-      fullNameM == 'Simon'
-    ) {
-      session.flash('notification', { type: 'error', message: 'Va poop fdp.' })
-      return response.redirect('back')
-    }
+    let fullName: string = ''
+    let email: string = ''
+    let password: string
     try {
-      logger.info("Inscription de %s avec l'email %s", fullNameM, email)
-      const user = await User.create({ fullName: fullNameM, email, password })
+      const validatedData= await request.validateUsing(registerValidator)
+      fullName = validatedData.fullName
+      email = validatedData.email
+      password = validatedData.password
+      logger.info("Inscription de %s avec l'email %s", fullName, email)
+      const user = await User.create({ fullName: fullName, email, password })
       await auth.use('web').login(user)
       return response.redirect('/dashboard')
     } catch (error) {
-      if (error.code === 'ER_DUP_ENTRY') {
-        session.flash('notification', { type: 'error', message: 'Cet email est déjà utilisé' })
-        return response.redirect('back')
-      }
-      session.flash('notification', {
-        type: 'error',
-        message: "Une erreur est survenue lors de l'inscription.",
-      })
-      logger.error("Erreur lors de l'inscription de %s avec l'email %s", fullName, email)
+      logger.error("Erreur lors de la validation des données de connexion")
       logger.error(error)
+      if (error.code === 'E_VALIDATION_ERROR') {
+        error.messages.forEach((message : any) => {
+          if (message.rule === 'sameAs' && message.field === 'password_confirmation') {
+            session.flash('notification', {
+              type: 'error',
+              message: "Les mots de passe ne correspondent pas.",
+            })
+          } else if (message.rule === 'unique' && message.field === 'email') {
+            session.flash('notification', {
+              type: 'error',
+              message: "L'email est déjà utilisé.",
+            })
+          } else if (message.rule === 'minLength' && message.field === 'password') {
+            session.flash('notification', {
+              type: 'error',
+              message: "Le mot de passe doit contenir au moins 8 caractères.",
+            })
+          } else {
+            session.flash('notification', {
+              type: 'error',
+              message: "Une erreur est survenue lors de la validation des données.",
+            })
+          }
+        })
+      } else {
+        session.flash('notification', {
+          type: 'error',
+          message: 'Une erreur est survenue lors de la connexion.',
+        })
+      }
+
       return response.redirect('back')
     }
   }
