@@ -71,15 +71,14 @@ export default class TeamsController {
     if (teamExist) {
       return response.status(409).json({ message: 'Cette équipe existe déjà' })
     }
-    const start_date = DateTime.fromISO(teamData.start_date.toString())
-    const end_date = DateTime.fromISO(teamData.end_date.toString())
+    
     const team = await Team.create({
       name: teamData.name,
       description: teamData.description,
       imageUrl: teamData.imageUrl,
       status: teamData.status,
-      startDate: start_date,
-      endDate: end_date,
+      startDate: request.input('start_date'),
+      endDate: request.input('end_date'),
     })
     try {
       await this.addMember(auth.user.id, team.id, Role.Admin)
