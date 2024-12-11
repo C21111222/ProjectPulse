@@ -52,7 +52,6 @@ export default class TasksController {
       .where('user_tasks.task_id', task.id)
     }
     logger.info('Tasks retrieved')
-    logger.info(tasks)
     return response.status(200).json(tasks)
   }
 

@@ -13,7 +13,18 @@ export default class UsersController {
     const users = await User.query().select('id', 'full_name', 'email')
     return response.json(users)
   }
-
+  
+  /**
+   * Handles the request to view a user's public profile.
+   * 
+   * @param {HttpContext} context - The HTTP context object containing the request, authentication, and view.
+   * @returns {Promise<View>} - The rendered view of the user's profile or a 404 page if the user is not found.
+   * 
+   * @remarks
+   * - If the user is not found, it renders a 404 page.
+   * - If the authenticated user is viewing their own profile, it renders the profile page.
+   * - Otherwise, it renders the public profile page of the user.
+   */
   async viewPublicProfile({ auth, request, view }: HttpContext) {
     const userId = request.input('user_id')
     const user = await User.find(userId)
@@ -27,6 +38,17 @@ export default class UsersController {
     return view.render('pages/publicProfile', { user })
   }
 
+  /**
+   * Updates the profile of the authenticated user.
+   *
+   * @param {HttpContext} context - The HTTP context object containing the request, auth, and response.
+   * @returns {Promise<void>} - A promise that resolves when the user's profile has been updated and the response has been redirected.
+   *
+   * @remarks
+   * This method retrieves the authenticated user's ID from the auth object, finds the user in the database,
+   * updates the user's full name with the value from the request input, saves the updated user, and redirects
+   * the response to the profile page.
+   */
   async updateProfile({ request, auth, response }: HttpContext) {
     const userId = auth.user!.id
     const user = await User.findOrFail(userId)
