@@ -367,10 +367,13 @@ background-color: #0056b3;
 }
 
 .timeline {
-  display: inline-block; /* Affiche les éléments en ligne */
-  position: relative;
-  margin: 0 auto;
-}
+    max-height: 400px; /* Ajustez cette valeur selon vos besoins */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+  }
 
 
 .task {
