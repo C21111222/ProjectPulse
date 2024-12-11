@@ -1,157 +1,246 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Gestion de l'équipe
-    </title>
-    <link rel="stylesheet" href="/resources/css/dashboard.css" />
-  </head>
-  <body>
-    @include('components/navbar')
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion de l'équipe</title>
+  <link rel="stylesheet" href="/resources/css/dashboard.css" />
+</head>
+<body>
+  @include('components/navbar')
 
-    <div class="main-container">
-      <div class="container">
-        <h1>
-          Gestion de l'équipe {{ team.name }}
-        </h1>
-        <h2>
-          Membres de l'équipe
-        </h2>
-        <ul class="user-list">
-          @each(user in members)
-            <li>
-              <span>{{ user.full_name }}</span>
-              <span class="user-role">{{ user.role }}</span>
-              @if(user.id === auth.user.id)
-                <span>(Vous)</span>
-              @else
-                @if(user.role == 'admin')
-                  <span>(Administrateur)</span>
-                @endif
+  <div class="main-container">
+    <div class="container">
+      <h1>
+        Gestion de l'équipe {{ team.name }}
+      </h1>
+      <h2>
+        Membres de l'équipe
+      </h2>
+      <ul class="user-list">
+        @each(user in members)
+          <li>
+            <span>{{ user.full_name }}</span>
+            <span class="user-role">{{ user.role }}</span>
+            @if(user.id === auth.user.id)
+              <span>(Vous)</span>
+            @else
+              @if(user.role == 'admin')
+                <span>(Administrateur)</span>
               @endif
-            </li>
-          @endeach
-        </ul>
-        <a href="/dashboard" class="button back-button">Retour</a>
-      </div>
+            @endif
+          </li>
+        @endeach
+      </ul>
+      <button class="button invite" onclick="openInviteModal()">Inviter</button>
+      <a href="/dashboard" class="button back-button">Retour</a>
+    </div>
 
-      <!-- Section de chat d'équipe -->
-      <div class="chat-container">
-        <h2>
-          Chat d'équipe
-        </h2>
-        <div id="chatBox" class="chat-box">
+    <!-- Section de chat d'équipe -->
+    <div class="chat-container">
+      <h2>
+        Chat d'équipe
+      </h2>
+      <div id="chatBox" class="chat-box">
+      </div>
+      <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Tapez votre message..." />
+        <button id="sendButton">Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="timeline-container">
+    <div class="timeline-header">
+      <h2>Tâches de l'équipe</h2>
+      <div class="project-dates">
+        <div class="project-period">
+          <span>Début : <span id="start-date"></span></span>
+          <span>Fin : <span id="end-date"></span></span>
         </div>
-        <div class="chat-input">
-          <input type="text" id="messageInput" placeholder="Tapez votre message..." />
-          <button id="sendButton">Envoyer</button>
+        <div class="task-dates">
+          <span>Première tâche : <span id="first-task"></span></span>
+          <span>Dernière tâche : <span id="last-task"></span></span>
         </div>
       </div>
     </div>
-    <div class="timeline-container">
-      <div class="timeline-header">
-        <h2>Tâches de l'équipe</h2>
-        <div class="project-dates">
-          <div class="project-period">
-            <span>Début : <span id="start-date"></span></span>
-            <span>Fin : <span id="end-date"></span></span>
-          </div>
-          <div class="task-dates">
-            <span>Première tâche : <span id="first-task"></span></span>
-            <span>Dernière tâche : <span id="last-task"></span></span>
-          </div>
-        </div>
-      </div>
-      <button class="button invite" onclick="toggleTaskModal()">Ajouter une tâche</button>
-      <div class="timeline">
-      
-      </div>
+    <button class="button invite" onclick="toggleTaskModal()">Ajouter une tâche</button>
+    <div class="timeline">
+    
     </div>
+  </div>
+
+  <!-- Modal pour ajouter une tâche -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeTaskModal()">&times;</span>
+      <h2>
+        Ajouter une tâche
+      </h2>
+      <form id="taskForm">
+        <label for="taskName">Nom de la tâche</label>
+        <input type="text" id="taskName" name="taskName" required />
+        <label for="taskDescription">Description de la tâche</label>
+        <textarea id="taskDescription" name="taskDescription" required></textarea>
+        <label for="taskStatus">Statut de la tâche</label>
+        <select id="taskStatus" name="taskStatus" required>
+          <option value="waiting">En attente</option>
+          <option value="in_progress">En cours</option>
+          <option value="done">Terminée</option>
+        </select>
+        <label for="taskPriority">Priorité de la tâche</label>
+        <select id="taskPriority" name="taskPriority" required>
+          <option value="low">Basse</option>
+          <option value="medium">Moyenne</option>
+          <option value="high">Haute</option>
+        </select>
+        <label for="taskStartDate">Date de début</label>
+        <input type="date" id="taskStartDate" name="taskStartDate" required />
+        <label for="taskEndDate">Date de fin</label>
+        <input type="date" id="taskEndDate" name="taskEndDate" required />
+        <label for="taskUsers">Utilisateurs assignés</label>
+        <select id="taskUsers" name="taskUsers" multiple required>
+          @each(user in members)
+            <option value="{{ user.id }}">{{ user.full_name }}</option>
+          @endeach
+        </select>
+        <button type="submit" class="button invite">Ajouter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal pour inviter des utilisateurs -->
+<div id="inviteModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeInviteModal()">&times;</span>
+    <h2>Inviter des utilisateurs</h2>
+    <div class="invite-list-container">
+      <ul class="invite-list">
+        @each(user in users)
+          <li>
+            <span>{{ user.full_name }}</span>
+            <div class="invite-actions">
+              <button class="button invite" onclick="sendInvitation({{ user.id }})">Inviter</button>
+            </div>
+          </li>
+        @endeach
+      </ul>
+    </div>
+  </div>
+</div>
     <script>
 
-        function formatDate(dateString) {
-          const options = { year: 'numeric', month: 'long', day: 'numeric' };
-          return new Date(dateString).toLocaleDateString('fr-FR', options);
-        }
-        
-    document.getElementById('start-date').innerText = formatDate('{{ team.start_date }}');
-    document.getElementById('end-date').innerText = formatDate('{{ team.end_date }}');
-        function loadTasks(){
-          fetch(`/team_task/{{ team.id }}`, {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json"
-            }
-          }).then(response => {
-            if (!response.ok) {
-              return response.json().then(errorData => {
-                throw new Error("Erreur lors du chargement des tâches : " + errorData.message);
-              });
-            }
-            return response.json();
-          }).then(data => {
-            console.log("Tâches récupérées :");
-            console.log(data);
-            // on récupère l'élément timeline et on supprime les tâches déjà affichées
-            const timeline = document.querySelector(".timeline");
-            timeline.innerHTML = "";
-            // on trie les tâches par date de début
-            data.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-            document.getElementById('first-task').innerText = data[0].title + " (" + formatDate(data[0].start_date) + ")";
-          document.getElementById('last-task').innerText = data[data.length - 1].title + " (" + formatDate(data[data.length - 1].start_date) + ")";
-            data.forEach(task => {
-              const taskElement = document.createElement("div");
-              taskElement.classList.add("task");
-              taskElement.classList.add(task.status);
-              taskElement.innerHTML = `
-                <div class="content">
-                  <span>Titre : ${task.title}</span>
-                  <span> Desc : ${task.description}</span>
-                  <span>${formatDate(task.start_date)} - ${formatDate(task.end_date)}</span>
-                  <span> Priorité : ${task.priority}</span>
-                  <span> Status : ${task.status}</span>
-                  ${task.users.map(user => `<img src="${user.image_url}" alt="Photo de ${user.full_name}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;" />`).join("")}
-                </div>
-              `;
-              timeline.appendChild(taskElement);
+      function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('fr-FR', options);
+      }
+      document.getElementById('start-date').innerText = formatDate('{{ team.startDate }}');
+      document.getElementById('end-date').innerText = formatDate('{{ team.endDate }}');
+      function loadTasks(){
+        fetch(`/team_task/{{ team.id }}`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }).then(response => {
+          if (!response.ok) {
+            return response.json().then(errorData => {
+              throw new Error("Erreur lors du chargement des tâches : " + errorData.message);
             });
-          }).catch(error => {
-            console.error("Erreur lors du chargement des tâches :", error);
-            alert("Erreur lors du chargement des tâches : " + error.message);
+          }
+          return response.json();
+        }).then(data => {
+          console.log("Tâches récupérées :");
+          console.log(data);
+          // on récupère l'élément timeline et on supprime les tâches déjà affichées
+          const timeline = document.querySelector(".timeline");
+          timeline.innerHTML = "";
+          // on trie les tâches par date de début
+          data.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+          if (data.length === 0) {
+            document.getElementById('first-task').innerText = "Aucune tâche";
+            document.getElementById('last-task').innerText = "Aucune tâche";
+            return;
+          }
+          // on affiche la première et la dernière tâche, leurs titre et date de début et de fin
+          document.getElementById('first-task').innerText = data[0].title + " (" + formatDate(data[0].start_date) + ")";
+          document.getElementById('last-task').innerText = data[data.length - 1].title + " (" + formatDate(data[data.length - 1].start_date) + ")";
+          data.forEach(task => {
+            const taskElement = document.createElement("div");
+            taskElement.classList.add("task");
+            taskElement.classList.add(task.status);
+            taskElement.innerHTML = `
+              <div class="content">
+                <span>Titre : ${task.title}</span>
+                <span> Desc : ${task.description}</span>
+                <span>${formatDate(task.start_date)} - ${formatDate(task.end_date)}</span>
+                <span> Priorité : ${task.priority}</span>
+                <span> Status : ${task.status}</span>
+                ${task.users.map(user => `<img src="${user.image_url}" alt="Photo de ${user.full_name}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;" />`).join("")}
+              </div>
+            `;
+            timeline.appendChild(taskElement);
           });
-        }
-  
-        loadTasks();
-        function toggleTaskModal() {
-          const today = new Date().toISOString().split('T')[0];
-          const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-          document.getElementById('taskStartDate').value = today;
-          document.getElementById('taskEndDate').value = tomorrow;
-          document.getElementById("taskModal").style.display = "block";
-        }
-  
-        function closeTaskModal() {
-          document.getElementById("taskModal").style.display = "none";
-        }
-        document.getElementById('taskForm').addEventListener('submit', function(event) {
-          event.preventDefault();
-          addTask();
+        }).catch(error => {
+          console.error("Erreur lors du chargement des tâches :", error);
+          alert("Erreur lors du chargement des tâches : " + error.message);
         });
+      }
+
+      loadTasks();
+      function toggleTaskModal() {
+        const today = new Date().toISOString().split('T')[0];
+        const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+        document.getElementById('taskStartDate').value = today;
+        document.getElementById('taskEndDate').value = tomorrow;
+        document.getElementById("taskModal").style.display = "block";
+      }
+
+      function closeTaskModal() {
+        document.getElementById("taskModal").style.display = "none";
+      }
+      function openInviteModal() {
+        document.getElementById("inviteModal").style.display = "block";
+      }
+      
+      function closeInviteModal() {
+        document.getElementById("inviteModal").style.display = "none";
+      }
+
+      document.getElementById('taskForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        addTask();
+      });
+
+      function addTask() {
   
-        function addTask() {
-    
-          const name = document.getElementById("taskName").value;
-          const description = document.getElementById("taskDescription").value;
-          const status = document.getElementById("taskStatus").value;
-          const start_date = document.getElementById("taskStartDate").value;
-          const end_date = document.getElementById("taskEndDate").value;
-          const priority = document.getElementById("taskPriority").value;
-          const users = Array.from(document.getElementById("taskUsers").selectedOptions).map(option => option.value);
-        
-          console.log("Données de la tâche :", {
+        const name = document.getElementById("taskName").value;
+        const description = document.getElementById("taskDescription").value;
+        const status = document.getElementById("taskStatus").value;
+        const start_date = document.getElementById("taskStartDate").value;
+        const end_date = document.getElementById("taskEndDate").value;
+        const priority = document.getElementById("taskPriority").value;
+        const users = Array.from(document.getElementById("taskUsers").selectedOptions).map(option => option.value);
+      
+        console.log("Données de la tâche :", {
+          teamId: {{ team.id }},
+          title: name,
+          description: description,
+          priority: priority,
+          status: status,
+          start_date: start_date,
+          end_date: end_date,
+          users: users,
+        });
+        alert("Ajout de tâche");
+        fetch(`/tasks`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "credentials": "include"
+          },
+          body: JSON.stringify({
             teamId: {{ team.id }},
             title: name,
             description: description,
@@ -160,46 +249,63 @@
             start_date: start_date,
             end_date: end_date,
             users: users,
-          });
-          alert("Ajout de tâche");
-          fetch(`/tasks`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "credentials": "include"
-            },
-            body: JSON.stringify({
-              teamId: {{ team.id }},
-              title: name,
-              description: description,
-              priority: priority,
-              status: status,
-              start_date: start_date,
-              end_date: end_date,
-              users: users,
-            })
-          }).then(response => {
-            if (!response.ok) {
-              alert("Erreur lors de l'ajout de la tâche : " + response );
-              return response.json().then(errorData => {
-                throw new Error("Erreur lors de l'ajout de la tâche : " + errorData.message);
-              });
-            }
-            return response.json();
-          }).then(data => {
-            alert("Tâche ajoutée avec succès.");
-            // on recharge la page pour mettre à jour la liste des tâches
-            location.reload();
-          }).catch(error => {
-            console.error("Erreur lors de l'ajout de la tâche :", error);
-            alert("Erreur lors de l'ajout de la tâche : " + error.message);
-          });
-          loadTasks();
-          // on ferme la modal après avoir ajouté la tâche
-          closeTaskModal();
-        }
-    </script>
+          })
+        }).then(response => {
+          if (!response.ok) {
+            alert("Erreur lors de l'ajout de la tâche : " + response );
+            return response.json().then(errorData => {
+              throw new Error("Erreur lors de l'ajout de la tâche : " + errorData.message);
+            });
+          }
+          return response.json();
+        }).then(data => {
+          alert("Tâche ajoutée avec succès.");
+          // on recharge la page pour mettre à jour la liste des tâches
+          location.reload();
+        }).catch(error => {
+          console.error("Erreur lors de l'ajout de la tâche :", error);
+          alert("Erreur lors de l'ajout de la tâche : " + error.message);
+        });
+        loadTasks();
+        // on ferme la modal après avoir ajouté la tâche
+        closeTaskModal();
+      }
 
+
+      
+      function sendInvitation(userId) {
+        fetch(`/send_invitation`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            credentials: "include"
+          },
+          body: JSON.stringify({
+            userId: userId,
+            teamId: {{ team.id }}
+          })
+        }).then(response => {
+          if (!response.ok) {
+            return response.json().then(errorData => {
+              throw new Error("Erreur lors de l'envoi de l'invitation : " + errorData.message);
+            });
+          }
+          return response.json();
+        }).then(data => {
+          alert("Invitation envoyée avec succès.");
+          // on recharge la page pour mettre à jour la liste des membres
+          location.reload();
+        }).catch(error => {
+          alert("Erreur lors de l'envoi de l'invitation : " + error.message);
+        });
+        // on ferme la modal après avoir envoyé l'invitation 
+        closeInviteModal();
+      }
+      
+
+      
+
+    </script>
     <script type="module">
       import {
         Transmit
@@ -269,8 +375,8 @@
           })
         });
         console.log(response);
+        document.getElementById('messageInput').value = '';
         return response.json();
-        messageInput.value = "";
       }
       document.getElementById('messageInput').addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
@@ -283,9 +389,10 @@
       
       let unsubscribe = notifSubscription.onMessage(data => {
         console.log("Nouveau message reçu :", data);
+        const messageClass = data.senderName === '{{ auth.user.fullName }}' ? "sent" : "received";
         const formattedTime = new Date(data.createdAt).toLocaleTimeString("fr-FR");
         chatBox.innerHTML += `
-            <div class="message-container received" style="display: flex;  margin-bottom: 10px;">
+            <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
               <img 
                 src="${data.senderImage}" 
                 alt="Photo de ${data.senderName}" 
@@ -296,6 +403,7 @@
         scrollToBottom();
       });
 
+      // lorsqu'on quitte la page, on se désabonne des notifications
       window.addEventListener("beforeunload", () => {
         unsubscribe();
       });

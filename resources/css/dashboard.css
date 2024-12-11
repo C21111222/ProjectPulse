@@ -9,95 +9,67 @@ body {
   height: 100vh;
   flex-direction: column;
 }
+
 .timeline-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .project-dates {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 14px;
-    color: #888;
-  }
-  
-  .project-period,
-  .task-dates {
-    display: flex;
-    gap: 20px;
-  }
-  .project-dates {
-    display: flex;
-    gap: 20px;
-    font-size: 14px;
-    color: #888;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.project-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  color: #888;
+}
+
+.project-period,
+.task-dates {
+  display: flex;
+  gap: 10px;
+}
+
 .message-container.received {
   display: flex;
   justify-content: flex-start;
-  /* Les messages commencent du centre */
   flex-direction: row;
-  /* Le texte vient de gauche à droite */
   text-align: left;
   align-self: flex-start;
   margin-right: auto;
-  /* Pousse le conteneur vers la gauche */
   max-width: 50%;
-  /* Limite la largeur du message */
 }
 
 .message-container.received .message-content {
   background-color: #c2bdbd;
-  /* Couleur du fond pour les messages reçus */
   border-radius: 0 10px 10px 10px;
-  /* Arrondi à droite, angle gauche non arrondi */
   padding: 12px 12px;
-  /* Réduction du padding pour éviter l'espace à gauche */
   word-wrap: break-word;
-  /* Gère le texte long */
   white-space: pre-wrap;
-  /* Garde les espaces et retours à la ligne */
   margin-left: 5px;
-  /* Pas de marge à gauche */
   margin-right: 25px;
-  /* Pas de marge à droite */
   max-width: 100%;
-  /* Permet au message de prendre toute la largeur disponible */
 }
 
 .message-container.sent {
   display: flex;
   justify-content: flex-start;
-  /* Les messages commencent du centre */
   flex-direction: row-reverse;
-  /* Le texte vient de droite à gauche */
   text-align: left;
-  /* Alignement du texte à droite */
   align-self: flex-end;
   margin-left: auto;
-  /* Pousse le conteneur vers la droite */
   max-width: 50%;
-  /* Limite la largeur du message */
 }
 
 .message-container.sent .message-content {
   background-color: #d4f1c5;
-  /* Couleur du fond du message */
   border-radius: 10px 0 10px 10px;
-  /* Arrondi à gauche, angle droit non arrondi */
   padding: 12px 12px;
-  /* Réduction du padding pour éviter l'espace à gauche */
   word-wrap: break-word;
-  /* Gère le texte long */
   white-space: pre-wrap;
-  /* Garde les espaces et retours à la ligne */
   margin-right: 25px;
-  /* Pas de marge à droite */
   margin-left: 5px;
-  /* Pas de marge à gauche */
   max-width: 100%;
-  /* Permet au message de prendre toute la largeur disponible */
 }
 
 .message-content {
@@ -112,11 +84,13 @@ body {
   flex-direction: column;
   width: 90%;
   max-width: 1400px;
+  height: 52%; /* Ajuste la hauteur pour utiliser tout l'espace disponible */
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin-bottom: 20px;
+  margin-top: 80px; /* Ajoute un espace en haut pour éviter que le conteneur soit caché par la navbar */
 }
 
 @media (min-width: 768px) {
@@ -127,14 +101,17 @@ body {
 
 .container {
   flex: 1;
-  padding: 30px;
+  padding: 7px;
   text-align: center;
 }
 
 .chat-container {
   flex: 1;
-  padding: 30px;
+  padding: 10px;
   border-top: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 @media (min-width: 768px) {
@@ -227,86 +204,87 @@ h1, h2 {
 
 /* Styles pour le modal */
 .modal {
-display: none; /* Masqué par défaut */
-position: fixed; /* Reste en place même lors du défilement */
-z-index: 1; /* Au-dessus de tout autre contenu */
-left: 0;
-top: 0;
-width: 100%; /* Largeur complète */
-height: 100%; /* Hauteur complète */
-overflow: auto; /* Activer le défilement si nécessaire */
-background-color: rgb(0,0,0); /* Couleur de fond */
-background-color: rgba(0,0,0,0.4); /* Couleur de fond avec opacité */
-padding-top: 60px; /* Espacement en haut */
+  display: none; /* Masqué par défaut */
+  position: fixed; /* Reste en place même lors du défilement */
+  z-index: 1; /* Au-dessus de tout autre contenu */
+  left: 0;
+  top: 0;
+  width: 100%; /* Largeur complète */
+  height: 100%; /* Hauteur complète */
+  overflow: auto; /* Activer le défilement si nécessaire */
+  background-color: rgb(0,0,0); /* Couleur de fond */
+  background-color: rgba(0,0,0,0.4); /* Couleur de fond avec opacité */
+  padding-top: 60px; /* Espacement en haut */
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 5% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 600px;
-    border-radius: 10px;
-    max-height: 80vh; /* Fixe la hauteur maximale de la modal */
-    overflow-y: auto; /* Ajoute une barre de défilement verticale */
-  }
-  
-  .invite-list-container {
-    max-height: 60vh; /* Fixe la hauteur maximale de la liste */
-    overflow-y: auto; /* Ajoute une barre de défilement verticale */
-  }
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 10px;
+  max-height: 80vh; /* Fixe la hauteur maximale de la modal */
+  overflow-y: auto; /* Ajoute une barre de défilement verticale */
+}
+
+.invite-list-container {
+  max-height: 60vh; /* Fixe la hauteur maximale de la liste */
+  overflow-y: auto; /* Ajoute une barre de défilement verticale */
+}
 
 .close {
-color: #aaa;
-float: right;
-font-size: 28px;
-font-weight: bold;
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
 }
 
 .close:hover,
 .close:focus {
-color: black;
-text-decoration: none;
-cursor: pointer;
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .modal-content h2 {
-margin-top: 0;
+  margin-top: 0;
 }
 
 .modal-content label {
-display: block;
-margin-top: 10px;
-font-weight: bold;
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
 }
 
 .modal-content input[type="text"],
 .modal-content input[type="date"],
 .modal-content textarea,
 .modal-content select {
-width: 100%;
-padding: 10px;
-margin-top: 5px;
-margin-bottom: 15px;
-border: 1px solid #ccc;
-border-radius: 5px;
-box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
 }
 
 .modal-content button {
-background-color: #007BFF;
-color: white;
-padding: 10px 20px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-font-size: 16px;
+  background-color: #007BFF;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
 }
 
 .modal-content button:hover {
-background-color: #0056b3;
+  background-color: #0056b3;
 }
+
 .close {
   color: #aaa;
   float: right;
@@ -328,7 +306,8 @@ background-color: #0056b3;
 }
 
 .chat-box {
-  height: 300px;
+  flex-grow: 1;
+  height: 250px;
   overflow-y: scroll;
   border: 1px solid #ddd;
   padding: 10px;
@@ -364,8 +343,12 @@ background-color: #0056b3;
 .timeline-container {
   width: 90%;
   max-width: 1400px;
+  height: auto; /* Ajuste automatiquement la hauteur */
   background-color: white;
-  padding: 30px;
+  padding-top: 10px; /* Réduit l'espace en haut */
+  padding-bottom: 10px; /* Réduit l'espace en bas */
+  padding-left: 20px; /* Ajoute de l'espace à gauche */
+  padding-right: 20px; /* Ajoute de l'espace à droite */
   box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
   border-top: 1px solid #ddd;
   border-radius: 10px;
@@ -374,26 +357,24 @@ background-color: #0056b3;
 }
 
 .timeline {
-    max-height: 400px; /* Ajustez cette valeur selon vos besoins */
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 5px;
-  }
-
+  max-height: 200px; /* Ajustez cette valeur selon vos besoins */
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 5px; /* Réduit le padding */
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
 
 .task {
   display: inline-block; /* Affiche les tâches en ligne */
-  padding: 10px 40px;
+  padding: 5px 20px; /* Réduit le padding */
   position: relative;
   background-color: inherit;
   width: auto; /* Ajuste la largeur automatiquement */
 }
 
-
 .content {
-  padding: 20px 30px;
+  padding: 5px 10px; /* Réduit le padding */
   background-color: white;
   position: relative;
   border-radius: 6px;
@@ -402,7 +383,35 @@ background-color: #0056b3;
   white-space: normal; /* Permet le retour à la ligne pour le texte */
 }
 
+.content span {
+  font-size: 12px; /* Réduit la taille de la police */
+}
+
 .task span {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 3px; /* Réduit la marge */
+}
+
+/* Media queries pour les petits écrans */
+@media (max-width: 767px) {
+  .main-container {
+    margin-top: 100px; /* Ajoute un espace en haut pour éviter que le conteneur soit caché par la navbar */
+  }
+
+  .chat-box {
+    height: 150px; /* Réduit la hauteur de la boîte de chat */
+  }
+
+  .chat-input {
+    flex-direction: column; /* Affiche le champ de saisie et le bouton d'envoi en colonne */
+  }
+
+  .chat-input input {
+    border-radius: 5px; /* Ajuste les coins arrondis */
+    margin-bottom: 10px; /* Ajoute un espace en bas */
+  }
+
+  .chat-input button {
+    border-radius: 5px; /* Ajuste les coins arrondis */
+  }
 }

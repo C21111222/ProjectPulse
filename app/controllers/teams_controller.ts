@@ -159,20 +159,6 @@ export default class TeamsController {
       return response.status(404).json({ message: 'Utilisateur non trouvé' })
     }
     // on recupere le role de l'utilisateur dans l'equipe qui se trouve dans le pivot
-    const role = await db
-      .from('user_teams')
-      .where('team_id', teamId)
-      .where('user_id', user.id)
-      .select('role')
-      .first()
-    if (!role) {
-      return response.status(404).json({ message: 'Utilisateur non trouvé' })
-    }
-    if (role.role !== 'admin' && role.role !== 'manager') {
-      return response
-        .status(403)
-        .json({ message: "Vous n'avez pas les droits pour effectuer cette action" })
-    }
 
     const team = await Team.find(teamId)
     // on verifie qu'il n'y a pas déjà une invitation en cours

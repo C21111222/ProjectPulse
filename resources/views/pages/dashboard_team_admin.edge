@@ -140,8 +140,8 @@
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('fr-FR', options);
       }
-      document.getElementById('start-date').innerText = formatDate('{{ team.start_date }}');
-      document.getElementById('end-date').innerText = formatDate('{{ team.end_date }}');
+      document.getElementById('start-date').innerText = formatDate('{{ team.startDate }}');
+      document.getElementById('end-date').innerText = formatDate('{{ team.endDate }}');
       function loadTasks(){
         fetch(`/team_task/{{ team.id }}`, {
           method: "GET",
@@ -165,6 +165,11 @@
           // on trie les tâches par date de début
           data.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
           // on affiche la première et la dernière tâche, leurs titre et date de début et de fin
+          if (data.length === 0) {
+            document.getElementById('first-task').innerText = "Aucune tâche";
+            document.getElementById('last-task').innerText = "Aucune tâche";
+            return;
+          }
           document.getElementById('first-task').innerText = data[0].title + " (" + formatDate(data[0].start_date) + ")";
           document.getElementById('last-task').innerText = data[data.length - 1].title + " (" + formatDate(data[data.length - 1].start_date) + ")";
           data.forEach(task => {
@@ -467,9 +472,10 @@
       
       let unsubscribe = notifSubscription.onMessage(data => {
         console.log("Nouveau message reçu :", data);
+        const messageClass = data.senderName === '{{ auth.user.fullName }}' ? "sent" : "received";
         const formattedTime = new Date(data.createdAt).toLocaleTimeString("fr-FR");
         chatBox.innerHTML += `
-            <div class="message-container received" style="display: flex;  margin-bottom: 10px;">
+            <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
               <img 
                 src="${data.senderImage}" 
                 alt="Photo de ${data.senderName}" 
