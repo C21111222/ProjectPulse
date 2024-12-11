@@ -78,6 +78,10 @@ export default class TeamsController {
         'id',
         members.map((member) => member.user_id)
       )
+      .whereNotIn(
+        'id',
+        invitedUserIds.map((invitedUser) => invitedUser.invitee_id)
+      )
       .andWhere('id', '!=', 999999)
       .andWhere('id', '!=', user.id)
       .select('id', 'full_name', 'email', 'image_url')
