@@ -27,12 +27,6 @@
             @else
               @if(user.role == 'admin')
                 <span>(Administrateur)</span>
-              @else
-                <div class="user-actions">
-                  <button class="button promote" onclick="promoteToManager({{ user.id }})">Promouvoir</button>
-                  <button class="button demote" onclick="demoteManager({{ user.id }})">Rétrograder</button>
-                  <button class="button delete" onclick="deleteUser({{ user.id }})">Supprimer</button>
-                </div>
               @endif
             @endif
           </li>
