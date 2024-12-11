@@ -1,4 +1,4 @@
-// import type { HttpContext } from '@adonisjs/core/http'
+import type { HttpContext } from '@adonisjs/core/http'
 import Team from '#models/team'
 import User from '#models/user'
 import Notification from '#models/notification'
@@ -10,8 +10,6 @@ import {
 } from '#services/notification_service'
 import db from '@adonisjs/lucid/services/db'
 import logger from '@adonisjs/core/services/logger'
-import { json } from 'stream/consumers'
-import { log } from 'console'
 
 enum Role {
   Admin = 'admin',
@@ -22,12 +20,15 @@ enum Role {
 export default class TeamsController {
   private notificationService = new NotificationService()
 
-  public async create({ view }) {
+  public async create({ view } : HttpContext) {
     return view.render('pages/create_team')
   }
 
-  public async dashboardTeam({ view, auth, params, response }) {
+  public async dashboardTeam({ view, auth, params, response } : HttpContext) {
     logger.info('Dashboard team')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const user = await User.find(auth.user.id)
     if (!user) {
       return view.render('pages/dashboard', { teams: [] })
@@ -94,35 +95,12 @@ export default class TeamsController {
     })
   }
 
-  public async createTeam1({ request, response, auth }) {
-    logger.info('Creating team1')
-    logger.info(request.all())
-    const data = request.only(['name', 'description', 'imageUrl', 'status', 'startDate', 'endDate'])
-    const teamExist = await Team.findBy('name', data.name)
-    if (teamExist) {
-      return response.status(409).json({ message: 'Cette équipe existe déjà' })
-    }
-    const team = new Team()
-    team.name = data.name
-    team.description = data.description
-    team.imageUrl = data.imageUrl
-    team.status = data.status
-    team.startDate = data.startDate
-    team.endDate = data.endDate
 
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({ message: 'Utilisateur non trouvé' })
-    }
-    await team.save()
-    // on ajoute l'utilisateur qui a créé l'équipe en tant qu'admin
-    await user.related('teams').attach([team.id])
-    await user.related('teams').pivotQuery().where('team_id', team.id).update({ role: Role.Admin })
-    return response.redirect('/dashboard')
-  }
-
-  async createTeam({ auth, request, response }) {
+  async createTeam({ auth, request, response } : HttpContext) {
     logger.info('Creating team')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const teamData = request.only([
       'name',
       'description',
@@ -153,7 +131,11 @@ export default class TeamsController {
     return response.json(team)
   }
 
-  async changeStatus({ auth, request, response }) {
+  async changeStatus({ auth, request, response } : HttpContext) {
+    logger.info('Changing status')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const teamId = request.input('teamId')
     const user = await User.find(auth.user.id)
     if (!user) {
@@ -207,8 +189,11 @@ export default class TeamsController {
     }
   }
 
-  async sendInvitation({ auth, request, response }) {
+  async sendInvitation({ auth, request, response } :HttpContext) {
     logger.info('Sending invitation')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const { teamId, userId } = request.only(['teamId', 'userId'])
     // on verifie que l'utilisateur qui envoie la requete est bien admin ou manager de l'equipe
 
@@ -260,7 +245,7 @@ export default class TeamsController {
         teamName: team!.name,
         teamImage: team!.imageUrl,
         inviterId: auth.user.id,
-        inviterName: auth.user.fullName,
+        inviterName: auth.user.fullName || '',
         inviterImage: auth.user.imageUrl,
         type: NotificationType.TEAM_INVITE,
       }
@@ -273,8 +258,11 @@ export default class TeamsController {
     }
   }
 
-  async acceptInvitation({ auth, params, response }) {
+  async acceptInvitation({ auth, params, response } :HttpContext) {
     logger.info('Accepting invitation')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const notification1 = await Notification.query()
       .where('id', params.id)
       .where('invitee_id', auth.user.id)
@@ -325,8 +313,11 @@ export default class TeamsController {
     }
   }
 
-  async declineInvitation({ auth, request, response }) {
+  async declineInvitation({ auth, request, response } :HttpContext) {
     logger.info('Declining invitation')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const notificationId = request.input('notificationId')
     const notification1 = await Notification.query()
       .where('id', notificationId)
@@ -378,8 +369,11 @@ export default class TeamsController {
     }
   }
 
-  async deleteFromTeam({ auth, request, response }) {
+  async deleteFromTeam({ auth, request, response } :HttpContext) {
     logger.info('Deleting from team')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const teamId = request.input('teamId')
     const userId = request.input('userId')
     console.log(request.all())
@@ -467,8 +461,11 @@ export default class TeamsController {
     }
   }
 
-  async promoteUser({ auth, request, response }) {
+  async promoteUser({ auth, request, response } :HttpContext) {
     logger.info('Promoting user')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const { teamId, userId } = request.only(['teamId', 'userId'])
     // on verifie que l'utilisateur qui envoie la requete est bien admin de l'equipe
 
@@ -542,8 +539,11 @@ export default class TeamsController {
     }
   }
 
-  async demoteUser({ auth, request, response }) {
+  async demoteUser({ auth, request, response } :HttpContext) {
     logger.info('Demoting user')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const { teamId, userId } = request.only(['teamId', 'userId'])
     // on verifie que l'utilisateur qui envoie la requete est bien admin de l'equipe
 
@@ -608,8 +608,11 @@ export default class TeamsController {
       .json({ message: "Impossible de rétrograder l'utilisateur, il est déjà membre" })
   }
 
-  async getMembers({ auth, request, response }) {
+  async getMembers({ auth, request, response } :HttpContext) {
     logger.info('Getting members')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const teamId = request.input('teamId')
     const user = await User.find(auth.user.id)
     if (!user) {
@@ -640,8 +643,11 @@ export default class TeamsController {
     return response.json(users)
   }
 
-  async deleteTeam({ auth, request, response }) {
+  async deleteTeam({ auth, request, response } :HttpContext) {
     logger.info('Deleting team')
+    if (!auth.user) {
+        return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
     const teamId = request.input('teamId')
     logger.info('Team id %s', teamId)
     const user = await User.find(auth.user.id)
