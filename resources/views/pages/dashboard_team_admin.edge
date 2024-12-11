@@ -62,6 +62,8 @@
       <div class="project-dates">
         <span>Début : <span id="start-date"></span></span>
         <span>Fin : <span id="end-date"></span></span>
+        <span>Premiere tâche : <span id="first-task"></span></span>
+        <span>Dernière tâche : <span id="last-task"></span></span>
       </div>
     </div>
     <button class="button invite" onclick="toggleTaskModal()">Ajouter une tâche</button>
@@ -158,6 +160,9 @@
           timeline.innerHTML = "";
           // on trie les tâches par date de début
           data.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+          // on affiche la première et la dernière tâche, leurs titre et date de début et de fin
+          document.getElementById('first-task').innerText = data[0].title + " (" + formatDate(data[0].start_date) + ")";
+          document.getElementById('last-task').innerText = data[data.length - 1].title + " (" + formatDate(data[data.length - 1].start_date) + ")";
           data.forEach(task => {
             const taskElement = document.createElement("div");
             taskElement.classList.add("task");
