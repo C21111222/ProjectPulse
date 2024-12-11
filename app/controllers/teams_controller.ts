@@ -64,15 +64,26 @@ export default class TeamsController {
       .select('users.id', 'users.full_name', 'users.email', 'user_teams.role', 'users.image_url')
     // on charge tous les utilisateurs du site qui ne sont pas dans l'equipe
     logger.info('selecting users')
-    const users = await db
-      .from('users')
-      .whereNotIn(
-        'id',
-        members.map((member) => member.user_id)
-      )
-      .andWhere('id', '!=', 999999)
-      .andWhere('id', '!=', user.id)
-      .select('id', 'full_name', 'email', 'image_url')
+    const invitedUserIds = await db
+    .from('notifications')
+    .where('teamId', teamId)
+    .where('type', NotificationType.TEAM_INVITE)
+    .select('inviteeId');
+  
+  const users = await db
+    .from('users')
+    .whereNotIn(
+      'id',
+      members.map((member) => member.user_id)
+    )
+    .andWhere('id', '!=', 999999)
+    .andWhere('id', '!=', user.id)
+    .whereNotIn(
+      'id',
+      invitedUserIds.map((invitation) => invitation.inviteeId)
+    )
+    .select('id', 'full_name', 'email', 'image_url');
+    
     // s'il est admin on renvoie la vue avec le role admin
     if (role.role === Role.Admin || role.role === Role.Manager) {
       return view.render('pages/dashboard_team_admin', {
