@@ -39,7 +39,7 @@ export default class AuthController {
       logger.info("Tentative de connexion avec l'email " + request.input('email'))
   
       try {
-        const validatedData = await request.validate(loginValidator)
+        const validatedData = await request.validateUsing(loginValidator)
         email = validatedData.email
         password = validatedData.password
         const user = await User.verifyCredentials(email, password)
@@ -76,7 +76,7 @@ export default class AuthController {
 
     logger.info("Tentative de connexion avec l'email " + request.input('email'))
     try {
-      const { email, password } = request.validateUsing(loginValidator)
+      const { email, password } = request.all()
       const user = await User.verifyCredentials(email, password)
       if (user) {
         await auth.use('web').login(user)
