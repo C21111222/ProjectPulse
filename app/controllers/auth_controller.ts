@@ -34,38 +34,25 @@ export default class AuthController {
    * ```
    */
   public async login({ request, auth, response, session }: HttpContextContract) {
-    const { email, password } = request.validateUsing(loginValidator)
-    logger.info("Tentative de connexion avec l'email %s", email)
-    try {
-      const user = await User.verifyCredentials(email, password)
-      if (user) {
+      let email: string
+      let password: string
+  
+      try {
+        const validatedData = await request.validate(loginValidator)
+        email = validatedData.email
+        password = validatedData.password
+        const user = await User.verifyCredentials(email, password)
         await auth.use('web').login(user)
-        logger.info("Connexion réussie pour l'email %s", email)
         return response.redirect('/dashboard')
-      } else {
-        logger.info("Connexion échouée pour l'email %s", email)
+      } catch (error) {
+        logger.error("Erreur lors de la validation des données de connexion")
+        logger.error(error)
         session.flash('notification', {
           type: 'error',
-          message: 'Email ou mot de passe incorrect.',
+          message: 'Une erreur est survenue lors de la connexion.',
         })
         return response.redirect('back')
       }
-    } catch (error) {
-      logger.info("Connexion échouée pour l'email %s", email)
-      if (error.code == 'E_INVALID_CREDENTIALS') {
-        session.flash('notification', {
-          type: 'error',
-          message: 'Email ou mot de passe incorrect.',
-        })
-        return response.redirect('back')
-      }
-      session.flash('notification', {
-        type: 'error',
-        message: 'Une erreur est survenue lors de la connexion.',
-      })
-      return response.redirect('back')
-    }
-  }
 
   /**
    * Handles the fast login process for a user.
