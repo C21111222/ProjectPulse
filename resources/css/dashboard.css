@@ -10,12 +10,6 @@ body {
   flex-direction: column;
 }
 
-.timeline-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .project-dates {
   display: flex;
   flex-direction: column;
@@ -98,7 +92,47 @@ body {
     flex-direction: row;
   }
 }
+.delete-task-btn {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 16px;
+  cursor: pointer;
+  float: right;
+  margin-left: 10px;
+}
+.task-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
 
+.task-stats canvas {
+  max-width: 100px;
+  max-height: 100px;
+  margin: 0 10px; /* Ajoute un espace entre les graphiques */
+}
+
+.chart-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto; /* Centre les graphiques horizontalement */
+}
+
+.chart-label {
+  position: absolute;
+  top: 0%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+.delete-task-btn:hover {
+  color: darkred;
+}
 .container {
   flex: 1;
   padding: 7px;
@@ -340,30 +374,6 @@ h1, h2 {
   background-color: #0056b3;
 }
 
-.timeline-container {
-  width: 90%;
-  max-width: 1400px;
-  height: auto; /* Ajuste automatiquement la hauteur */
-  background-color: white;
-  padding-top: 10px; /* Réduit l'espace en haut */
-  padding-bottom: 10px; /* Réduit l'espace en bas */
-  padding-left: 20px; /* Ajoute de l'espace à gauche */
-  padding-right: 20px; /* Ajoute de l'espace à droite */
-  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-  border-top: 1px solid #ddd;
-  border-radius: 10px;
-  overflow-x: auto; /* Ajout de la barre de défilement horizontale */
-  white-space: nowrap; /* Empêche le retour à la ligne pour les éléments enfants */
-}
-
-.timeline {
-  max-height: 200px; /* Ajustez cette valeur selon vos besoins */
-  overflow-y: auto;
-  border: 1px solid #ddd;
-  padding: 5px; /* Réduit le padding */
-  background-color: #f9f9f9;
-  border-radius: 5px;
-}
 
 .task {
   display: inline-block; /* Affiche les tâches en ligne */
@@ -415,3 +425,97 @@ h1, h2 {
     border-radius: 5px; /* Ajuste les coins arrondis */
   }
 }
+.timeline-container {
+  width: 90%;
+  max-width: 1400px;
+  display: flex;
+  height: auto; /* Ajuste automatiquement la hauteur */
+  background-color: white;
+  padding-top: 10px; /* Réduit l'espace en haut */
+  padding-bottom: 10px; /* Réduit l'espace en bas */
+  padding-left: 20px; /* Ajoute de l'espace à gauche */
+  padding-right: 20px; /* Ajoute de l'espace à droite */
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid #ddd;
+  border-radius: 10px;
+  overflow-x: auto; /* Ajout de la barre de défilement horizontale */
+  white-space: nowrap; /* Empêche le retour à la ligne pour les éléments enfants */
+}
+.timeline-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-right: 20px;
+  border-right: 1px solid #ddd;
+  padding-right: 20px;
+}
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.timeline-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.button.invite {
+  background-color: #5A45FF;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button.invite:hover {
+  background-color: #4a3ae0;
+}
+
+.timeline {
+  flex: 1;
+  margin-right: 20px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  overflow-y: auto;
+  max-height: 400px; /* Ajustez cette valeur selon vos besoins */
+}
+
+.task-stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.project-period,
+.task-dates {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.task-chart {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.task-chart canvas {
+  max-width: 100px;
+  max-height: 100px;
+}
+
+.chart-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto; /* Centre les graphiques horizontalement */
+}
+

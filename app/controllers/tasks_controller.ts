@@ -18,6 +18,36 @@ export default class TasksController {
     return response.status(200).json(tasks)
   }
 
+  async getTask({ response, auth, params }) {
+    logger.info('Getting task')
+    const user = await User.find(auth.user.id)
+    if (!user) {
+      return response.status(404).json({
+        message: 'User not found',
+      })
+    }
+    const taskId = params.id
+    logger.info('Task id: ' + taskId)
+    if (!taskId) {
+      return response.status(400).json({
+        message: 'Task id is required',
+      })
+    }
+    const task = await Task.find(taskId)
+    if (!task) {
+      return response.status(404).json({
+        message: 'Task not found',
+      })
+    }
+    const team = await user.related('teams').query().where('team_id', task.teamId).first()
+    if (!team) {
+      return response.status(403).json({
+        message: 'You are not part of this team',
+      })
+    }
+    return response.status(200).json(task)
+  }
+
   async getTeamTasks({ response, auth, params }) {
     const user = await User.find(auth.user.id)
     logger.info('Getting team tasks')
@@ -53,6 +83,38 @@ export default class TasksController {
     }
     logger.info('Tasks retrieved')
     return response.status(200).json(tasks)
+  }
+
+  async getTeamTaskStat({ response, auth, params }) {
+    const user = await User.find(auth.user.id)
+    logger.info('Getting team task stat')
+    if (!user) {
+      return response.status(404).json({
+        message: 'User not found',
+      })
+    }
+    const teamId = params.id
+    logger.info('Team id: ' + teamId)
+    if (!teamId) {
+      return response.status(400).json({
+        message: 'Team id is required',
+      })
+    }
+    const team = await db.from('user_teams').where('user_id', user.id).andWhere('team_id', teamId).first()
+    if (!team) {
+      return response.status(403).json({
+        message: 'You are not part of this team',
+      })
+    }
+    const tasks = await db.from('tasks').where('team_id', teamId)
+    const stat = {
+      total: tasks.length,
+      done: tasks.filter((task) => task.status === 'done').length,
+      inProgress: tasks.filter((task) => task.status === 'in_progress').length,
+      waiting: tasks.filter((task) => task.status === 'waiting').length,
+    }
+    logger.info('Team task stat retrieved')
+    return response.status(200).json(stat)
   }
 
   async addTask({ response, auth, request }) {
@@ -200,5 +262,60 @@ export default class TasksController {
     return response.status(200).json({
       message: 'Task deleted',
     })
+  }
+
+  async updateTask({ response, auth, request }) {
+    logger.info('Updating task')
+    const user = await User.find(auth.user.id)
+    if (!user) {
+      logger.error('User not found')
+      return response.status(404).json({
+        message: 'User not found',
+      })
+    }
+    const taskId = request.input('taskId')
+    if (!taskId) {
+      logger.error('Task id is required')
+      return response.status(400).json({
+        message: 'Task id is required',
+      })
+    }
+    const task = await Task.find(taskId)
+    if (!task) {
+      logger.error('Task not found')
+      return response.status(404).json({
+        message: 'Task not found',
+      })
+    }
+    const team = await user.related('teams').query().where('team_id', task.teamId).first()
+    if (!team) {
+      logger.error('You are not part of this team')
+      return response.status(403).json({
+        message: 'You are not part of this team',
+      })
+    }
+    const userRole = await db
+      .from('user_teams')
+      .where('user_id', user.id)
+      .andWhere('team_id', task.teamId)
+      .first()
+    const isCreator = await db
+      .from('user_tasks')
+      .where('user_id', user.id)
+      .andWhere('task_id', task.id)
+      .first()
+    if (userRole.role !== 'admin' && userRole.role !== 'manager' && !isCreator) {
+      logger.error('You are not allowed to update this task')
+      return response.status(403).json({
+        message: 'You are not allowed to update this task',
+      })
+    }
+    task.status = request.input('status')
+    task.priority = request.input('priority')
+    task.startDate = request.input('start_date')
+    task.endDate = request.input('end_date')
+    await task.save()
+    logger.info('Task updated')
+    return response.status(200).json(task)
   }
 }

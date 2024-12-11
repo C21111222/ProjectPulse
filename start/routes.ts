@@ -101,9 +101,13 @@ router
     // Tâches
     router.get('/tasks', [TaskController, 'getUserTasks'])
     router.get('/team_task/:id', [TaskController, 'getTeamTasks'])
+    router.get('/task_stat/:id', [TaskController, 'getTeamTaskStat'])
+    router.post('/update_task', [TaskController, 'updateTask'])
+    router.get('/task/:id', [TaskController, 'getTask'])
     router.post('/tasks', [TaskController, 'addTask'])
     router.post('/delete_task', [TaskController, 'deleteTask'])
     router.post('/add_user_task', [TaskController, 'addUsersToTask'])
+
 
     // Notifications
     router.get('/notifications', [NotificationController, 'getNotifications'])
