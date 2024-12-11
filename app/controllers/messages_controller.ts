@@ -8,6 +8,7 @@ import {
   NotificationMessage,
   NotificationType,
 } from '#services/notification_service'
+import db from '@adonisjs/lucid/services/db'
 
 export default class MessageriesController {
   private notificationService: NotificationService = new NotificationService()
@@ -320,7 +321,7 @@ export default class MessageriesController {
       await this.notificationService.sendNotification(channelT, chatMessage)
       // on attend 0.5s pour être sûr que le message est bien enregistré puis on verifie si le message a été vu
       setTimeout(async () => {
-        const message = await Message.find(newMessage.id)
+        const message = await db.from('messages').where('id', newMessage.id).first()
         logger.info('envoi de la notif')
         if (message && !message.viewed) {
           logger.info('message non vu')
@@ -336,7 +337,7 @@ export default class MessageriesController {
           }
           await this.notificationService.sendNotification(channelNotif, notificationMessage)
         }
-      }, 500)
+      }, 1000)
     } catch (error) {
       return response.status(500).json({ message: "Erreur lors de l'envoi du message" })
     }
