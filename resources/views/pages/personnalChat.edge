@@ -161,7 +161,7 @@
         const formattedTime = new Date(data.createdAt).toLocaleTimeString('fr-FR');
         const chatBox = document.getElementById('chatBox');
         if (data.sender !== {{ auth.user.id }}) {
-          sendViewedNotificationSingle(data.id);
+          sendViewedNotificationSingle(data.messageId);
         }
         chatBox.innerHTML += `
           <div class="message-container ${messageClass}" style="display: flex; margin-bottom: 10px;">
