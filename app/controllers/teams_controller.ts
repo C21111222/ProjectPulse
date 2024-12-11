@@ -65,13 +65,8 @@ export default class TeamsController {
     if (!auth.user) {
         return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
     }
+    try {
     const teamData = await request.validateUsing(createTeamValidator)
-    // on verifie si une equipe avec le meme nom existe deja
-    const teamExist = await Team.findBy('name', teamData.name)
-    if (teamExist) {
-      return response.status(409).json({ message: 'Cette équipe existe déjà' })
-    }
-    
     const team = await Team.create({
       name: teamData.name,
       description: teamData.description,
@@ -80,12 +75,13 @@ export default class TeamsController {
       startDate: request.input('start_date'),
       endDate: request.input('end_date'),
     })
-    try {
       await this.addMember(auth.user.id, team.id, Role.Admin)
+      return response.json(team)
     } catch (error) {
-      return response.status(500).json({ message: "Impossible de créer l'équipe" + error.message })
+      logger.error(error)
+      return response.status(500).json({ message: "Impossible de créer l'équipe : " + error.messages[0].message })
     }
-    return response.json(team)
+
   }
 
   async changeStatus({ auth, request, response } : HttpContext) {
@@ -570,12 +566,12 @@ export default class TeamsController {
     return response.json(users)
   }
 
-  async deleteTeam({ auth, request, response } :HttpContext) {
+  async deleteTeam({ auth, params, response } :HttpContext) {
     logger.info('Deleting team')
     if (!auth.user) {
         return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
     }
-    const teamId = request.input('teamId')
+    const teamId = params.id
     const user = await User.find(auth.user.id)
     if (!user) {
       return response.status(404).json({ message: 'Utilisateur non trouvé' })

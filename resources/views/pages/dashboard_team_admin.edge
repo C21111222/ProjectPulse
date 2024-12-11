@@ -40,6 +40,7 @@
       </ul>
       <button class="button invite" onclick="openInviteModal()">Inviter</button>
       <a href="/dashboard" class="button back-button">Retour</a>
+      <button class="button delete" onclick="deleteTeam()">Supprimer l'équipe</button>
     </div>
 
     <!-- Section de chat d'équipe -->
@@ -135,6 +136,28 @@
   </div>
 </div>
     <script>
+      function deleteTeam(){
+        fetch(`/delete_team/{{ team.id }}`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }).then(response => {
+          if (!response.ok) {
+            return response.json().then(errorData => {
+              throw new Error("Erreur lors de la suppression de l'équipe : " + errorData.message);
+            });
+          }
+          return response.json();
+        }).then(data => {
+          alert("Équipe supprimée avec succès.");
+          // on redirige l'utilisateur vers la page d'accueil
+          window.location.href = "/dashboard";
+        }).catch(error => {
+          alert("Erreur lors de la suppression de l'équipe : " + error.message);
+        });
+      }
 
       function formatDate(dateString) {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };

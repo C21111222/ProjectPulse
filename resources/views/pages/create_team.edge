@@ -1,161 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Créer une équipe
-    </title>
-    <link rel="stylesheet" href="/path/to/your/styles.css" />
-    <style>
-      body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #F7F8FA;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        color: #46444c;
-      }
-      
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Créer une équipe</title>
+  <link rel="stylesheet" href="/path/to/your/styles.css" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #F7F8FA;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #46444c;
+    }
+
+    .form-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .form-container h2 {
+      margin-top: 0;
+    }
+
+    .form-container label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form-container input,
+    .form-container textarea,
+    .form-container select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .form-container button {
+      background-color: #5A45FF;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+
+    .form-container button:hover {
+      background-color: #4a3ae0;
+    }
+
+    @media (max-width: 600px) {
       .form-container {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-        width: 90%;
-        max-width: 400px;
+        padding: 15px;
       }
-      
-      .form-container h2 {
-        margin-top: 0;
-      }
-      
-      .form-container label {
-        display: block;
-        margin-bottom: 5px;
-      }
-      
+
       .form-container input,
       .form-container textarea,
       .form-container select {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
+        padding: 8px;
       }
-      
+
       .form-container button {
-        background-color: #5A45FF;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        width: 100%;
+        padding: 8px 15px;
       }
-      
-      .form-container button:hover {
-        background-color: #4a3ae0;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Créer une équipe</h2>
+    <form id="create-team-form" enctype="multipart/form-data">
+      <label for="name">Nom de l'équipe</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="4" required></textarea>
+
+      <label for="status">Statut</label>
+      <select id="status" name="status" required>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+
+      <label for="start_date">Date de début</label>
+      <input type="date" id="start_date" name="start_date" required />
+
+      <label for="end_date">Date de fin</label>
+      <input type="date" id="end_date" name="end_date" required />
+
+      <label for="image">Image de l'équipe</label>
+      <input type="file" id="image" name="image" accept="image/*" required />
+
+      <button type="submit">Créer</button>
+    </form>
+  </div>
+
+  <script>
+    // Définir les valeurs par défaut pour les dates
+    document.addEventListener('DOMContentLoaded', (event) => {
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+      document.getElementById('start_date').value = today;
+      document.getElementById('end_date').value = tomorrow;
+    });
+
+    document.getElementById("create-team-form").addEventListener("submit", async function(event) {
+      event.preventDefault();
+      const formData = new FormData(this);
+      try {
+        // Étape 1 : Créer l'équipe
+        const response = await fetch("/teams", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: formData.get("name"),
+            description: formData.get("description"),
+            status: formData.get("status"),
+            start_date: formData.get("start_date"),
+            end_date: formData.get("end_date")
+          })
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error(errorData);
+          throw new Error(errorData.message);
+        }
+        const team = await response.json();
+        // Étape 2 : Télécharger l'image
+        const imageFormData = new FormData();
+        imageFormData.append("image", formData.get("image"));
+        imageFormData.append("team_id", team.id);
+        const imageResponse = await fetch("/upload_team_image", {
+          method: "POST",
+          body: imageFormData
+        });
+        if (!imageResponse.ok) {
+          throw new Error("Erreur lors du téléchargement de l'image");
+        }
+        alert("Équipe créée avec succès");
+        window.location.href = "/dashboard";
+      } catch (error) {
+        console.error(error);
+        alert("Erreur : " + error.message);
       }
-      
-      @media (max-width: 600px) {
-        .form-container {
-          padding: 15px;
-        }
-      
-        .form-container input,
-        .form-container textarea,
-        .form-container select {
-          padding: 8px;
-        }
-      
-        .form-container button {
-          padding: 8px 15px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="form-container">
-      <h2>
-        Créer une équipe
-      </h2>
-      <form id="create-team-form" enctype="multipart/form-data">
-        <label for="name">Nom de l'équipe</label>
-        <input type="text" id="name" name="name" required />
-
-        <label for="description">Description</label>
-        <textarea id="description" name="description" rows="4" required></textarea>
-
-        <label for="status">Statut</label>
-        <select id="status" name="status" required>
-          <option value="active">
-            Active
-          </option>
-          <option value="inactive">
-            Inactive
-          </option>
-        </select>
-
-        <label for="start_date">Date de début</label>
-        <input type="date" id="start_date" name="start_date" required />
-
-        <label for="end_date">Date de fin</label>
-        <input type="date" id="end_date" name="end_date" required />
-
-        <label for="image">Image de l'équipe</label>
-        <input type="file" id="image" name="image" accept="image/*" required />
-
-        <button type="submit">Créer</button>
-      </form>
-    </div>
-
-    <script>
-      document.getElementById("create-team-form").addEventListener("submit", async function(event) {
-        event.preventDefault();
-        const formData = new FormData(this);
-        try {
-          // Étape 1 : Créer l'équipe
-          const response = await fetch("/teams", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              name: formData.get("name"),
-              description: formData.get("description"),
-              status: formData.get("status"),
-              start_date: formData.get("start_date"),
-              end_date: formData.get("end_date")
-            })
-          });
-          if (!response.ok) {
-            throw new Error("Erreur lors de la création de l'équipe");
-          }
-          const team = await response.json();
-          // Étape 2 : Télécharger l'image
-          const imageFormData = new FormData();
-          imageFormData.append("image", formData.get("image"));
-          imageFormData.append("team_id", team.id);
-          const imageResponse = await fetch("/upload_team_image", {
-            method: "POST",
-            body: imageFormData
-          });
-          if (!imageResponse.ok) {
-            throw new Error("Erreur lors du téléchargement de l'image");
-          }
-          alert("Équipe créée avec succès");
-          window.location.href = "/dashboard";
-        } catch (error) {
-          console.error(error);
-          alert("Erreur : " + error.message);
-        }
-      });
-    </script>
-  </body>
+    });
+  </script>
+</body>
 </html>
