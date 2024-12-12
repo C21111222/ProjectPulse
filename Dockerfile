@@ -1,22 +1,18 @@
-# Étape 1: Utiliser une image Node.js comme base
-FROM node:22
+# Étape 1: Base avec Playwright préinstallé
+FROM node:22 as base
 
-# Étape 2: Définir le répertoire de travail dans le conteneur
 WORKDIR /app
-
-# Étape 3: Copier les fichiers de votre projet dans le conteneur
-COPY package*.json ./
-
-# Étape 4: Installer les dépendances
-RUN npm install
-
+RUN npm install -g npm@latest
 RUN npx playwright install
 RUN npx playwright install-deps
-# Étape 5: Copier le reste du projet dans le conteneur
+
+# Étape 2: Application spécifique
+FROM base as app
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
 COPY . .
 
-# Étape 6: Exposer le port 3333
 EXPOSE 3333
-
-# Étape 7: Démarrer l'application AdonisJS
 CMD ["npm", "run", "dev"]
