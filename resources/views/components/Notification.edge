@@ -129,35 +129,35 @@
      case NotificationType.TEAM_INVITE:
       notificationItem.classList.add("team-invite-notification");
       notificationItem.innerHTML = `<div><p><img src="${notification.inviterImage}" class="img-inviter"> ${notification.inviterName} vous a invité à rejoindre l'équipe <img src="${notification.teamImage}" class="img-team"> ${notification.teamName}</p>
-            <div class="notification-buttons">
-              <button onclick="acceptInvitation(${notification.notificationId})">Accepter</button>
-              <button onclick="declineInvitation(${notification.notificationId})">Décliner</button>
-            </div>
-          </div>`;
+              <div class="notification-buttons">
+                <button onclick="acceptInvitation(${notification.notificationId})">Accepter</button>
+                <button onclick="declineInvitation(${notification.notificationId})">Décliner</button>
+              </div>
+            </div>`;
       break;
   
      case NotificationType.TEAM_INVITE_ACCEPTED:
       notificationItem.classList.add("team-invite-accepted-notification");
       notificationItem.innerHTML = `
-            ${notification.inviterName} a accepté l'invitation à rejoindre l'équipe ${notification.teamName}
-            <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
-          `;
+              ${notification.inviterName} a accepté l'invitation à rejoindre l'équipe ${notification.teamName}
+              <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+            `;
       break;
   
      case NotificationType.TEAM_INVITE_DECLINED:
       notificationItem.classList.add("team-invite-declined-notification");
       notificationItem.innerHTML = `
-            ${notification.inviterName} a refusé votre invitation à rejoindre l'équipe ${notification.teamName}
-            <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
-          `;
+              ${notification.inviterName} a refusé votre invitation à rejoindre l'équipe ${notification.teamName}
+              <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+            `;
       break;
   
      case NotificationType.TEAM_BANNED:
       notificationItem.classList.add("team-banned-notification");
       notificationItem.innerHTML = `
-            ${notification.inviterName} a été banni de l'équipe ${notification.teamName}
-            <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
-          `;
+              ${notification.inviterName} a été banni de l'équipe ${notification.teamName}
+              <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+            `;
       break;
   
      default:
@@ -202,35 +202,35 @@
      case NotificationType.TEAM_INVITE:
       notificationItem.classList.add("team-invite-notification");
       notificationItem.innerHTML = `<div><p><img src="${notification.inviterImage}" class="img-inviter"> ${notification.inviterName} vous a invité à rejoindre l'équipe <img src="${notification.teamImage}" class="img-team"> ${notification.teamName}</p>
-            <div class="notification-buttons">
-              <button onclick="acceptInvitation(${notification.notificationId})">Accepter</button>
-              <button onclick="declineInvitation(${notification.notificationId})">Décliner</button>
-            </div>
-          </div>`;
+              <div class="notification-buttons">
+                <button onclick="acceptInvitation(${notification.notificationId})">Accepter</button>
+                <button onclick="declineInvitation(${notification.notificationId})">Décliner</button>
+              </div>
+            </div>`;
       break;
   
      case NotificationType.TEAM_INVITE_ACCEPTED:
       notificationItem.classList.add("team-invite-accepted-notification");
       notificationItem.innerHTML = `
-            ${notification.inviterName} a accepté l'invitation à rejoindre l'équipe ${notification.teamName}
-            <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
-          `;
+              ${notification.inviterName} a accepté l'invitation à rejoindre l'équipe ${notification.teamName}
+              <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+            `;
       break;
   
      case NotificationType.TEAM_INVITE_DECLINED:
       notificationItem.classList.add("team-invite-declined-notification");
       notificationItem.innerHTML = `
-            ${notification.inviterName} a refusé votre invitation à rejoindre l'équipe ${notification.teamName}
-            <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
-          `;
+              ${notification.inviterName} a refusé votre invitation à rejoindre l'équipe ${notification.teamName}
+              <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+            `;
       break;
   
      case NotificationType.TEAM_BANNED:
       notificationItem.classList.add("team-banned-notification");
       notificationItem.innerHTML = `
-            ${notification.inviterName} a été banni de l'équipe ${notification.teamName}
-            <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
-          `;
+              ${notification.inviterName} a été banni de l'équipe ${notification.teamName}
+              <button class="close-btn-notification" onclick="deleteNotification(${notification.notificationId})">X</button>
+            `;
       break;
   
      default:

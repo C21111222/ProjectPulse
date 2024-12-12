@@ -108,7 +108,6 @@ router
     router.post('/delete_task', [TaskController, 'deleteTask'])
     router.post('/add_user_task', [TaskController, 'addUsersToTask'])
 
-
     // Notifications
     router.get('/notifications', [NotificationController, 'getNotifications'])
     router.delete('/notifications/:id', [NotificationController, 'deleteNotification'])

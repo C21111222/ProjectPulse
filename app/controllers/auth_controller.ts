@@ -34,25 +34,25 @@ export default class AuthController {
    * ```
    */
   public async login({ request, auth, response, session }: HttpContextContract) {
-      let email: string
-      let password: string
-      logger.info("Tentative de connexion avec l'email " + request.input('email'))
-  
-      try {
-        const validatedData = await request.validateUsing(loginValidator)
-        email = validatedData.email
-        password = validatedData.password
-        const user = await User.verifyCredentials(email, password)
-        await auth.use('web').login(user)
-        return response.redirect('/dashboard')
-      } catch (error) {
-        logger.error("Erreur lors de la validation des données de connexion")
-        session.flash('notification', {
-          type: 'error',
-          message: 'Une erreur est survenue lors de la connexion.',
-        })
-        return response.redirect('back')
-      }
+    let email: string
+    let password: string
+    logger.info("Tentative de connexion avec l'email " + request.input('email'))
+
+    try {
+      const validatedData = await request.validateUsing(loginValidator)
+      email = validatedData.email
+      password = validatedData.password
+      const user = await User.verifyCredentials(email, password)
+      await auth.use('web').login(user)
+      return response.redirect('/dashboard')
+    } catch (error) {
+      logger.error('Erreur lors de la validation des données de connexion')
+      session.flash('notification', {
+        type: 'error',
+        message: 'Une erreur est survenue lors de la connexion.',
+      })
+      return response.redirect('back')
+    }
   }
 
   /**
@@ -73,7 +73,6 @@ export default class AuthController {
    * ```
    */
   public async loginFast({ request, auth, response, session }: HttpContextContract) {
-
     logger.info("Tentative de connexion avec l'email " + request.input('email'))
     try {
       const { email, password } = request.all()
@@ -136,7 +135,7 @@ export default class AuthController {
     let email: string = ''
     let password: string
     try {
-      const validatedData= await request.validateUsing(registerValidator)
+      const validatedData = await request.validateUsing(registerValidator)
       fullName = validatedData.fullName
       email = validatedData.email
       password = validatedData.password
@@ -145,14 +144,14 @@ export default class AuthController {
       await auth.use('web').login(user)
       return response.redirect('/dashboard')
     } catch (error) {
-      logger.error("Erreur lors de la validation des données de connexion")
+      logger.error('Erreur lors de la validation des données de connexion')
       logger.error(error)
       if (error.code === 'E_VALIDATION_ERROR') {
-        error.messages.forEach((message : any) => {
+        error.messages.forEach((message: any) => {
           if (message.rule === 'sameAs' && message.field === 'password_confirmation') {
             session.flash('notification', {
               type: 'error',
-              message: "Les mots de passe ne correspondent pas.",
+              message: 'Les mots de passe ne correspondent pas.',
             })
           } else if (message.rule === 'unique' && message.field === 'email') {
             session.flash('notification', {
@@ -162,12 +161,12 @@ export default class AuthController {
           } else if (message.rule === 'minLength' && message.field === 'password') {
             session.flash('notification', {
               type: 'error',
-              message: "Le mot de passe doit contenir au moins 8 caractères.",
+              message: 'Le mot de passe doit contenir au moins 8 caractères.',
             })
           } else {
             session.flash('notification', {
               type: 'error',
-              message: "Une erreur est survenue lors de la validation des données.",
+              message: 'Une erreur est survenue lors de la validation des données.',
             })
           }
         })

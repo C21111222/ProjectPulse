@@ -6,10 +6,10 @@ import logger from '@adonisjs/core/services/logger'
 import db from '@adonisjs/lucid/services/db'
 import AuthService from '#services/auth_service'
 export default class TasksController {
-  private authService = new AuthService();
+  private authService = new AuthService()
   async getUserTasks({ response, auth, request }) {
-    const user = await this.authService.getAuthenticatedUser(auth, response);
-    if (!user) return;
+    const user = await this.authService.getAuthenticatedUser(auth, response)
+    if (!user) return
     // on recupere les taches de l'utilisateur
     const tasks = await user.related('tasks').query().exec()
     return response.status(200).json(tasks)
@@ -17,8 +17,8 @@ export default class TasksController {
 
   async getTask({ response, auth, params }) {
     logger.info('Getting task')
-    const user = await this.authService.getAuthenticatedUser(auth, response);
-    if (!user) return;
+    const user = await this.authService.getAuthenticatedUser(auth, response)
+    if (!user) return
     const taskId = params.id
     logger.info('Task id: ' + taskId)
     if (!taskId) {
@@ -43,8 +43,8 @@ export default class TasksController {
 
   async getTeamTasks({ response, auth, params }) {
     logger.info('Getting team tasks')
-    const user = await this.authService.getAuthenticatedUser(auth, response);
-    if (!user) return;
+    const user = await this.authService.getAuthenticatedUser(auth, response)
+    if (!user) return
     // on recupere l'id de l'equipe de l'utilisateur
     const teamId = params.id
     logger.info('Team id: ' + teamId)
@@ -54,21 +54,25 @@ export default class TasksController {
       })
     }
     // on verifie que l'utilisateur fait bien partie de l'equipe
-    const team = await db.from('user_teams').where('user_id', user.id).andWhere('team_id', teamId).first()
+    const team = await db
+      .from('user_teams')
+      .where('user_id', user.id)
+      .andWhere('team_id', teamId)
+      .first()
     if (!team) {
       return response.status(403).json({
         message: 'You are not part of this team',
       })
     }
-    // on recupere les taches de l'equipe, ordonnees par date de debut 
+    // on recupere les taches de l'equipe, ordonnees par date de debut
     const tasks = await db.from('tasks').where('team_id', teamId).orderBy('start_date', 'asc')
-    // 
+    //
     for (const task of tasks) {
       task.users = await db
-      .from('users')
-      .select('user_id', 'full_name', 'email', 'image_url') // Select only the necessary fields
-      .innerJoin('user_tasks', 'users.id', 'user_tasks.user_id')
-      .where('user_tasks.task_id', task.id)
+        .from('users')
+        .select('user_id', 'full_name', 'email', 'image_url') // Select only the necessary fields
+        .innerJoin('user_tasks', 'users.id', 'user_tasks.user_id')
+        .where('user_tasks.task_id', task.id)
     }
     logger.info('Tasks retrieved')
     return response.status(200).json(tasks)
@@ -76,8 +80,8 @@ export default class TasksController {
 
   async getTeamTaskStat({ response, auth, params }) {
     logger.info('Getting team task stat')
-    const user = await this.authService.getAuthenticatedUser(auth, response);
-    if (!user) return;
+    const user = await this.authService.getAuthenticatedUser(auth, response)
+    if (!user) return
     const teamId = params.id
     logger.info('Team id: ' + teamId)
     if (!teamId) {
@@ -85,7 +89,11 @@ export default class TasksController {
         message: 'Team id is required',
       })
     }
-    const team = await db.from('user_teams').where('user_id', user.id).andWhere('team_id', teamId).first()
+    const team = await db
+      .from('user_teams')
+      .where('user_id', user.id)
+      .andWhere('team_id', teamId)
+      .first()
     if (!team) {
       return response.status(403).json({
         message: 'You are not part of this team',
@@ -104,8 +112,8 @@ export default class TasksController {
 
   async addTask({ response, auth, request }) {
     logger.info('Adding task')
-    const user = await this.authService.getAuthenticatedUser(auth, response);
-    if (!user) return;
+    const user = await this.authService.getAuthenticatedUser(auth, response)
+    if (!user) return
     const teamId = request.input('teamId')
     if (!teamId) {
       return response.status(400).json({
@@ -141,8 +149,8 @@ export default class TasksController {
   }
 
   async addUsersToTask({ response, auth, request }) {
-    const user = await this.authService.getAuthenticatedUser(auth, response);
-    if (!user) return;
+    const user = await this.authService.getAuthenticatedUser(auth, response)
+    if (!user) return
     const taskId = request.input('taskId')
     if (!taskId) {
       return response.status(400).json({
@@ -197,8 +205,8 @@ export default class TasksController {
 
   async deleteTask({ response, auth, request }) {
     logger.info('Deleting task')
-    const user = await this.authService.getAuthenticatedUser(auth, response);
-    if (!user) return;
+    const user = await this.authService.getAuthenticatedUser(auth, response)
+    if (!user) return
     const taskId = request.input('taskId')
     if (!taskId) {
       return response.status(400).json({
@@ -240,8 +248,8 @@ export default class TasksController {
 
   async updateTask({ response, auth, request }) {
     logger.info('Updating task')
-    const user = await this.authService.getAuthenticatedUser(auth, response);
-    if (!user) return;
+    const user = await this.authService.getAuthenticatedUser(auth, response)
+    if (!user) return
     const taskId = request.input('taskId')
     if (!taskId) {
       logger.error('Task id is required')

@@ -1,184 +1,226 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestion de l'équipe</title>
-  <link rel="stylesheet" href="/resources/css/dashboard.css" />
-</head>
-<body>
-  @include('components/navbar')
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Gestion de l'équipe
+    </title>
+    <link rel="stylesheet" href="/resources/css/dashboard.css" />
+  </head>
+  <body>
+    @include('components/navbar')
 
-  <div class="main-container">
-    <div class="container">
-      <h1>
-        Gestion de l'équipe {{ team.name }}
-      </h1>
-      <h2>
-        Membres de l'équipe
-      </h2>
-      <ul class="user-list">
-        @each(user in members)
-          <li>
-            <span>{{ user.full_name }}</span>
-            <span class="user-role">{{ user.role }}</span>
-            @if(user.id === auth.user.id)
-              <span>(Vous)</span>
-            @else
-              @if(user.role == 'admin')
-                <span>(Administrateur)</span>
+    <div class="main-container">
+      <div class="container">
+        <h1>
+          Gestion de l'équipe {{ team.name }}
+        </h1>
+        <h2>
+          Membres de l'équipe
+        </h2>
+        <ul class="user-list">
+          @each(user in members)
+            <li>
+              <span>{{ user.full_name }}</span>
+              <span class="user-role">{{ user.role }}</span>
+              @if(user.id === auth.user.id)
+                <span>(Vous)</span>
+              @else
+                @if(user.role == 'admin')
+                  <span>(Administrateur)</span>
+                @endif
               @endif
-            @endif
-          </li>
-        @endeach
-      </ul>
-      <button class="button invite" onclick="openInviteModal()">Inviter</button>
-      <a href="/dashboard" class="button back-button">Retour</a>
-      <button class="button delete" onclick="deleteTeam()">Supprimer l'équipe</button>
+            </li>
+          @endeach
+        </ul>
+        <button class="button invite" onclick="openInviteModal()">Inviter</button>
+        <a href="/dashboard" class="button back-button">Retour</a>
+        <button class="button delete" onclick="deleteTeam()">Supprimer l'équipe</button>
+      </div>
+
+      <!-- Section de chat d'équipe -->
+      <div class="chat-container">
+        <h2>
+          Chat d'équipe
+        </h2>
+        <div id="chatBox" class="chat-box">
+        </div>
+        <div class="chat-input">
+          <input type="text" id="messageInput" placeholder="Tapez votre message..." />
+          <button id="sendButton">Envoyer</button>
+        </div>
+      </div>
     </div>
 
-    <!-- Section de chat d'équipe -->
-    <div class="chat-container">
-      <h2>
-        Chat d'équipe
-      </h2>
-      <div id="chatBox" class="chat-box">
+    <div class="timeline-container">
+      <div class="timeline-left">
+        <div class="timeline-header">
+          <h2>
+            Tâches de l'équipe
+          </h2>
+          <button class="button invite" onclick="toggleTaskModal()">Ajouter une tâche</button>
+        </div>
+        <div class="timeline">
+          <!-- Contenu de la timeline -->
+        </div>
       </div>
-      <div class="chat-input">
-        <input type="text" id="messageInput" placeholder="Tapez votre message..." />
-        <button id="sendButton">Envoyer</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="timeline-container">
-    <div class="timeline-left">
-    <div class="timeline-header">
-      <h2>Tâches de l'équipe</h2>
-      <button class="button invite" onclick="toggleTaskModal()">Ajouter une tâche</button>
-    </div>
-      <div class="timeline">
-        <!-- Contenu de la timeline -->
-      </div>
-    </div>
       <div class="task-stats">
         <div class="project-period">
-          <span><strong>Début :</strong> <span id="start-date"></span></span>
-          <span><strong>Fin :</strong> <span id="end-date"></span></span>
+          <span>            <strong>Début :</strong>            <span id="start-date"></span></span>
+          <span>            <strong>Fin :</strong>            <span id="end-date"></span></span>
         </div>
         <div class="task-dates">
-          <span><strong>Première tâche :</strong> <span id="first-task"></span></span>
-          <span><strong>Dernière tâche :</strong> <span id="last-task"></span></span>
+          <span>            <strong>Première tâche :</strong>            <span id="first-task"></span></span>
+          <span>            <strong>Dernière tâche :</strong>            <span id="last-task"></span></span>
         </div>
         <div class="task-chart">
           <div class="chart-container">
-            <canvas id="waitingChart"></canvas>
-            <div class="chart-label">En attente <span id="waitingNumber"></span>
+            <canvas id="waitingChart">
+            </canvas>
+            <div class="chart-label">
+              En attente <span id="waitingNumber"></span>
             </div>
           </div>
           <div class="chart-container">
-            <canvas id="inProgressChart"></canvas>
-            <div class="chart-label">En cours <span id="inProgressNumber"></span>
+            <canvas id="inProgressChart">
+            </canvas>
+            <div class="chart-label">
+              En cours <span id="inProgressNumber"></span>
             </div>
 
           </div>
           <div class="chart-container">
-            <canvas id="doneChart"></canvas>
-            <div class="chart-label">Terminée <span id="doneNumber"></span>
+            <canvas id="doneChart">
+            </canvas>
+            <div class="chart-label">
+              Terminée <span id="doneNumber"></span>
             </div>
           </div>
         </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Modal pour ajouter une tâche -->
-  <div id="taskModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeTaskModal()">&times;</span>
-      <h2>
-        Ajouter une tâche
-      </h2>
-      <form id="taskForm">
-        <label for="taskName">Nom de la tâche</label>
-        <input type="text" id="taskName" name="taskName" required />
-        <label for="taskDescription">Description de la tâche</label>
-        <textarea id="taskDescription" name="taskDescription" required></textarea>
-        <label for="taskStatus">Statut de la tâche</label>
-        <select id="taskStatus" name="taskStatus" required>
-          <option value="waiting">En attente</option>
-          <option value="in_progress">En cours</option>
-          <option value="done">Terminée</option>
-        </select>
-        <label for="taskPriority">Priorité de la tâche</label>
-        <select id="taskPriority" name="taskPriority" required>
-          <option value="low">Basse</option>
-          <option value="medium">Moyenne</option>
-          <option value="high">Haute</option>
-        </select>
-        <label for="taskStartDate">Date de début</label>
-        <input type="date" id="taskStartDate" name="taskStartDate" required />
-        <label for="taskEndDate">Date de fin</label>
-        <input type="date" id="taskEndDate" name="taskEndDate" required />
-        <label for="taskUsers">Utilisateurs assignés</label>
-        <select id="taskUsers" name="taskUsers" multiple required>
-          @each(user in members)
-            <option value="{{ user.id }}">{{ user.full_name }}</option>
-          @endeach
-        </select>
-        <button type="submit" class="button invite">Ajouter</button>
-      </form>
+    <!-- Modal pour ajouter une tâche -->
+    <div id="taskModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeTaskModal()">&times;</span>
+        <h2>
+          Ajouter une tâche
+        </h2>
+        <form id="taskForm">
+          <label for="taskName">Nom de la tâche</label>
+          <input type="text" id="taskName" name="taskName" required />
+          <label for="taskDescription">Description de la tâche</label>
+          <textarea id="taskDescription" name="taskDescription" required></textarea>
+          <label for="taskStatus">Statut de la tâche</label>
+          <select id="taskStatus" name="taskStatus" required>
+            <option value="waiting">
+              En attente
+            </option>
+            <option value="in_progress">
+              En cours
+            </option>
+            <option value="done">
+              Terminée
+            </option>
+          </select>
+          <label for="taskPriority">Priorité de la tâche</label>
+          <select id="taskPriority" name="taskPriority" required>
+            <option value="low">
+              Basse
+            </option>
+            <option value="medium">
+              Moyenne
+            </option>
+            <option value="high">
+              Haute
+            </option>
+          </select>
+          <label for="taskStartDate">Date de début</label>
+          <input type="date" id="taskStartDate" name="taskStartDate" required />
+          <label for="taskEndDate">Date de fin</label>
+          <input type="date" id="taskEndDate" name="taskEndDate" required />
+          <label for="taskUsers">Utilisateurs assignés</label>
+          <select id="taskUsers" name="taskUsers" multiple required>
+            @each(user in members)
+              <option value="{{ user.id }}">
+                {{ user.full_name }}
+              </option>
+            @endeach
+          </select>
+          <button type="submit" class="button invite">Ajouter</button>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <div id="updateTaskModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeUpdateTaskModal()">&times;</span>
-      <h2>Modifier une tâche</h2>
-      <form id="updateTaskForm">
-        <input type="hidden" id="updateTaskId" name="updateTaskId" />
-        <label for="updateTaskStatus">Statut de la tâche</label>
-        <select id="updateTaskStatus" name="updateTaskStatus" required>
-          <option value="waiting">En attente</option>
-          <option value="in_progress">En cours</option>
-          <option value="done">Terminée</option>
-        </select>
-        <label for="updateTaskPriority">Priorité de la tâche</label>
-        <select id="updateTaskPriority" name="updateTaskPriority" required>
-          <option value="low">Basse</option>
-          <option value="medium">Moyenne</option>
-          <option value="high">Haute</option>
-        </select>
-        <label for="updateTaskStartDate">Date de début</label>
-        <input type="date" id="updateTaskStartDate" name="updateTaskStartDate" required />
-        <label for="updateTaskEndDate">Date de fin</label>
-        <input type="date" id="updateTaskEndDate" name="updateTaskEndDate" required />
-        <button type="submit" class="button invite" id="updateTask">Modifier</button>
-      </form>
+    <div id="updateTaskModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeUpdateTaskModal()">&times;</span>
+        <h2>
+          Modifier une tâche
+        </h2>
+        <form id="updateTaskForm">
+          <input type="hidden" id="updateTaskId" name="updateTaskId" />
+          <label for="updateTaskStatus">Statut de la tâche</label>
+          <select id="updateTaskStatus" name="updateTaskStatus" required>
+            <option value="waiting">
+              En attente
+            </option>
+            <option value="in_progress">
+              En cours
+            </option>
+            <option value="done">
+              Terminée
+            </option>
+          </select>
+          <label for="updateTaskPriority">Priorité de la tâche</label>
+          <select id="updateTaskPriority" name="updateTaskPriority" required>
+            <option value="low">
+              Basse
+            </option>
+            <option value="medium">
+              Moyenne
+            </option>
+            <option value="high">
+              Haute
+            </option>
+          </select>
+          <label for="updateTaskStartDate">Date de début</label>
+          <input type="date" id="updateTaskStartDate" name="updateTaskStartDate" required />
+          <label for="updateTaskEndDate">Date de fin</label>
+          <input type="date" id="updateTaskEndDate" name="updateTaskEndDate" required />
+          <button type="submit" class="button invite" id="updateTask">Modifier</button>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <!-- Modal pour inviter des utilisateurs -->
-<div id="inviteModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeInviteModal()">&times;</span>
-    <h2>Inviter des utilisateurs</h2>
-    <div class="invite-list-container">
-      <ul class="invite-list">
-        @each(user in users)
-          <li>
-            <span>{{ user.full_name }}</span>
-            <div class="invite-actions">
-              <button class="button invite" onclick="sendInvitation({{ user.id }})">Inviter</button>
-            </div>
-          </li>
-        @endeach
-      </ul>
+    <!-- Modal pour inviter des utilisateurs -->
+    <div id="inviteModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeInviteModal()">&times;</span>
+        <h2>
+          Inviter des utilisateurs
+        </h2>
+        <div class="invite-list-container">
+          <ul class="invite-list">
+            @each(user in users)
+              <li>
+                <span>{{ user.full_name }}</span>
+                <div class="invite-actions">
+                  <button class="button invite" onclick="sendInvitation({{ user.id }})">Inviter</button>
+                </div>
+              </li>
+            @endeach
+          </ul>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+      
+    </script>
     <script>
-      document.addEventListener('DOMContentLoaded', (event) => {
+      document.addEventListener("DOMContentLoaded", event => {
         fetch(`/task_stat/{{ team.id }}`, {
           method: "GET",
           credentials: "include",
@@ -196,14 +238,14 @@
           console.log("Statistiques des tâches récupérées :", taskStats);
           const createChart = (ctx, label, percentage) => {
             new Chart(ctx, {
-              type: 'doughnut',
+              type: "doughnut",
               data: {
-                labels: [label, ''],
-                datasets: [{
-                  data: [percentage, 100 - percentage],
-                  backgroundColor: ['#007BFF', '#E0E0E0'],
+                labels: [ label, "" ],
+                datasets: [ {
+                  data: [ percentage, 100 - percentage ],
+                  backgroundColor: [ "#007BFF", "#E0E0E0" ],
                   borderWidth: 1
-                }]
+                } ]
               },
               options: {
                 responsive: true,
@@ -211,15 +253,16 @@
                 cutoutPercentage: 70,
                 plugins: {
                   legend: {
-                    display: false, // Affiche les légendes
+                    display: false,
+                    // Affiche les légendes
                     labels: {
                       font: {
-                        size: 8 // Taille de la police
+                        size: 8
                       }
                     }
                   },
                   tooltip: {
-                    enabled: false // Désactive les tooltips
+                    enabled: false
                   }
                 },
                 layout: {
@@ -231,40 +274,27 @@
               }
             });
           };
-      
-          createChart(
-            document.getElementById('waitingChart').getContext('2d'),
-            'En attente',
-            (taskStats.waiting / taskStats.total) * 100
-          );
-          document.getElementById('waitingNumber').innerText = taskStats.waiting + "/" + taskStats.total;
-          createChart(
-            document.getElementById('inProgressChart').getContext('2d'),
-            'En cours',
-            (taskStats.inProgress / taskStats.total) * 100
-          );
-          document.getElementById('inProgressNumber').innerText = taskStats.inProgress + "/" + taskStats.total;
-          createChart(
-            document.getElementById('doneChart').getContext('2d'),
-            'Terminée',
-            (taskStats.done / taskStats.total) * 100
-          );
-          document.getElementById('doneNumber').innerText = taskStats.done + "/" + taskStats.total;
+          createChart(document.getElementById("waitingChart").getContext("2d"), "En attente", taskStats.waiting / taskStats.total * 100);
+          document.getElementById("waitingNumber").innerText = taskStats.waiting + "/" + taskStats.total;
+          createChart(document.getElementById("inProgressChart").getContext("2d"), "En cours", taskStats.inProgress / taskStats.total * 100);
+          document.getElementById("inProgressNumber").innerText = taskStats.inProgress + "/" + taskStats.total;
+          createChart(document.getElementById("doneChart").getContext("2d"), "Terminée", taskStats.done / taskStats.total * 100);
+          document.getElementById("doneNumber").innerText = taskStats.done + "/" + taskStats.total;
         });
       });
       
-      document.getElementById('updateTaskForm').addEventListener('submit', function(event) {
+      document.getElementById("updateTaskForm").addEventListener("submit", function(event) {
         console.log("Soumission du formulaire de modification de tâche");
         event.preventDefault();
         updateTask();
       });
-
+      
       function updateTask() {
-        const status = document.getElementById('updateTaskStatus').value;
-        const priority = document.getElementById('updateTaskPriority').value;
-        const startDate = document.getElementById('updateTaskStartDate').value;
-        const endDate = document.getElementById('updateTaskEndDate').value;
-        const taskId = document.getElementById('updateTaskId').value;
+        const status = document.getElementById("updateTaskStatus").value;
+        const priority = document.getElementById("updateTaskPriority").value;
+        const startDate = document.getElementById("updateTaskStartDate").value;
+        const endDate = document.getElementById("updateTaskEndDate").value;
+        const taskId = document.getElementById("updateTaskId").value;
         fetch(`/update_task`, {
           method: "POST",
           headers: {
@@ -295,28 +325,29 @@
         // on ferme la modal après avoir modifié la tâche
         closeUpdateTaskModal();
       }
+      
       function formatDateForInput(date) {
         const d = new Date(date);
-        const month = ('0' + (d.getMonth() + 1)).slice(-2);
-        const day = ('0' + d.getDate()).slice(-2);
+        const month = ("0" + (d.getMonth() + 1)).slice(-2);
+        const day = ("0" + d.getDate()).slice(-2);
         const year = d.getFullYear();
         return `${year}-${month}-${day}`;
       }
-
+      
       function openUpdateTaskModal(id, status, priority, startDate, endDate) {
         console.log("Ouverture de la modal de modification de la tâche", id, status, priority, formatDate(startDate), formatDate(endDate));
-        document.getElementById('updateTaskId').value = id;
-        document.getElementById('updateTaskStatus').value = status;
-        document.getElementById('updateTaskPriority').value = priority;
-        document.getElementById('updateTaskStartDate').value = formatDateForInput(startDate);
-        document.getElementById('updateTaskEndDate').value = formatDateForInput(endDate);
-        document.getElementById('updateTaskModal').style.display = 'block';
+        document.getElementById("updateTaskId").value = id;
+        document.getElementById("updateTaskStatus").value = status;
+        document.getElementById("updateTaskPriority").value = priority;
+        document.getElementById("updateTaskStartDate").value = formatDateForInput(startDate);
+        document.getElementById("updateTaskEndDate").value = formatDateForInput(endDate);
+        document.getElementById("updateTaskModal").style.display = "block";
       }
       
       function closeUpdateTaskModal() {
-        document.getElementById('updateTaskModal').style.display = 'none';
+        document.getElementById("updateTaskModal").style.display = "none";
       }
-
+      
       function deleteTask(taskId) {
         fetch(`/delete_task`, {
           method: "POST",
@@ -342,7 +373,8 @@
           alert("Erreur lors de la suppression de la tâche : " + error.message);
         });
       }
-      function deleteTeam(){
+      
+      function deleteTeam() {
         fetch(`/delete_team/{{ team.id }}`, {
           method: "POST",
           credentials: "include",
@@ -364,14 +396,21 @@
           alert("Erreur lors de la suppression de l'équipe : " + error.message);
         });
       }
-
+      
       function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('fr-FR', options);
+        const options = {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        };
+        return new Date(dateString).toLocaleDateString("fr-FR", options);
       }
-      document.getElementById('start-date').innerText = formatDate('{{ team.startDate }}');
-      document.getElementById('end-date').innerText = formatDate('{{ team.endDate }}');
-      function loadTasks(){
+      
+      document.getElementById("start-date").innerText = formatDate("{{ team.startDate }}");
+      
+      document.getElementById("end-date").innerText = formatDate("{{ team.endDate }}");
+      
+      function loadTasks() {
         fetch(`/team_task/{{ team.id }}`, {
           method: "GET",
           credentials: "include",
@@ -395,27 +434,27 @@
           data.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
           // on affiche la première et la dernière tâche, leurs titre et date de début et de fin
           if (data.length === 0) {
-            document.getElementById('first-task').innerText = "Aucune tâche";
-            document.getElementById('last-task').innerText = "Aucune tâche";
+            document.getElementById("first-task").innerText = "Aucune tâche";
+            document.getElementById("last-task").innerText = "Aucune tâche";
             return;
           }
-          document.getElementById('first-task').innerText = data[0].title + " (" + formatDate(data[0].start_date) + ")";
-          document.getElementById('last-task').innerText = data[data.length - 1].title + " (" + formatDate(data[data.length - 1].start_date) + ")";
+          document.getElementById("first-task").innerText = data[0].title + " (" + formatDate(data[0].start_date) + ")";
+          document.getElementById("last-task").innerText = data[data.length - 1].title + " (" + formatDate(data[data.length - 1].start_date) + ")";
           data.forEach(task => {
             const taskElement = document.createElement("div");
             taskElement.classList.add("task");
             taskElement.classList.add(task.status);
             taskElement.innerHTML = `
-            <div class="content" onclick="openUpdateTaskModal(${task.id}, '${task.status}', '${task.priority}', '${task.start_date}', '${task.end_date}')">
-              <span>Titre : ${task.title}</span>
-              <span> Desc : ${task.description}</span>
-              <span>${formatDate(task.start_date)} - ${formatDate(task.end_date)}</span>
-              <span> Priorité : ${task.priority}</span>
-              <span> Status : ${task.status}</span>
-              ${task.users.map(user => `<img src="${user.image_url}" alt="Photo de ${user.full_name}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;" />`).join("")}
-              <button class="delete-task-btn" onclick="deleteTask(${task.id})">✖</button>
-            </div>
-          `;
+                  <div class="content" onclick="openUpdateTaskModal(${task.id}, '${task.status}', '${task.priority}', '${task.start_date}', '${task.end_date}')">
+                    <span>Titre : ${task.title}</span>
+                    <span> Desc : ${task.description}</span>
+                    <span>${formatDate(task.start_date)} - ${formatDate(task.end_date)}</span>
+                    <span> Priorité : ${task.priority}</span>
+                    <span> Status : ${task.status}</span>
+                    ${task.users.map(user => `<img src="${user.image_url}" alt="Photo de ${user.full_name}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;" />`).join("")}
+                    <button class="delete-task-btn" onclick="deleteTask(${task.id})">✖</button>
+                  </div>
+                `;
             timeline.appendChild(taskElement);
           });
         }).catch(error => {
@@ -423,19 +462,21 @@
           alert("Erreur lors du chargement des tâches : " + error.message);
         });
       }
-
+      
       loadTasks();
+      
       function toggleTaskModal() {
-        const today = new Date().toISOString().split('T')[0];
-        const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-        document.getElementById('taskStartDate').value = today;
-        document.getElementById('taskEndDate').value = tomorrow;
+        const today = new Date().toISOString().split("T")[0];
+        const tomorrow = new Date(Date.now() + 864e5).toISOString().split("T")[0];
+        document.getElementById("taskStartDate").value = today;
+        document.getElementById("taskEndDate").value = tomorrow;
         document.getElementById("taskModal").style.display = "block";
       }
-
+      
       function closeTaskModal() {
         document.getElementById("taskModal").style.display = "none";
       }
+      
       function openInviteModal() {
         document.getElementById("inviteModal").style.display = "block";
       }
@@ -443,14 +484,13 @@
       function closeInviteModal() {
         document.getElementById("inviteModal").style.display = "none";
       }
-
-      document.getElementById('taskForm').addEventListener('submit', function(event) {
+      
+      document.getElementById("taskForm").addEventListener("submit", function(event) {
         event.preventDefault();
         addTask();
       });
-
+      
       function addTask() {
-  
         const name = document.getElementById("taskName").value;
         const description = document.getElementById("taskDescription").value;
         const status = document.getElementById("taskStatus").value;
@@ -458,7 +498,6 @@
         const end_date = document.getElementById("taskEndDate").value;
         const priority = document.getElementById("taskPriority").value;
         const users = Array.from(document.getElementById("taskUsers").selectedOptions).map(option => option.value);
-      
         console.log("Données de la tâche :", {
           teamId: {{ team.id }},
           title: name,
@@ -467,14 +506,14 @@
           status: status,
           start_date: start_date,
           end_date: end_date,
-          users: users,
+          users: users
         });
         alert("Ajout de tâche");
         fetch(`/tasks`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "credentials": "include"
+            credentials: "include"
           },
           body: JSON.stringify({
             teamId: {{ team.id }},
@@ -484,11 +523,11 @@
             status: status,
             start_date: start_date,
             end_date: end_date,
-            users: users,
+            users: users
           })
         }).then(response => {
           if (!response.ok) {
-            alert("Erreur lors de l'ajout de la tâche : " + response );
+            alert("Erreur lors de l'ajout de la tâche : " + response);
             return response.json().then(errorData => {
               throw new Error("Erreur lors de l'ajout de la tâche : " + errorData.message);
             });
@@ -506,8 +545,6 @@
         // on ferme la modal après avoir ajouté la tâche
         closeTaskModal();
       }
-
-
       
       function sendInvitation(userId) {
         fetch(`/send_invitation`, {
@@ -537,10 +574,6 @@
         // on ferme la modal après avoir envoyé l'invitation 
         closeInviteModal();
       }
-      
-
-
-
     </script>
     <script type="module">
       import {
@@ -584,14 +617,14 @@
         const messageClass = message.senderId === {{ auth.user.id }} ? "sent" : "received";
         const formattedTime = new Date(message.createdAt).toLocaleTimeString("fr-FR");
         chatBox.innerHTML += `
-            <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
-              <img 
-                src="${message.sender.imageUrl}" 
-                alt="Photo de ${message.senderName}" 
-                style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
-              />
-              <p class="message-content" style="margin: 0;"><strong>${message.senderId === {{ auth.user.id }} ? "Vous" : message.senderName}</strong>: ${message.content} <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span></p>
-            </div>`;
+                  <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
+                    <img 
+                      src="${message.sender.imageUrl}" 
+                      alt="Photo de ${message.senderName}" 
+                      style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
+                    />
+                    <p class="message-content" style="margin: 0;"><strong>${message.senderId === {{ auth.user.id }} ? "Vous" : message.senderName}</strong>: ${message.content} <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span></p>
+                  </div>`;
       });
       
       scrollToBottom();
@@ -611,11 +644,12 @@
           })
         });
         console.log(response);
-        document.getElementById('messageInput').value = '';
+        document.getElementById("messageInput").value = "";
         return response.json();
       }
-      document.getElementById('messageInput').addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
+      
+      document.getElementById("messageInput").addEventListener("keydown", event => {
+        if (event.key === "Enter") {
           event.preventDefault();
           sendMessage();
         }
@@ -625,21 +659,21 @@
       
       let unsubscribe = notifSubscription.onMessage(data => {
         console.log("Nouveau message reçu :", data);
-        const messageClass = data.senderName === '{{ auth.user.fullName }}' ? "sent" : "received";
+        const messageClass = data.senderName === "{{ auth.user.fullName }}" ? "sent" : "received";
         const formattedTime = new Date(data.createdAt).toLocaleTimeString("fr-FR");
         chatBox.innerHTML += `
-            <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
-              <img 
-                src="${data.senderImage}" 
-                alt="Photo de ${data.senderName}" 
-                style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
-              />
-              <p class="message-content" style="margin: 0;"><strong>${data.senderName === "{{ auth.user.fullName }}" ? "Vous" : data.senderName}</strong>: ${data.message} <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span></p>
-            </div>`;
+                  <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
+                    <img 
+                      src="${data.senderImage}" 
+                      alt="Photo de ${data.senderName}" 
+                      style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
+                    />
+                    <p class="message-content" style="margin: 0;"><strong>${data.senderName === "{{ auth.user.fullName }}" ? "Vous" : data.senderName}</strong>: ${data.message} <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span></p>
+                  </div>`;
         scrollToBottom();
       });
-
       // lorsqu'on quitte la page, on se désabonne des notifications
+      
       window.addEventListener("beforeunload", () => {
         unsubscribe();
       });

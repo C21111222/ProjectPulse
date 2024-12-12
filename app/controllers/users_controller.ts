@@ -13,13 +13,13 @@ export default class UsersController {
     const users = await User.query().select('id', 'full_name', 'email')
     return response.json(users)
   }
-  
+
   /**
    * Handles the request to view a user's public profile.
-   * 
+   *
    * @param {HttpContext} context - The HTTP context object containing the request, authentication, and view.
    * @returns {Promise<View>} - The rendered view of the user's profile or a 404 page if the user is not found.
-   * 
+   *
    * @remarks
    * - If the user is not found, it renders a 404 page.
    * - If the authenticated user is viewing their own profile, it renders the profile page.
