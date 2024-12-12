@@ -22,9 +22,12 @@ export const plugins: Config['plugins'] = [assert(), pluginAdonisJS(app)]
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [],
+  setup: [
+    () => testUtils.db().truncate(),
+  ],
   teardown: [],
 }
+
 
 /**
  * Configure suites by tapping into the test suite instance.
@@ -35,3 +38,4 @@ export const configureSuite: Config['configureSuite'] = (suite) => {
     return suite.setup(() => testUtils.httpServer().start())
   }
 }
+
