@@ -14,6 +14,7 @@ git clone
 cd ProjectPulse
 ```
 
+
 - build the docker image
 
 ```
