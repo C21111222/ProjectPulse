@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import User from '#models/user'
 
+
 test.group('Public profile', () => {
   test('displays user profile', async ({ visit }) => {
     const user = new User()
@@ -9,7 +10,7 @@ test.group('Public profile', () => {
     user.password = 'secret'
     await user.save()
     const page = await visit('/login')
-    await page.fill('input[name="email"]', 'test@test.com')
+    await page.fill('input[name="email"]', 'test1@test.com')
     await page.fill('input[name="password"]', 'secret')
     await page.click('button[type="submit"]')
     await page.assertPath('/dashboard')
