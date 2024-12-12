@@ -9,7 +9,7 @@ test.group('Public profile', () => {
     user.email = 'test1@test.com'
     user.password = 'secret'
     await user.save()
-    const page = await visit('/profile')
+    const page = await visit('/login')
     await page.fill('input[name="email"]', user.email)
     await page.fill('input[name="password"]', user.password)
     await page.click('button[type="submit"]')
