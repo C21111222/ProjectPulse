@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     // Exécuter les tests dans un conteneur temporaire
-                    sh "docker run --rm -v $UPLOAD_DIR:/app/uploads -v $ENV_FILE_PATH:/app/.env -v $ENV_TEST_FILE_PATH:/app/.env.test $DOCKER_IMAGE npm test"
+                    sh "docker run --rm -v $UPLOAD_DIR:/app/uploads -v $ENV_FILE_PATH:/app/.env -v $ENV_TEST_FILE_PATH:/app/.env.test $DOCKER_IMAGE node ace test "
                 }
             }
         }
