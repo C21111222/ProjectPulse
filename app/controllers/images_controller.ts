@@ -52,6 +52,9 @@ export default class ImagesController {
 
   async upload({ auth, request, response }: HttpContext) {
     // Création du dossier de stockage si inexistant
+    if (!auth.user || !auth.user.id) {
+      return response.status(401).json({ message: 'Unauthorized' })
+    }
     multer({ dest: 'uploads/' })
     logger.info('Uploading image')
     logger.info('User id : %s', auth.user.id)
@@ -82,11 +85,33 @@ export default class ImagesController {
     return response.ok('Image uploaded')
   }
 
+  /**
+   * Retrieves an image based on the provided filename parameter.
+   * 
+   * @param {Object} params - The parameters object.
+   * @param {string} params.filename - The name of the image file to retrieve.
+   * @param {Object} response - The response object used to send the image data.
+   * 
+   * @returns {Promise<void>} - A promise that resolves to void.
+   * 
+   * @throws {Error} - Throws an error if the image is not found.
+   */
   async getImage({ params, response }) {
     const image = await Image.findOrFail('name', params.filename)
     return response.json(image)
   }
 
+  /**
+   * Deletes an image based on the provided filename in the request parameters.
+   * 
+   * @param {Object} params - The request parameters.
+   * @param {string} params.filename - The name of the image file to be deleted.
+   * @param {Object} response - The response object.
+   * 
+   * @returns {Promise<void>} - A promise that resolves when the image is deleted.
+   * 
+   * @throws {Error} - Throws an error if the image is not found or if there is an issue deleting the file.
+   */
   async deleteImage({ params, response }) {
     const image = await Image.findByOrFail('name', params.filename)
     if (image.url) {
