@@ -2,7 +2,7 @@ import vine from '@vinejs/vine'
 
 export const loginValidator = vine.compile(
   vine.object({
-    email: vine.string().maxLength(32),
+    email: vine.string().email().maxLength(32),
     password: vine.string().maxLength(32),
   })
 )
