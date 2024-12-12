@@ -10,6 +10,8 @@ COPY package*.json ./
 # Étape 4: Installer les dépendances
 RUN npm install
 
+RUN npx playwright install
+
 # Étape 5: Copier le reste du projet dans le conteneur
 COPY . .
 
