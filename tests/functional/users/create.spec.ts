@@ -3,6 +3,7 @@ import { test } from '@japa/runner'
 import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
 
+
 test.group('creating user', () => {
   test('hashes user password', async ({ assert }) => {
     const user = new User()
@@ -55,4 +56,5 @@ test.group('creating user', () => {
     }
   })
 })
+
 

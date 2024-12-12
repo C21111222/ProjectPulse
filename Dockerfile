@@ -11,6 +11,7 @@ RUN npx playwright install-deps
 FROM base as app
 
 WORKDIR /app
+RUN cat .env.test
 COPY package*.json ./
 RUN npm install
 COPY . .
