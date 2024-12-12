@@ -6,7 +6,8 @@ RUN npm install -g npm@latest
 RUN npx playwright install
 RUN npx playwright install-deps
 
-# Étape 2: Application spécifique
+
+# Étape 2: Application spécifique 
 FROM base as app
 
 WORKDIR /app
