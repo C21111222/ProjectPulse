@@ -13,6 +13,8 @@ test.group('Public profile', () => {
     await page.fill('input[name="email"]', user.email)
     await page.fill('input[name="password"]', user.password)
     await page.click('button[type="submit"]')
+    await page.assertPath('/dashboard')
+    await page.assertTextContains('body', user.fullName)
     // on va sur la page de profil
     const page1 = await visit('/profile')
     await page1.assertTextContains('body', user.email)
