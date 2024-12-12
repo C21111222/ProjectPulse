@@ -14,7 +14,7 @@ test.group('Public profile', () => {
     // on va sur la page de profil
     const page1 = await visit('/profile')
     // on charge le js
-    const profile = page1.locator('body')
+    const profile = page1.locator('fullname-container')
     await profile.waitFor();
     await page1.assertTextContains('body', user.email)
 })
