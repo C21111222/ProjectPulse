@@ -90,10 +90,8 @@ export default class TeamsController {
         return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
     }
     const teamId = request.input('teamId')
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({ message: 'Utilisateur non trouvé' })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     // on verifie que l'utilisateur est bien admin de l'equipe
     const role = await db
       .from('user_teams')
@@ -149,10 +147,8 @@ export default class TeamsController {
     const { teamId, userId } = request.only(['teamId', 'userId'])
     // on verifie que l'utilisateur qui envoie la requete est bien admin ou manager de l'equipe
 
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({ message: 'Utilisateur non trouvé' })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     // on recupere le role de l'utilisateur dans l'equipe qui se trouve dans le pivot
 
     const team = await Team.find(teamId)
@@ -203,10 +199,8 @@ export default class TeamsController {
       return response.status(404).json({ message: 'Notification not found' })
     }
     const teamId = notification1.teamId
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({ message: 'Utilisateur non trouvé' })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     try {
       await this.addMember(user.id, teamId, Role.Member)
       // on envoie une notification à tous les membres de l'équipe pour les informer de l'arrivée du nouveau membre
@@ -258,10 +252,8 @@ export default class TeamsController {
     }
 
     const teamId = notification1.teamId
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({ message: 'Utilisateur non trouvé' })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     const team = await Team.find(teamId)
     if (!team) {
       return response.status(404).json({ message: 'Equipe non trouvée' })
@@ -307,10 +299,8 @@ export default class TeamsController {
     console.log(request.all())
     // on verifie que l'utilisateur qui envoie la requete est bien admin ou manager de l'equipe
 
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({ message: 'Utilisateur non trouvé' })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     // on recupere le role de l'utilisateur dans l'equipe qui se trouve dans le pivot
     const role = await db
       .from('user_teams')
@@ -537,10 +527,8 @@ export default class TeamsController {
         return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
     }
     const teamId = request.input('teamId')
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({ message: 'Utilisateur non trouvé' })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     // on verifie que l'utilisateur fait bien partie de l'equipe
     const team = await user.related('teams').query().where('team_id', teamId).first()
     if (!team) {
@@ -572,10 +560,8 @@ export default class TeamsController {
         return response.status(401).json({ message: 'Vous devez être connecté pour accéder à cette page' })
     }
     const teamId = params.id
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({ message: 'Utilisateur non trouvé' })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     // on verifie que l'utilisateur est bien admin de l'equipe
     const role = await db
       .from('user_teams')

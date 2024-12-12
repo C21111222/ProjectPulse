@@ -4,15 +4,12 @@ import Task from '#models/task'
 import User from '#models/user'
 import logger from '@adonisjs/core/services/logger'
 import db from '@adonisjs/lucid/services/db'
-
+import AuthService from '#services/auth_service'
 export default class TasksController {
+  private authService = new AuthService();
   async getUserTasks({ response, auth, request }) {
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({
-        message: 'User not found',
-      })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     // on recupere les taches de l'utilisateur
     const tasks = await user.related('tasks').query().exec()
     return response.status(200).json(tasks)
@@ -20,12 +17,8 @@ export default class TasksController {
 
   async getTask({ response, auth, params }) {
     logger.info('Getting task')
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({
-        message: 'User not found',
-      })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     const taskId = params.id
     logger.info('Task id: ' + taskId)
     if (!taskId) {
@@ -49,13 +42,9 @@ export default class TasksController {
   }
 
   async getTeamTasks({ response, auth, params }) {
-    const user = await User.find(auth.user.id)
     logger.info('Getting team tasks')
-    if (!user) {
-      return response.status(404).json({
-        message: 'User not found',
-      })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     // on recupere l'id de l'equipe de l'utilisateur
     const teamId = params.id
     logger.info('Team id: ' + teamId)
@@ -86,13 +75,9 @@ export default class TasksController {
   }
 
   async getTeamTaskStat({ response, auth, params }) {
-    const user = await User.find(auth.user.id)
     logger.info('Getting team task stat')
-    if (!user) {
-      return response.status(404).json({
-        message: 'User not found',
-      })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     const teamId = params.id
     logger.info('Team id: ' + teamId)
     if (!teamId) {
@@ -119,12 +104,8 @@ export default class TasksController {
 
   async addTask({ response, auth, request }) {
     logger.info('Adding task')
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({
-        message: 'User not found',
-      })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     const teamId = request.input('teamId')
     if (!teamId) {
       return response.status(400).json({
@@ -160,12 +141,8 @@ export default class TasksController {
   }
 
   async addUsersToTask({ response, auth, request }) {
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({
-        message: 'User not found',
-      })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     const taskId = request.input('taskId')
     if (!taskId) {
       return response.status(400).json({
@@ -219,12 +196,9 @@ export default class TasksController {
   }
 
   async deleteTask({ response, auth, request }) {
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      return response.status(404).json({
-        message: 'User not found',
-      })
-    }
+    logger.info('Deleting task')
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     const taskId = request.input('taskId')
     if (!taskId) {
       return response.status(400).json({
@@ -266,13 +240,8 @@ export default class TasksController {
 
   async updateTask({ response, auth, request }) {
     logger.info('Updating task')
-    const user = await User.find(auth.user.id)
-    if (!user) {
-      logger.error('User not found')
-      return response.status(404).json({
-        message: 'User not found',
-      })
-    }
+    const user = await this.authService.getAuthenticatedUser(auth, response);
+    if (!user) return;
     const taskId = request.input('taskId')
     if (!taskId) {
       logger.error('Task id is required')
