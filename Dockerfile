@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 RUN npx playwright install
-
+RUN npx playwright install-deps
 # Étape 5: Copier le reste du projet dans le conteneur
 COPY . .
 
