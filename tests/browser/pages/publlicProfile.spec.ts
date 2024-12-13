@@ -1,7 +1,6 @@
 import { test } from '@japa/runner'
 import User from '#models/user'
 
-
 test.group('Public profile', () => {
   test('displays user profile', async ({ visit }) => {
     const user = new User()
@@ -18,10 +17,10 @@ test.group('Public profile', () => {
     // on va sur la page de profil
     const page1 = await visit('/profile')
     await page1.assertTextContains('body', user.email)
-})
+  })
 
-test('unauthenticated user is redirected to login page', async ({ visit }) => {
+  test('unauthenticated user is redirected to login page', async ({ visit }) => {
     const page = await visit('/profile')
     await page.assertPath('/login')
-})
+  })
 })

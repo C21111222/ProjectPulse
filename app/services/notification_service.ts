@@ -4,7 +4,6 @@ import Team from '#models/team'
 import User from '#models/user'
 import Notification from '#models/notification'
 import logger from '@adonisjs/core/services/logger'
-import { log } from 'console'
 
 export enum NotificationType {
   MESSAGE = 'MESSAGE',
@@ -64,7 +63,7 @@ type MessageTypes =
   | NotificationTeamInviteResponse
 
 export class NotificationService {
-  public async sendNotification(channel: string, message: MessageTypes) {
+  public static async sendNotification(channel: string, message: MessageTypes) {
     logger.info('Sending notification to channel ' + channel)
     try {
       await transmit.broadcast(channel, { ...message })
@@ -73,7 +72,58 @@ export class NotificationService {
     }
   }
 
-  public async sendTeamNotification(teamid: number, message: MessageTypes) {
+  public static async getNotificationsForUser(userId: number): Promise<Notification[]> {
+    return Notification.query()
+      .where('invitee_id', userId)
+      .preload('inviter')
+      .preload('team')
+  }
+
+  public static async deleteNotificationForUser(notificationId: number, userId: number): Promise<boolean> {
+    const notification = await Notification.query()
+      .where('id', notificationId)
+      .where('invitee_id', userId)
+      .first()
+    if (!notification) {
+      return false
+    }
+    await notification.delete()
+    return true
+  }
+
+  public static async createTeamBannedNotification(
+    teamId: number,
+    inviterId: number,
+    inviteeId: number,
+    teamName: string,
+    teamImage: string,
+    inviterName: string,
+    inviterImage: string,
+    inviteeName: string,
+    inviteeImage: string
+  ): Promise<NotificationTeamInviteResponse> {
+    const notif = await Notification.create({
+      teamId: teamId,
+      inviterId: inviterId,
+      inviteeId: inviteeId,
+      type: NotificationType.TEAM_BANNED,
+    })
+    return {
+      notificationId: notif.id,
+      teamId: teamId,
+      teamName: teamName,
+      teamImage: teamImage,
+      inviterId: inviterId,
+      inviterName: inviterName,
+      inviterImage: inviterImage,
+      inviteeId: inviteeId,
+      inviteeName: inviteeName,
+      inviteeImage: inviteeImage,
+      type: NotificationType.TEAM_BANNED,
+    }
+  }
+
+  public static async sendTeamNotification(teamid: number, message: MessageTypes) {
     // on envoie la notification à chaque membre
     const team = await Team.find(teamid)
     if (!team) {
@@ -110,7 +160,7 @@ export class NotificationService {
     })
   }
 
-  async deleteNotification2(userId: number, notificationId: number) {
+  static async deleteNotification2(userId: number, notificationId: number) {
     const user = await User.find(userId)
     if (!user) {
       throw new Error('User not found')

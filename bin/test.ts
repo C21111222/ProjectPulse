@@ -58,10 +58,9 @@ new Ignitor(APP_ROOT, { importer: IMPORTER })
       plugins: [
         assert(),
         browserClient({
-          runInSuites: ['browser']
-        })
-      ]
-    
+          runInSuites: ['browser'],
+        }),
+      ],
     })
   })
   .run(() => run())
@@ -69,5 +68,3 @@ new Ignitor(APP_ROOT, { importer: IMPORTER })
     process.exitCode = 1
     prettyPrintError(error)
   })
-
-

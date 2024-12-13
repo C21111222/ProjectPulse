@@ -1,19 +1,30 @@
-// import type { HttpContext } from '@adonisjs/core/http'
-
-import User from '#models/user'
-import Notification from '#models/notification'
+import type { HttpContext } from '@adonisjs/core/http'
 import logger from '@adonisjs/core/services/logger'
+import UserService from '#services/user_service'
+import { NotificationService } from '#services/notification_service'
 
 export default class NotificationsController {
-  async getNotifications({ auth, response }) {
-    const user = await User.find(auth.user.id)
+  /**
+   * Retrieves notifications and unread messages for the authenticated user.
+   *
+   * @param {HttpContext} context - The HTTP context containing the authentication and response objects.
+   * @param {object} context.auth - The authentication object containing user information.
+   * @param {object} context.response - The response object used to send the HTTP response.
+   * @returns {Promise<void>} - A promise that resolves to void. The response object is used to send the result.
+   *
+   * @throws {Error} If the user is not authenticated, responds with a 401 status and an 'Unauthorized' message.
+   * @throws {Error} If the user is not found, responds with a 404 status and a 'User not found' message.
+   */
+  async getNotifications({ auth, response }: HttpContext) {
+    if (!auth.user) {
+      return response.status(401).json({ message: 'Unauthorized' })
+    }
+    const user = await UserService.getUserById(auth.user.id)
     if (!user) {
       return response.status(404).json({ message: 'User not found' })
     }
-    const notifications = await Notification.query()
-      .where('invitee_id', user.id)
-      .preload('inviter')
-      .preload('team')
+
+    const notifications = await NotificationService.getNotificationsForUser(user.id)
     const formattedNotifications = notifications.map((notification) => ({
       notificationId: notification.id,
       teamId: notification.team.id,
@@ -27,29 +38,37 @@ export default class NotificationsController {
       inviteeImage: user.imageUrl,
       type: notification.type,
     }))
-    // on recuoere maintenant les messafes non lus
-    const unreadMessages = await user.getUnreadMessages()
-    // on les ajoute aux notifications, sans les formatter
+
+    const unreadMessages = await UserService.getUnreadMessages(user)
     const result = { notifications: formattedNotifications, messages: unreadMessages }
 
     return response.status(200).json(result)
   }
 
-  async deleteNotification({ auth, params, response }) {
+  /**
+   * Deletes a notification for the authenticated user.
+   *
+   * @param {HttpContext} context - The HTTP context containing the authenticated user, request parameters, and response object.
+   * @returns {Promise<void>} - A promise that resolves to void.
+   *
+   * @throws {Error} - Throws an error if the user is not authenticated or if the user or notification is not found.
+   */
+  async deleteNotification({ auth, params, response }: HttpContext) {
     logger.info('Deleting notification')
-    const user = await User.find(auth.user.id)
+    if (!auth.user) {
+      return response.status(401).json({ message: 'Unauthorized' })
+    }
+    const user = await UserService.getUserById(auth.user.id)
     if (!user) {
       return response.status(404).json({ message: 'User not found' })
     }
-    const notification = await Notification.query()
-      .where('id', params.id)
-      .where('invitee_id', user.id)
-      .first()
-    if (!notification) {
+
+    const success = await NotificationService.deleteNotificationForUser(params.id, user.id)
+    if (!success) {
       return response.status(404).json({ message: 'Notification not found' })
     }
-    await notification.delete()
+
     logger.info('Notification deleted')
-    return response.ok(JSON.stringify({ message: 'Notification deleted' }))
+    return response.ok({ message: 'Notification deleted' })
   }
 }

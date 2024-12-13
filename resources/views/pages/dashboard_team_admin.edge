@@ -451,16 +451,16 @@
             taskElement.classList.add("task");
             taskElement.classList.add(task.status);
             taskElement.innerHTML = `
-                  <div class="content" onclick="openUpdateTaskModal(${task.id}, '${task.status}', '${task.priority}', '${task.start_date}', '${task.end_date}')">
-                    <span>Titre : ${task.title}</span>
-                    <span> Desc : ${task.description}</span>
-                    <span>${formatDate(task.start_date)} - ${formatDate(task.end_date)}</span>
-                    <span> Priorité : ${task.priority}</span>
-                    <span> Status : ${task.status}</span>
-                    ${task.users.map(user => `<img src="${user.image_url}" alt="Photo de ${user.full_name}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;" />`).join("")}
-                    <button class="delete-task-btn" onclick="deleteTask(${task.id})">✖</button>
-                  </div>
-                `;
+                              <div class="content" onclick="openUpdateTaskModal(${task.id}, '${task.status}', '${task.priority}', '${task.start_date}', '${task.end_date}')">
+                                <span>Titre : ${task.title}</span>
+                                <span> Desc : ${task.description}</span>
+                                <span>${formatDate(task.start_date)} - ${formatDate(task.end_date)}</span>
+                                <span> Priorité : ${task.priority}</span>
+                                <span> Status : ${task.status}</span>
+                                ${task.users.map(user => `<img src="${user.image_url}" alt="Photo de ${user.full_name}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;" />`).join("")}
+                                <button class="delete-task-btn" onclick="deleteTask(${task.id})">✖</button>
+                              </div>
+                            `;
             timeline.appendChild(taskElement);
           });
         }).catch(error => {
@@ -704,14 +704,14 @@
         const messageClass = message.senderId === {{ auth.user.id }} ? "sent" : "received";
         const formattedTime = new Date(message.createdAt).toLocaleTimeString("fr-FR");
         chatBox.innerHTML += `
-                  <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
-                    <img 
-                      src="${message.sender.imageUrl}" 
-                      alt="Photo de ${message.senderName}" 
-                      style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
-                    />
-                    <p class="message-content" style="margin: 0;"><strong>${message.senderId === {{ auth.user.id }} ? "Vous" : message.senderName}</strong>: ${message.content} <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span></p>
-                  </div>`;
+                              <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
+                                <img 
+                                  src="${message.sender.imageUrl}" 
+                                  alt="Photo de ${message.senderName}" 
+                                  style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
+                                />
+                                <p class="message-content" style="margin: 0;"><strong>${message.senderId === {{ auth.user.id }} ? "Vous" : message.senderName}</strong>: ${message.content} <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span></p>
+                              </div>`;
       });
       
       scrollToBottom();
@@ -749,14 +749,14 @@
         const messageClass = data.senderName === "{{ auth.user.fullName }}" ? "sent" : "received";
         const formattedTime = new Date(data.createdAt).toLocaleTimeString("fr-FR");
         chatBox.innerHTML += `
-                  <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
-                    <img 
-                      src="${data.senderImage}" 
-                      alt="Photo de ${data.senderName}" 
-                      style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
-                    />
-                    <p class="message-content" style="margin: 0;"><strong>${data.senderName === "{{ auth.user.fullName }}" ? "Vous" : data.senderName}</strong>: ${data.message} <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span></p>
-                  </div>`;
+                              <div class="message-container ${messageClass}" style="display: flex;  margin-bottom: 10px;">
+                                <img 
+                                  src="${data.senderImage}" 
+                                  alt="Photo de ${data.senderName}" 
+                                  style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; object-fit: cover;"
+                                />
+                                <p class="message-content" style="margin: 0;"><strong>${data.senderName === "{{ auth.user.fullName }}" ? "Vous" : data.senderName}</strong>: ${data.message} <span style="font-size: 0.8em; color: gray;">(${formattedTime})</span></p>
+                              </div>`;
         scrollToBottom();
       });
       // lorsqu'on quitte la page, on se désabonne des notifications

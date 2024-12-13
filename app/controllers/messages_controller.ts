@@ -1,4 +1,4 @@
-// import type { HttpContext } from '@adonisjs/core/http'
+import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import Message from '#models/message'
 import logger from '@adonisjs/core/services/logger'
@@ -11,7 +11,6 @@ import {
 import db from '@adonisjs/lucid/services/db'
 
 export default class MessageriesController {
-  private notificationService: NotificationService = new NotificationService()
   /**
    * Handles the index action for the messages controller.
    *
@@ -25,7 +24,7 @@ export default class MessageriesController {
    * This method retrieves all users and filters out the authenticated user and a global user with a specific ID (999999).
    * It then renders the chat page with the remaining users.
    */
-  async index({ auth, view }) {
+  async index({ auth, view }: HttpContext) {
     const users = await User.query().exec()
     const authUser = users.find((user) => user.id === auth.user.id)
     const globalUser = users.find((user) => user.id === 999999)
@@ -60,6 +59,18 @@ export default class MessageriesController {
     return view.render('pages/chat', { users: resultat })
   }
 
+  /**
+   * Handles the retrieval and display of a single chat between the authenticated user and a specified receiver.
+   * 
+   * @param {Object} ctx - The context object containing the request, authentication, and view.
+   * @param {Object} ctx.auth - The authentication object containing the authenticated user.
+   * @param {Object} ctx.request - The request object containing the input data.
+   * @param {Object} ctx.view - The view object used to render the response.
+   * 
+   * @returns {Promise<void>} - Renders the chat page with the messages between the authenticated user and the receiver.
+   * 
+   * @throws {Error} - Throws an error if the receiver is not found.
+   */
   async singleChat({ auth, request, view }) {
     const receiverId = request.input('receiver_id')
     const receiver = await User.find(receiverId)
@@ -79,7 +90,18 @@ export default class MessageriesController {
     logger.info(messages)
     return view.render('pages/personnalChat', { messages: messages, user: receiver.serialize() })
   }
-
+  /**
+   * Retrieves a list of users who have sent unviewed messages to the authenticated user.
+   * 
+   * @param {Object} context - The context object containing the authenticated user and response.
+   * @param {Object} context.auth - The authentication object containing the authenticated user.
+   * @param {Object} context.auth.user - The authenticated user object.h   
+   * @param {Object} context.response - The response object used to send back the HTTP response.
+   *
+   * @returns {Promise<void>} - A promise that resolves with the list of users who have sent unviewed messages.
+   * 
+    * @throws {Error} - Throws an error if there is an issue retrieving the users.
+    */
   async unviewedChats({ auth, response }) {
     const users = await User.query().exec()
     const authUser = users.find((user) => user.id === auth.user.id)
@@ -107,10 +129,20 @@ export default class MessageriesController {
         })
       }
     }
-    logger.info(resultat)
     return response.json(resultat)
   }
 
+  /**
+   * Marks all messages from a specific sender as viewed by the authenticated user.
+   *
+   * @param {Object} ctx - The context object containing auth, request, and response.
+   * @param {Object} ctx.auth - The authentication object containing the authenticated user.
+   * @param {Object} ctx.request - The request object containing the sender_id input.
+   * @param {Object} ctx.response - The response object used to send back the HTTP response.
+   * @returns {Promise<void>} - A promise that resolves to void.
+   *
+   * @throws {Error} - Throws an error if the sender is not found or if there is an issue updating the messages.
+   */
   async haveView({ auth, request, response }) {
     // on met tous les messages de la conversation en lu
     const sendId = request.input('sender_id')
@@ -131,6 +163,18 @@ export default class MessageriesController {
     return response.ok({ message: 'Messages lus' })
   }
 
+  /**
+   * Marks a message as viewed by the authenticated user.
+   * 
+   * @param {object} ctx - The context object containing auth, request, and response.
+   * @param {object} ctx.auth - The authentication object containing the authenticated user.
+   * @param {object} ctx.request - The request object containing the message ID.
+   * @param {object} ctx.response - The response object used to send the HTTP response.
+   * 
+   * @returns {Promise<void>} - A promise that resolves to void.
+   * 
+   * @throws {Error} - Throws an error if the message is not found, the user is not authorized to view the message, or there is an error while marking the message as viewed.
+   */
   async haveViewSingle({ auth, request, response }) {
     // on met un message en lu
     logger.info('haveViewSingle')
@@ -150,6 +194,7 @@ export default class MessageriesController {
     }
     return response.ok({ message: 'Message lu' })
   }
+
   /**
    * Retrieves the message history between the authenticated user and a specified receiver.
    *
@@ -192,6 +237,18 @@ export default class MessageriesController {
     return response.json(messages)
   }
 
+  /**
+   * Retrieves the history of messages for a specific team.
+   * 
+   * @param {Object} ctx - The context object containing auth, request, and response.
+   * @param {Object} ctx.auth - The authentication object containing user information.
+   * @param {Object} ctx.request - The request object containing input data.
+   * @param {Object} ctx.response - The response object used to send back the HTTP response.
+   * 
+   * @returns {Promise<void>} - A promise that resolves to void. Sends a JSON response with the messages or an error message.
+   * 
+   * @throws {Error} - Throws an error if the user is not found or not authorized to access the team.
+   */
   async getTeamHistory({ auth, request, response }) {
     const teamId = request.input('teamId')
     // on vérifie que l'utilisateur est bien dans l'équipe
@@ -215,6 +272,17 @@ export default class MessageriesController {
     return response.json(messages)
   }
 
+  /**
+   * Sends a message to a team.
+   *
+   * @param {object} ctx - The context object containing auth, request, and response.
+   * @param {object} ctx.auth - The authentication object containing user information.
+   * @param {object} ctx.request - The request object containing input data.
+   * @param {object} ctx.response - The response object for sending HTTP responses.
+   * @returns {Promise<object>} The response object with a success or error message.
+   *
+   * @throws {Error} If there is an error while saving the message or sending the notification.
+   */
   async sendTeamMessage({ auth, request, response }) {
     const teamId = request.input('teamId')
     const message = request.input('message')
@@ -245,7 +313,7 @@ export default class MessageriesController {
         messageId: newMessage.id,
         senderImage: auth.user.imageUrl,
       }
-      await this.notificationService.sendNotification(channel, chatMessage)
+      await NotificationService.sendNotification(channel, chatMessage)
     } catch (error) {
       return response.status(500).json({ message: "Erreur lors de l'envoi du message" })
     }
@@ -265,7 +333,7 @@ export default class MessageriesController {
    *
    * @throws {Error} - Throws an error if there is an issue saving the message or broadcasting it.
    */
-  async sendMessage({ auth, request, response, session }) {
+  async sendMessage({ auth, request, response }) {
     const receiverId = request.input('receiver_id')
     const message = request.input('content')
     logger.info('sendMessage')
@@ -287,7 +355,7 @@ export default class MessageriesController {
           messageId: newMessage.id,
           senderImage: auth.user.imageUrl,
         }
-        await this.notificationService.sendNotification(channel, chatMessage)
+        await NotificationService.sendNotification(channel, chatMessage)
         await newMessage.save()
       } catch (error) {
         logger.error(error)
@@ -318,7 +386,7 @@ export default class MessageriesController {
         messageId: newMessage.id,
         senderImage: auth.user.imageUrl,
       }
-      await this.notificationService.sendNotification(channelT, chatMessage)
+      await NotificationService.sendNotification(channelT, chatMessage)
       // on attend 0.5s pour être sûr que le message est bien enregistré puis on verifie si le message a été vu
       setTimeout(async () => {
         const message = await db.from('messages').where('id', newMessage.id).first()
@@ -335,7 +403,7 @@ export default class MessageriesController {
             senderImage: auth.user.imageUrl,
             type: NotificationType.MESSAGE,
           }
-          await this.notificationService.sendNotification(channelNotif, notificationMessage)
+          await NotificationService.sendNotification(channelNotif, notificationMessage)
         }
       }, 1000)
     } catch (error) {

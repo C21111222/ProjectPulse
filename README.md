@@ -2,7 +2,6 @@
 
 ## Running the project
 
-
 Requirements:
 
 - docker
@@ -27,7 +26,6 @@ npm install
 node ace migration:run
 ```
 
-
 - build the docker image
 
 ```
@@ -41,7 +39,7 @@ docker run -d --network=host --name projectpulse-container -v /path/to/uploaded/
 ```
 
 - the docker container for test:
-    
+
 ```
 docker run --rm -v /path/to/uploaded/files:/app/uploads -v /path/to/.env:/app/.env -v  /path/to/.env.test:/app/.env.test adonisjs-project node ace test
 ```
@@ -53,7 +51,3 @@ Note that this project is online at https://projectpulse.pautentia.fr
 ## Documentation
 
 The documentation is available at https://projectpulse.pautentia.fr/docs or in pdf format in the root of the project.
-
-
-
-

@@ -16,8 +16,9 @@ test.group('Dashboard', () => {
     await page.fill('input[name="password"]', 'secret')
     await page.click('button[type="submit"]')
     await page.assertPath('/dashboard')
-    await page.assertTextContains('body', 'Vous êtes connecté(e) avec succès. Profitez de votre espace personnel.')
-    })
-
-
+    await page.assertTextContains(
+      'body',
+      'Vous êtes connecté(e) avec succès. Profitez de votre espace personnel.'
+    )
+  })
 })

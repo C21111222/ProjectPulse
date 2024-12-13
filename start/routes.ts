@@ -24,7 +24,7 @@ const UsersController = () => import('#controllers/users_controller')
 const ImagesController = () => import('#controllers/images_controller')
 const TeamController = () => import('#controllers/teams_controller')
 const NotificationController = () => import('#controllers/notifications_controller')
-const TaskController = () => import('#controllers/tasks_controller')
+const TaskController = () => import('#controllers/task_controller')
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +51,7 @@ router.group(() => {
   router.on('/home').render('pages/homePage')
 })
 
-router.get('/docs' , async ({response}) => {
+router.get('/docs', async ({ response }) => {
   return response.download(app.makePath('ProjectPulse.pdf'))
 })
 
