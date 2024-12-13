@@ -51,3 +51,6 @@ Note that this project is online at https://projectpulse.pautentia.fr
 ## Documentation
 
 The documentation is available at https://projectpulse.pautentia.fr/docs or in pdf format in the root of the project.
+
+
+NOTE: The frontend is made very quickly and is not optimized at all; please disregard it. Additionally, the commit names follow strict rules for confidentiality, which explains their sometimes strange names.
