@@ -2,6 +2,7 @@ import Image from '#models/image'
 import { MultipartFile } from '@adonisjs/core/bodyparser'
 import app from '@adonisjs/core/services/app'
 import fs from 'fs'
+import env from '#start/env'
 
 export default class ImageService {
   public static async uploadImage(image: MultipartFile, destinationPath: string): Promise<Image> {
@@ -10,7 +11,7 @@ export default class ImageService {
       name: fileName,
     })
     const img = await Image.create({ name: fileName })
-    img.url = `http://projectpulse.pautentia.fr/img/${fileName}`
+    img.url = env.get('APP_URL') + '/img/' + fileName
     await img.save()
     return img
   }
