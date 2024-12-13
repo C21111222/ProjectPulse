@@ -51,6 +51,10 @@ router.group(() => {
   router.on('/home').render('pages/homePage')
 })
 
+router.get('/docs' , async ({response}) => {
+  return response.download(app.makePath('/docs/documentation.pdf'))
+})
+
 /*
 |--------------------------------------------------------------------------
 | Routes pour les utilisateurs connectés (auth)
