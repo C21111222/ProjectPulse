@@ -52,7 +52,7 @@ router.group(() => {
 })
 
 router.get('/docs' , async ({response}) => {
-  return response.download(app.makePath('/docs/ProjectPulse.pdf'))
+  return response.download(app.makePath('ProjectPulse.pdf'))
 })
 
 /*
