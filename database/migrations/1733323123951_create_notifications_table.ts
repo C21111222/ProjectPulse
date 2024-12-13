@@ -12,7 +12,7 @@ export default class extends BaseSchema {
         'TEAM_INVITE_DECLINED',
         'TEAM_BANNED',
       ])
-      table.integer('team_id').unsigned().references('id').inTable('teams')
+      table.integer('team_id').unsigned().references('id').inTable('teams').onDelete('CASCADE')
       table.integer('inviter_id').unsigned().references('id').inTable('users')
       table.integer('invitee_id').unsigned().references('id').inTable('users')
       table.timestamp('created_at')
