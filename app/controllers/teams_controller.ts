@@ -372,6 +372,54 @@ export default class TeamsController {
       return response.status(500).json({ message: "Impossible de refuser l'invitation" })
     }
   }
+  /**
+   * Demotes a user from their current role in a team to a member role.
+   * 
+   * @param {HttpContext} context - The HTTP context containing auth, request, and response objects.
+   * @returns {Promise<void>} - A promise that resolves to void.
+   * @throws {Error} - Throws an error if the user is not authenticated, not authorized, or if there is an issue with the addition process.
+   *
+   * @example
+   * // Example request payload
+   * {
+   * "teamId": "123",
+   * "userId": "456"
+   * }
+   */
+  async demoteUser({ auth, request, response }: HttpContext) {
+    logger.info('Demoting user')
+    if (!auth.user) {
+      return response
+        .status(401)
+        .json({ message: 'Vous devez être connecté pour accéder à cette page' })
+    }
+
+    const { teamId, userId } = request.only(['teamId', 'userId'])
+    const user = await User.findOrFail(auth.user.id)
+    if (!(await TeamService.isUserAdminOfTeam(user.id, teamId))) {
+      return response
+        .status(403)
+        .json({ message: "Vous n'avez pas les droits pour effectuer cette action" })
+    }
+
+    const userRole = await TeamService.getUserRoleInTeam(userId, teamId)
+    if (!userRole) {
+      return response.status(404).json({ message: 'Utilisateur non trouvé' })
+    }
+    if (userRole === 'admin') {
+      return response
+        .status(403)
+        .json({ message: "Vous ne pouvez pas rétrograder un administrateur de l'équipe" })
+    }
+
+    try {
+      await TeamService.promoteUserInTeam(userId, teamId, 'member')
+      return response.json({ message: 'Utilisateur rétrogradé' })
+    } catch (error) {
+      logger.error('Error demoting user %s', error)
+      return response.status(500).json({ message: "Impossible de rétrograder l'utilisateur" })
+    }
+  }
 
   /**
    * Adds a user to a team.
