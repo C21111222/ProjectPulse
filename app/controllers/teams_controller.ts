@@ -55,6 +55,8 @@ export default class TeamsController {
       teamId,
       members.map((u) => u.user_id)
     )
+    logger.info('members')
+    logger.info(members)
 
     const viewPage =
       role === 'admin' || role === 'manager'
@@ -472,7 +474,7 @@ export default class TeamsController {
     }
 
     const { teamId, userId } = request.only(['teamId', 'userId'])
-
+    logger.info('Promoting user %s to team %s', userId, teamId)
     const user = await User.findOrFail(auth.user.id)
     if (!(await TeamService.isUserAdminOfTeam(user.id, teamId))) {
       return response
@@ -481,6 +483,7 @@ export default class TeamsController {
     }
 
     const userRole = await TeamService.getUserRoleInTeam(userId, teamId)
+    logger.info('User role %s', userRole)
     if (!userRole) {
       return response.status(404).json({ message: 'Utilisateur non trouvé' })
     }

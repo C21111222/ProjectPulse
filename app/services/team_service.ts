@@ -2,6 +2,7 @@ import Team from '#models/team'
 import User from '#models/user'
 import db from '@adonisjs/lucid/services/db'
 import { NotificationType } from '#services/notification_service'
+import logger from '@adonisjs/core/services/logger'
 
 type Role = 'admin' | 'manager' | 'member'
 
@@ -60,7 +61,9 @@ export default class TeamService {
     return db.from('user_teams').join('users', 'users.id', 'user_teams.user_id').where('team_id', teamId).select('user_id', 'full_name', 'role')
   }
 
-  public static async getUserRoleInTeam(teamId: number, userId: number): Promise<string | null> {
+  
+  public static async getUserRoleInTeam(userId: number,teamId: number): Promise<string | null> {
+
     const role = await db
       .from('user_teams')
       .where('team_id', teamId)
