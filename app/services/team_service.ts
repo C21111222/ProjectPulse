@@ -57,7 +57,7 @@ export default class TeamService {
   }
 
   public static async getTeamMembers(teamId: number): Promise<{ user_id: number; role: string }[]> {
-    return db.from('user_teams').where('team_id', teamId).select('user_id', 'role')
+    return db.from('user_teams').join('users', 'users.id', 'user_teams.user_id').where('team_id', teamId).select('user_id', 'full_name', 'role')
   }
 
   public static async getUserRoleInTeam(teamId: number, userId: number): Promise<string | null> {
