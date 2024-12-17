@@ -45,7 +45,7 @@ export default class TeamsController {
       return response.status(404).json({ message: 'Equipe non trouvée' })
     }
 
-    const role = await TeamService.getUserRoleInTeam(teamId, user.id)
+    const role = await TeamService.getUserRoleInTeam(user.id, teamId)
     if (!role) {
       return response.status(403).json({ message: 'Accès interdit à cette équipe' })
     }
